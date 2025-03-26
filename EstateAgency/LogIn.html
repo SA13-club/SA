@@ -94,15 +94,31 @@
     </div><!-- End Page Title -->
 
     <!-- Starter Section Section -->
-    <section id="starter-section" class="starter-section section">
+    <section id="starter-section" class="starter-section section contact">
 
       <!-- Section Title -->
       <div class="container section-title" data-aos="fade-up">
         <h2>登入</h2>
-        <p>還不是會員嗎？<a href="SignIn.php">立即註冊</a></p>
+        <p>還不是會員嗎？<a href="SignIn.php" data-bs-toggle="modal" data-bs-target="#SignInPermission">立即註冊</a></p>
+
+        <!-- Modal -->
+        <div class="modal fade" id="SignInPermission" tabindex="-1" aria-labelledby="SignInPermissionLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h1 style="color: #1b1b1b;" class="modal-title fs-5" id="SignInPermissionLabel">請問您的身分是？</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                  <a href="BusinessSignIn.html" class="btn-permission">企業</a>
+                  <a href="OgnizationSignIn.html" class="btn-permission">組織團體</a>
+                  <a href="PersonalSignIn.html" class="btn-permission">個人</a>
+              </div>
+            </div>
+          </div>
+        </div>
       </div><!-- End Section Title -->
 
-      <section id="contact" class="contact section">
         <div class="container" data-aos="fade-up" data-aos-delay="100">
             <div class="col-lg-12">
               <form action="forms/contact.php" method="post" class="php-email-form" data-aos="fade-up" data-aos-delay="200">
@@ -136,8 +152,6 @@
           </div>
   
         </div>
-  
-      </section><!-- /Contact Section -->
     </section>
 
   </main>

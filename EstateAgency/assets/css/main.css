@@ -752,6 +752,74 @@ section,
   background: color-mix(in srgb, var(--accent-color), transparent 20%);
 }
 
+.hero .btn-LogIn {
+  color: var(--contrast-color);
+  font-family: var(--heading-font);
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  display: inline-block;
+  padding: 10px 40px;
+  border-radius: 50px;
+  transition: 0.5s;
+  margin: 10px 0;
+  align-self: flex-start;
+  flex-shrink: 0;
+  border: 2px solid var(--accent-color);
+}
+
+.hero .btn-LogIn:hover {
+  background: color-mix(in srgb, var(--accent-color), transparent 20%);
+}
+
+.hero .btn-SignIn {
+  color: var(--contrast-color);
+  background-color: var(--accent-color);
+  font-family: var(--heading-font);
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  display: inline-block;
+  padding: 10px 40px;
+  border-radius: 50px;
+  transition: 0.5s;
+  margin: 10px 0;
+  align-self: flex-start;
+  flex-shrink: 0;
+  border: 2px solid var(--accent-color);
+}
+
+.hero .btn-SignIn:hover {
+  color: var(--accent-color);
+  background: color-mix(in srgb, var(--contrast-color), transparent 0%);
+}
+
+.btn-permission {
+  color: var(--accent-color);
+  background-color: #ffffff;
+  font-family: var(--heading-font);
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  display: inline-block;
+  padding: 10px 40px;
+  border-radius: 10px;
+  transition: 0.5s;
+  margin: 10px 0;
+  align-self: flex-start;
+  flex-shrink: 0;
+  border: 2px solid var(--accent-color);
+}
+
+.btn-permission:hover {
+  color: #ffffff;
+  background: color-mix(in srgb, var(--accent-color), transparent 20%);
+}
+
+
 .hero .carousel-control-prev,
 .hero .carousel-control-next {
   width: 10%;
