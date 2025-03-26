@@ -1451,13 +1451,14 @@ section,
 
 .real-estate .card .card-body .sale-rent {
   display: inline-block;
-  font-size: 15px;
+  font-size: 20px;
   font-weight: 500;
   color: var(--contrast-color);
   padding: 4px 20px;
   border: 2px solid var(--accent-color);
   border-radius: 50px;
   margin-bottom: 10px;
+  background-color: rgb(2, 2, 2);
 }
 
 .real-estate .card .card-body h3 {
@@ -1475,7 +1476,7 @@ section,
 .real-estate .card .card-body .card-content {
   background-color: var(--accent-color);
   color: var(--contrast-color);
-  height: 80px;
+  height: 200px;
   visibility: hidden;
   opacity: 0;
   margin-top: 10px;
@@ -1491,7 +1492,7 @@ section,
 }
 
 .real-estate .card:hover .card-content {
-  margin-bottom: -30px;
+  margin-bottom: -60px;
   visibility: visible;
   opacity: 1;
 }
@@ -1520,7 +1521,7 @@ section,
   font-size: 24px;
   border-radius: 50%;
   width: 48px;
-  height: 48px;
+  height: 200px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1713,6 +1714,15 @@ section,
   line-height: 0;
   margin-right: 8px;
   color: var(--accent-color);
+}
+
+.brief {
+  margin-left: 30px;
+  margin-top: 15px;
+}
+
+.propery-info {
+  margin-bottom: 5px;
 }
 
 /*--------------------------------------------------------------
