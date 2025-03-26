@@ -335,7 +335,6 @@
 
     </footer>
     <script>
-        // 單選類型邏輯
         document.querySelectorAll('.radio-button').forEach(button => {
             button.addEventListener('click', function () {
                 document.querySelectorAll('.radio-button').forEach(btn =>
@@ -345,14 +344,12 @@
             });
         });
 
-        // 標籤選擇邏輯
         document.querySelectorAll('.tag').forEach(tag => {
             tag.addEventListener('click', function () {
                 this.classList.toggle('selected');
             });
         });
 
-        // 表單提交邏輯
         document.getElementById('requirementForm').addEventListener('submit', function (e) {
             e.preventDefault();
 
