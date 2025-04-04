@@ -12,7 +12,7 @@
   <?php
   $servername = "localhost";
   $username = "root";
-  $password = "12345678";
+  $password = "";
   $dbname = "sa";
 
   $conn = new mysqli($servername, $username, $password, $dbname);
@@ -31,9 +31,10 @@
 
   $u_email = $_POST['u_email'];
   $u_password = $_POST['u_password'];
+  $u_permission = $_POST['u_permission'];
   $u_content = $_POST['u_content'];
-  $sql = "INSERT INTO corporation_account (c_name, c_type, c_industry, c_address, c_email, c_phone, e_name, e_type, e_email, e_phone, u_email, u_password, u_content)
-  VALUES ('$c_name', '$c_type', '$c_industry', '$c_address', '$c_email', '$c_phone', '$e_name', '$e_type', '$e_email', '$e_phone', '$u_email', '$u_password', '$u_content')";
+  $sql = "INSERT INTO corporation_account (c_name, c_type, c_industry, c_address, c_email, c_phone, e_name, e_type, e_email, e_phone, u_email, u_password, u_permission, u_content)
+  VALUES ('$c_name', '$c_type', '$c_industry', '$c_address', '$c_email', '$c_phone', '$e_name', '$e_type', '$e_email', '$e_phone', '$u_email', '$u_password','$u_permission', '$u_content')";
   if (mysqli_query($conn, $sql)) {
     echo "<h1 align='center'>新增完成</h1>";
   }
