@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="refresh" content="3; url=index.html">
+  <title>Document</title>
+</head>
+
+<body>
+  <?php
+  $servername = "localhost";
+  $username = "root";
+  $password = "12345678";
+  $dbname = "sa";
+
+  $conn = new mysqli($servername, $username, $password, $dbname);
+
+  $o_name = $_POST['o_name'];
+  $o_type = $_POST['o_type'];
+  $s_name = $_POST['s_name'];
+  $s_type = $_POST['s_type'];
+  $s_email = $_POST['s_email'];
+  $s_phone = $_POST['s_phone'];
+
+  $u_email = $_POST['u_email'];
+  $u_password = $_POST['u_password'];
+  $u_permission = $_POST['u_permission'];
+  $u_content = $_POST['u_content'];
+  $sql = "INSERT INTO organization_registrations (o_name, o_type, s_name, s_type, s_email, s_phone, u_email, u_password, u_permission, u_content)
+  VALUES ('$o_name', '$o_type', '$s_name', '$s_type', '$s_email', '$s_phone', '$u_email', '$u_password', '$u_permission', '$u_content')";
+  if (mysqli_query($conn, $sql)) {
+    echo "<h1 align='center'>新增完成</h1>";
+  }
+  ?>
+</body>
+
+</html>
