@@ -87,7 +87,7 @@
         <div class="container" style="padding: 85px 0 0 0;">
           <ol>
             <li><a href="index.html">首頁</a></li>
-            <li class="current">登入</li>
+            <li class="current">企業註冊</li>
           </ol>
         </div>
       </nav>
@@ -130,40 +130,49 @@
                 <input type="tel" class="form-control" name="c_phone" placeholder="公司電話" required="">
               </div>
 
-              <p>二、負責人與聯絡資訊</p>
+                  <p>二、負責人與聯絡資訊</p>
+                  
+                  <div class="col-md-6">
+                    <input type="text" class="form-control" name="e_name" placeholder="主要聯絡人姓名" required="">
+                  </div>
+                  <div class="col-md-6">
+                    <input type="text" class="form-control" name="e_type" placeholder="職稱" required="">
+                  </div>
+                  <div class="col-md-6">
+                    <input type="email" class="form-control" name="e_email" placeholder="聯絡人Email" required="">
+                  </div>
+                  <div class="col-md-6">
+                    <input type="tel" class="form-control" name="e_phone" placeholder="聯絡人手機號碼" required="">
+                  </div>
+                  
+                  <p>三、平台會員註冊</p>
+                  <div class="col-md-6">
+                    <input type="email" class="form-control" name="u_email" placeholder="Email" required="">
+                  </div>
+                  <div class="col-md-6">
+                    <input type="password" class="form-control" name="u_password" placeholder="密碼" required="">
+                  </div>
+                  <div class="col-md-12">
+                    <textarea class="form-control" name="u_content" rows="3" placeholder="公司簡介" required=""></textarea>
+                  </div>
 
-              <div class="col-md-6">
-                <input type="text" class="form-control" name="e_name" placeholder="主要聯絡人姓名" required="">
-              </div>
-              <div class="col-md-6">
-                <input type="text" class="form-control" name="e_type" placeholder="職稱" required="">
-              </div>
-              <div class="col-md-6">
-                <input type="email" class="form-control" name="e_email" placeholder="聯絡人Email" required="">
-              </div>
-              <div class="col-md-6">
-                <input type="tel" class="form-control" name="e_phone" placeholder="聯絡人手機號碼" required="">
-              </div>
-
-              <p>三、平台會員註冊</p>
-              <div class="col-md-6">
-                <input type="email" class="form-control" name="u_email" placeholder="Email" required="">
-              </div>
-              <div class="col-md-6">
-                <input type="password" class="form-control" name="u_password" placeholder="密碼" required="">
-              </div>
-              <div class="col-md-12">
-                <textarea class="form-control" name="u_content" rows="3" placeholder="公司簡介" required=""></textarea>
-              </div>
-              <div class="col-md-12 text-center">
-                <button type="submit">註冊</button>
-              </div>
-
-            </div>
-          </form>
+                  <div class="col-12">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="invalidCheck">
+                      <label class="form-check-label" for="exampleCheck1">
+                        <a href="#">同意政策相關條款</a>
+                      </label>
+                    </div>
+                  </div>
+                  <div class="col-md-12 text-center">
+                    <button type="submit">註冊</button>
+                  </div>
+  
+                </div>
+              </form>
+          </div>
+  
         </div>
-
-      </div>
 
     </section>
 
@@ -251,3 +260,35 @@
 </body>
 
 </html>
+
+
+<?php
+$servername = "localhost";
+$username = "root";
+$password = "12345678";
+$dbname = "SA";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+if ($_SERVER["REQUEST_METHOD"]=="POST") {
+ 
+  $c_name=$_POST['c_name'];
+  $c_type=$_POST['c_type'];
+  $c_industry=$_POST['c_industry'];
+  $c_address =$_POST['c_address'];
+  $c_email =$_POST['c_email'];
+  $c_phone=$_POST['c_phone'];
+
+  $e_name=$_POST['e_name'];
+  $e_type=$_POST['e_type'];
+  $e_email=$_POST['e_email'];
+  $e_phone=$_POST['e_phone'];
+
+  $u_email=$_POST['u_email'];
+  $u_password=$_POST['u_password'];
+  $u_content=$_POST['u_content'];
+}
+$sql = "INSERT INTO corporation_account (c_name, c_type, c_industry, c_address, c_email, c_phone, e_name, e_type, e_email, e_phone, u_email, u_password, u_content)
+  VALUES ('$c_name', '$c_type', '$c_industry', '$c_address', '$c_email', '$c_phone', '$e_name', '$e_type', '$e_email', '$e_phone', '$u_email', '$u_password', '$u_content')";
+$conn->close()
+?>

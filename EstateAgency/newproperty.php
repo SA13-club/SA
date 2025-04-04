@@ -215,51 +215,52 @@
                 <div class="form-group">
                     <label class="form-label">需求類型 <span class="required">*</span></label>
                     <div class="radio-group">
-                        <div class="radio-button" data-type="sponsorship">贊助</div>
-                        <div class="radio-button" data-type="collaboration">合作</div>
-                        <div class="radio-button" data-type="recruitment">招募</div>
-                        <div class="radio-button" data-type="internship">實習</div>
+                        <label><input type="radio" name="demand_type" value="sponser" required> 贊助</label>
+                        <label><input type="radio" name="demand_type" value="co"> 合作</label>
+                        <label><input type="radio" name="demand_type" value="recruit"> 招募</label>
+                        <label><input type="radio" name="demand_type" value="inter"> 實習</label>
                     </div>
+                    
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">需求標題 <span class="required">*</span></label>
-                    <input type="text" class="form-control" placeholder="請輸入需求簡要說明" required>
+                    <input type="text" class="form-control" name="require"   placeholder="請輸入需求簡要說明" required>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">需求詳細描述 <span class="required">*</span></label>
-                    <textarea class="form-control" rows="5" placeholder="詳細說明您的需求、期望和背景" required></textarea>
+                    <textarea class="form-control" rows="5" name="description" placeholder="詳細說明您的需求、期望和背景" required></textarea>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">選擇標籤</label>
                     <div class="tag-group">
-                        <div class="tag">技術開發</div>
-                        <div class="tag">活動策劃</div>
-                        <div class="tag">社群行銷</div>
-                        <div class="tag">產學合作</div>
-                        <div class="tag">資源募集</div>
-                        <div class="tag">專案管理</div>
+                        <div class="tech">技術開發</div>
+                        <div class="event">活動策劃</div>
+                        <div class="promo">社群行銷</div>
+                        <div class="copo">產學合作</div>
+                        <div class="resou">資源募集</div>
+                        <div class="file">專案管理</div>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">預期目標</label>
-                    <textarea class="form-control" rows="3" placeholder="請描述您希望通過此需求達成的具體目標"></textarea>
+                    <textarea class="form-control" rows="3" name="target" placeholder="請描述您希望通過此需求達成的具體目標"></textarea>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">聯繫方式 <span class="required">*</span></label>
                     <div class="radio-group" style="margin-bottom: 1rem;">
-                        <input type="text" class="form-control" placeholder="姓名" required>
-                        <input type="email" class="form-control" placeholder="電子郵件" required>
+                        <input type="text" class="form-control" name="name" placeholder="姓名" required>
+                        <input type="email" class="form-control" name="email" placeholder="電子郵件" required>
                     </div>
-                    <input type="tel" class="form-control" placeholder="聯絡電話">
+                    <input type="tel" class="form-control" name="phone" placeholder="聯絡電話">
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">需求截止日期</label>
+                    <label class="form-label" name="date">需求截止日期</label>
                     <input type="date" class="form-control">
                 </div>
 
