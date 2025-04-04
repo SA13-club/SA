@@ -146,11 +146,14 @@
                   </div>
                   
                   <p>三、平台會員註冊</p>
-                  <div class="col-md-6">
+                  <div class="col-md-5">
                     <input type="email" class="form-control" name="u_email" placeholder="Email" required="">
                   </div>
-                  <div class="col-md-6">
+                  <div class="col-md-5">
                     <input type="password" class="form-control" name="u_password" placeholder="密碼" required="">
+                  </div>
+                  <div class="col-md-2">
+                    <input type="text" class="form-control" name="u_permission" placeholder="企業" value="企業" disabled>
                   </div>
                   <div class="col-md-12">
                     <textarea class="form-control" name="u_content" rows="3" placeholder="公司簡介" required=""></textarea>
