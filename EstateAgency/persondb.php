@@ -26,6 +26,9 @@
   if (mysqli_query($conn, $sql)) {
     echo "<h1 align='center'>新增完成</h1>";
   }
+  $sql2="INSERT INTO user_account (u_email, u_password, u_permission) VALUES('$u_email', '$u_password', '$u_permission')";
+  mysqli_query($conn, $sql2);
+
   ?>
 </body>
 
