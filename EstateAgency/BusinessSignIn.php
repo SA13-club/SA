@@ -101,80 +101,71 @@
         <h2>企業註冊</h2>
         <p>歡迎各大企業加入此合作招募平台！</p>
       </div><!-- End Section Title -->
-        <div class="container" data-aos="fade-up" data-aos-delay="100">
-            <div class="col-lg-12">
-              <form action="" method="post" class="php-email-form" data-aos="fade-up" data-aos-delay="200">
-                <div class="row gy-4">
-                  <p>一、基本公司資訊</p>
-                  <div class="col-md-6">
-                    <input type="text" class="form-control" name="c_name" placeholder="公司名稱" required="">
-                  </div>
-                  <div class="col-md-3">
-                    <input type="text" class="form-control" name="c_type" placeholder="公司類型" required="">
-                  </div>
-                  <div class="col-md-3">
-                    <select class="form-select" id="validationCustom04" name="c_industry" required>
-                      <option selected disabled value="_">請選擇產業類別</option>
-                      <option value="大眾傳播相關業">大眾傳播相關業</option>
-                      <option value="旅遊／休閒／運動業">旅遊／休閒／運動業</option>
-                      <option value="住宿／餐飲服務業">住宿／餐飲服務業</option>
-                    </select>
-                  </div>
-                  <div class="col-md-5">
-                    <input type="text" class="form-control" name="c_address" placeholder="公司地址" required="">
-                  </div>
-                  <div class="col-md-4">
-                    <input type="email" class="form-control" name="c_email" placeholder="公司Email" required="">
-                  </div>
-                  <div class="col-md-3">
-                    <input type="tel" class="form-control" name="c_phone" placeholder="公司電話" required="">
-                  </div>
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+        <div class="col-lg-12">
+          <form action="businessdb.php" method="post" class="php-email-form" data-aos="fade-up" data-aos-delay="200">
+            <div class="row gy-4">
+              <p>一、基本公司資訊</p>
+              <div class="col-md-6">
+                <input type="text" class="form-control" name="c_name" placeholder="公司名稱" required="">
+              </div>
+              <div class="col-md-3">
+                <input type="text" class="form-control" name="c_type" placeholder="公司類型" required="">
+              </div>
+              <div class="col-md-3">
+                <select class="form-select" id="validationCustom04" name="c_industry" required>
+                  <option selected disabled value="_">請選擇產業類別</option>
+                  <option value="大眾傳播相關業">大眾傳播相關業</option>
+                  <option value="旅遊／休閒／運動業">旅遊／休閒／運動業</option>
+                  <option value="住宿／餐飲服務業">住宿／餐飲服務業</option>
+                </select>
+              </div>
+              <div class="col-md-5">
+                <input type="text" class="form-control" name="c_address" placeholder="公司地址" required="">
+              </div>
+              <div class="col-md-4">
+                <input type="email" class="form-control" name="c_email" placeholder="公司Email" required="">
+              </div>
+              <div class="col-md-3">
+                <input type="tel" class="form-control" name="c_phone" placeholder="公司電話" required="">
+              </div>
 
-                  <p>二、負責人與聯絡資訊</p>
-                  
-                  <div class="col-md-6">
-                    <input type="text" class="form-control" name="e_name" placeholder="主要聯絡人姓名" required="">
-                  </div>
-                  <div class="col-md-6">
-                    <input type="text" class="form-control" name="e_type" placeholder="職稱" required="">
-                  </div>
-                  <div class="col-md-6">
-                    <input type="email" class="form-control" name="e_email" placeholder="聯絡人Email" required="">
-                  </div>
-                  <div class="col-md-6">
-                    <input type="tel" class="form-control" name="e_phone" placeholder="聯絡人手機號碼" required="">
-                  </div>
-                  
-                  <p>三、平台會員註冊</p>
-                  <div class="col-md-6">
-                    <input type="email" class="form-control" name="u_email" placeholder="Email" required="">
-                  </div>
-                  <div class="col-md-6">
-                    <input type="password" class="form-control" name="u_password" placeholder="密碼" required="">
-                  </div>
-                  <div class="col-md-12">
-                    <textarea class="form-control" name="u_content" rows="3" placeholder="公司簡介" required=""></textarea>
-                  </div>
+              <p>二、負責人與聯絡資訊</p>
 
-                  <div class="col-12">
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="invalidCheck">
-                      <label class="form-check-label" for="exampleCheck1">
-                        <a href="#">同意政策相關條款</a>
-                      </label>
-                    </div>
-                  </div>
-                  <div class="col-md-12 text-center">
-                    <button type="submit">註冊</button>
-                  </div>
-  
-                </div>
-              </form>
-          </div>
-  
+              <div class="col-md-6">
+                <input type="text" class="form-control" name="e_name" placeholder="主要聯絡人姓名" required="">
+              </div>
+              <div class="col-md-6">
+                <input type="text" class="form-control" name="e_type" placeholder="職稱" required="">
+              </div>
+              <div class="col-md-6">
+                <input type="email" class="form-control" name="e_email" placeholder="聯絡人Email" required="">
+              </div>
+              <div class="col-md-6">
+                <input type="tel" class="form-control" name="e_phone" placeholder="聯絡人手機號碼" required="">
+              </div>
+
+              <p>三、平台會員註冊</p>
+              <div class="col-md-6">
+                <input type="email" class="form-control" name="u_email" placeholder="Email" required="">
+              </div>
+              <div class="col-md-6">
+                <input type="password" class="form-control" name="u_password" placeholder="密碼" required="">
+              </div>
+              <div class="col-md-12">
+                <textarea class="form-control" name="u_content" rows="3" placeholder="公司簡介" required=""></textarea>
+              </div>
+              <div class="col-md-12 text-center">
+                <button type="submit">註冊</button>
+              </div>
+
+            </div>
+          </form>
         </div>
 
-    </section><!-- /Starter Section Section -->
+      </div>
+
+    </section>
 
   </main>
 
@@ -249,7 +240,7 @@
 
   <!-- Vendor JS Files -->
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="assets/vendor/php-email-form/validate.js"></script>
+  <!-- <script src="assets/vendor/php-email-form/validate.js"></script> -->
   <script src="assets/vendor/aos/aos.js"></script>
   <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
   <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
@@ -260,35 +251,3 @@
 </body>
 
 </html>
-
-
-<?php
-$servername = "localhost";
-$username = "root";
-$password = "12345678";
-$dbname = "SA";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($_SERVER["REQUEST_METHOD"]=="POST") {
- 
-  $c_name=$_POST['c_name'];
-  $c_type=$_POST['c_type'];
-  $c_industry=$_POST['c_industry'];
-  $c_address =$_POST['c_address'];
-  $c_email =$_POST['c_email'];
-  $c_phone=$_POST['c_phone'];
-
-  $e_name=$_POST['e_name'];
-  $e_type=$_POST['e_type'];
-  $e_email=$_POST['e_email'];
-  $e_phone=$_POST['e_phone'];
-
-  $u_email=$_POST['u_email'];
-  $u_password=$_POST['u_password'];
-  $u_content=$_POST['u_content'];
-}
-$sql = "INSERT INTO corporation_account (c_name, c_type, c_industry, c_address, c_email, c_phone, e_name, e_type, e_email, e_phone, u_email, u_password, u_content)
-  VALUES ('$c_name', '$c_type', '$c_industry', '$c_address', '$c_email', '$c_phone', '$e_name', '$e_type', '$e_email', '$e_phone', '$u_email', '$u_password', '$u_content')";
-$conn->close()
-?>
