@@ -266,7 +266,7 @@
 $servername = "localhost";
 $username = "root";
 $password = "12345678";
-$dbname = "SA";
+$dbname = "sa";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -290,5 +290,7 @@ if ($_SERVER["REQUEST_METHOD"]=="POST") {
 }
 $sql = "INSERT INTO corporation_account (c_name, c_type, c_industry, c_address, c_email, c_phone, e_name, e_type, e_email, e_phone, u_email, u_password, u_content)
   VALUES ('$c_name', '$c_type', '$c_industry', '$c_address', '$c_email', '$c_phone', '$e_name', '$e_type', '$e_email', '$e_phone', '$u_email', '$u_password', '$u_content')";
+
+
 $conn->close()
 ?>
