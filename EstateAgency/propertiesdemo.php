@@ -37,46 +37,47 @@
   * License: https://bootstrapmade.com/license/
   ======================================================== -->
   <style>
-  .dcard-post {
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  padding: 15px 20px;
-  margin-bottom: 20px;
-  background-color: #fff;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  transition: 0.3s;
-}
-.dcard-post:hover {
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
+    .dcard-post {
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 15px 20px;
+      margin-bottom: 20px;
+      background-color: #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      transition: 0.3s;
+    }
 
-.dcard-header {
-  display: flex;
-  gap: 10px;
-  font-weight: bold;
-  font-size: 1.1rem;
-  margin-bottom: 10px;
-  color: #222;
-}
+    .dcard-post:hover {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
 
-.dcard-tag {
-  color:rgb(18, 226, 36);
-}
+    .dcard-header {
+      display: flex;
+      gap: 10px;
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+      color: #222;
+    }
 
-.dcard-body {
-  font-size: 0.95rem;
-  color: #444;
-  margin-bottom: 10px;
-}
+    .dcard-tag {
+      color: rgb(18, 226, 36);
+    }
 
-.dcard-footer {
-  font-size: 0.85rem;
-  color: #666;
-  display: flex;
-  gap: 15px;
-  flex-wrap: wrap;
-}
-</style>
+    .dcard-body {
+      font-size: 0.95rem;
+      color: #444;
+      margin-bottom: 10px;
+    }
+
+    .dcard-footer {
+      font-size: 0.85rem;
+      color: #666;
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+  </style>
 </head>
 
 <body class="properties-page">
@@ -92,10 +93,10 @@
 
       <nav id="navmenu" class="navmenu">
         <ul>
-          <li><a href="index.html" class="active">主頁</a></li>
+          <li><a href="index.html" >主頁</a></li>
           <li><a href="about.html">關於</a></li>
           <li><a href="services.html">服務</a></li>
-          <li><a href="properties.html">最新專案</a></li>
+          <li><a href="properties.html"class="active">最新專案</a></li>
           <li><a href="agents.html">合作單位</a></li>
           <li><a href="contact.html">聯絡我們</a></li>
         </ul>
@@ -133,44 +134,45 @@
     <section id="real-estate" class="real-estate section">
 
       <<div class='container'>
-    <div class='row mb-4'>
-        <div class='col-12 text-end'>
+        <div class='row mb-4'>
+          <div class='col-12 text-end'>
             <a href='newproperty.html' class='btn btn-primary'>
-                <i class='bi bi-plus-circle me-2'></i>New Property
+              <i class='bi bi-plus-circle me-2'></i>New Property
             </a>
+          </div>
         </div>
-    </div>
-    <div class='row gy-4'>
+        <div class='row gy-4'>
 
-    <div class="container">
-  <?php
-    $link = mysqli_connect('localhost', 'root', '', 'sa');
-    $sql = 'SELECT * FROM demanded';
-    $result = mysqli_query($link, $sql);
+          <div class="container">
+            <?php
+            $link = mysqli_connect('localhost', 'root', '12345678', 'sa');
+            $sql = 'SELECT * FROM demanded';
+            $result = mysqli_query($link, $sql);
 
-    while ($row = mysqli_fetch_assoc($result)) {
-      echo "
+            while ($row = mysqli_fetch_assoc($result)) {
+              echo "
         <div class='dcard-post'>
+        <a href='test.php?id={$row['id']}'>
           <div class='dcard-header'>
-            <span class='dcard-tag'>#".$row['tag']."</span>
-            <span class='dcard-title'>".$row['title']."</span>
+            <span class='dcard-tag'>#" . $row['tag'] . "</span>
+            <span class='dcard-title'>" . $row['title'] . "</span>
           </div>
           <div class='dcard-body'>
-            <p>".$row['content']."</p>
+            <p>" . $row['content'] . "</p>
           </div>
           <div class='dcard-footer'>
-            <span>聯絡人：".$row['name']."</span>
-            <span>電話：".$row['phone']."</span>
-            <span>Email：".$row['email']."</span>
-          </div>
+            <span>聯絡人：" . $row['name'] . "</span>
+            <span>電話：" . $row['phone'] . "</span>
+            <span>Email：" . $row['email'] . "</span>
+          </a></div>
         </div>
       ";
-    }
-  ?>
-</div>
+            }
+            ?>
+          </div>
 
-    </div>
-</div>
+        </div>
+        </div>
 
     </section><!-- /Real Estate Section -->
 
@@ -191,7 +193,7 @@
 
         </div>
 
-        
+
 
       </div>
     </div>
