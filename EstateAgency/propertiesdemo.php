@@ -36,6 +36,47 @@
   * Author: BootstrapMade.com
   * License: https://bootstrapmade.com/license/
   ======================================================== -->
+  <style>
+  .dcard-post {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 15px 20px;
+  margin-bottom: 20px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  transition: 0.3s;
+}
+.dcard-post:hover {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.dcard-header {
+  display: flex;
+  gap: 10px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+  color: #222;
+}
+
+.dcard-tag {
+  color:rgb(18, 226, 36);
+}
+
+.dcard-body {
+  font-size: 0.95rem;
+  color: #444;
+  margin-bottom: 10px;
+}
+
+.dcard-footer {
+  font-size: 0.85rem;
+  color: #666;
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+</style>
 </head>
 
 <body class="properties-page">
@@ -101,39 +142,33 @@
     </div>
     <div class='row gy-4'>
 
-        
-        <?php
-        $link = mysqli_connect('localhost', 'root', '', 'sa');
-        $sql = 'SELECT * FROM demanded';
-        $result = mysqli_query($link, $sql);
-        
-        while ($row = mysqli_fetch_assoc($result)) {
-            echo "
-            <div class='col-xl-4 col-md-6' data-aos='fade-up' data-aos-delay='200'>
-                <div class='card'>
-                    <img src='assets/img/properties/property-2.jpg' alt='' class='img-fluid'>
-                    <div class='card-body'>
-                        <span class='sale-rent'>".$row['title']."</span>
-                        <h3><a href='property-single.html' class='stretched-link'>#".$row['tag']."</a></h3>
-                        <div class='card-content d-flex flex-column justify-content-center text-center'>
-                            <div class='row propery-info'>
-                                <div class='col'>聯絡人</div>
-                                <div class='col'>電話</div>
-                                <div class='col'>email</div>
-                                
-                            </div>
-                            <div class='row'>
-                                <div class='col'>".$row['name']."</div>
-                                <div class='col'>".$row['phone']."</div>
-                                <div class='col'>".$row['email']."</div>
-                                
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>";
-        }
-        ?>
+    <div class="container">
+  <?php
+    $link = mysqli_connect('localhost', 'root', '', 'sa');
+    $sql = 'SELECT * FROM demanded';
+    $result = mysqli_query($link, $sql);
+
+    while ($row = mysqli_fetch_assoc($result)) {
+      echo "
+        <div class='dcard-post'>
+          <div class='dcard-header'>
+            <span class='dcard-tag'>#".$row['tag']."</span>
+            <span class='dcard-title'>".$row['title']."</span>
+          </div>
+          <div class='dcard-body'>
+            <p>".$row['content']."</p>
+          </div>
+          <div class='dcard-footer'>
+            <span>聯絡人：".$row['name']."</span>
+            <span>電話：".$row['phone']."</span>
+            <span>Email：".$row['email']."</span>
+          </div>
+        </div>
+      ";
+    }
+  ?>
+</div>
+
     </div>
 </div>
 
