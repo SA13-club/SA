@@ -12,7 +12,7 @@
   <?php
   $servername = "localhost";
   $username = "root";
-  $password = "12345678";
+  $password = "";
   $dbname = "sa";
 
   $conn = new mysqli($servername, $username, $password, $dbname);
