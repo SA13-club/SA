@@ -81,6 +81,15 @@
           <ol>
             <li><a href="index.php">首頁</a></li>
             <li><a href="propertiesdemo.php">最新專案</a></li>
+            <?php
+              $id=$_GET['id'];
+              $link = mysqli_connect('localhost', 'root', '12345678', 'sa');
+              $sql = "SELECT * FROM demanded where id='$id'";
+              $result = mysqli_query($link, $sql);
+              while ($row = mysqli_fetch_assoc($result)) {
+                echo "<li class='current'><a >" . $row['title'] . "</a></li>";
+              }
+              ?>
           </ol>
         </div>
       </nav>
@@ -163,10 +172,10 @@
               <h3>基本資料</h3>
               <ul>
                 <li><strong>發布單位:</strong> 台積電</li>
+                <li><strong>狀態:</strong> 招募中</li>
                 <li><strong>聯絡人:</strong> 可愛的狗狗</li>
                 <li><strong>電話:</strong>09123456789</li>
                 <li><strong>email:</strong> gmail.com</li>
-                <li><strong>狀態:</strong> 招募中</li>
                 <li><strong>需求類型:</strong> 贊助</li>
               </ul>
             </div>
