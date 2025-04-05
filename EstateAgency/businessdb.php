@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="refresh" content="3; url=index.html">
+  <meta http-equiv="refresh" content="3; url=index.php">
   <title>Document</title>
 </head>
 
@@ -37,6 +37,8 @@
   VALUES ('$c_name', '$c_type', '$c_industry', '$c_address', '$c_email', '$c_phone', '$e_name', '$e_type', '$e_email', '$e_phone', '$u_email', '$u_password','$u_permission', '$u_content')";
   if (mysqli_query($conn, $sql)) {
     echo "<h1 align='center'>新增完成</h1>";
+  }else{
+    echo "<h1 align='center'>新增g 194</h1>";
   }
   $sql2 = "INSERT INTO user_account (u_email, u_password, u_permission) VALUES('$u_email', '$u_password', '$u_permission')";
   mysqli_query($conn, $sql2);
