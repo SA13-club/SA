@@ -114,8 +114,8 @@
         <div class="container">
           <div class="row d-flex justify-content-center text-center">
             <div class="col-lg-8">
-              <h1>Properties</h1>
-              <p class="mb-0">Odio et unde deleniti. Deserunt numquam exercitationem. Officiis quo odio sint voluptas consequatur ut a odio voluptatem. Sit dolorum debitis veritatis natus dolores. Quasi ratione sint. Sit quaerat ipsum dolorem.</p>
+              <h1>最新專案</h1>
+              <!-- <p class="mb-0">Odio et unde deleniti. Deserunt numquam exercitationem. Officiis quo odio sint voluptas consequatur ut a odio voluptatem. Sit dolorum debitis veritatis natus dolores. Quasi ratione sint. Sit quaerat ipsum dolorem.</p> -->
             </div>
           </div>
         </div>
@@ -123,8 +123,8 @@
       <nav class="breadcrumbs">
         <div class="container">
           <ol>
-            <li><a href="index.php">Home</a></li>
-            <li class="current">Properties</li>
+            <li><a href="index.php">首頁</a></li>
+            <li class="current">最新專案</li>
           </ol>
         </div>
       </nav>
@@ -136,11 +136,12 @@
       <<div class='container'>
         <div class='row mb-4'>
           <div class='col-12 text-end'>
-            <a href='newproperty.html' class='btn btn-primary'>
-              <i class='bi bi-plus-circle me-2'></i>New Property
+            <a href='newproperty.html' class="btn btn-success">
+              <i class='bi bi-plus-circle me-2'></i>發布需求
             </a>
           </div>
         </div>
+        <br>
         <div class='row gy-4'>
 
           <div class="container">
@@ -152,7 +153,7 @@
             while ($row = mysqli_fetch_assoc($result)) {
               echo "
         <div class='dcard-post'>
-        <a href='test.php?id={$row['id']}'>
+        <a href='property-single.php?id={$row['id']}'>
           <div class='dcard-header'>
             <span class='dcard-tag'>#" . $row['tag'] . "</span>
             <span class='dcard-title'>" . $row['title'] . "</span>
@@ -161,7 +162,7 @@
             <p>" . $row['content'] . "</p>
           </div>
           <div class='dcard-footer'>
-            <span>聯絡人：" . $row['name'] . "</span>
+            <span>聯絡人："  . $row['name'] . "</span>
             <span>電話：" . $row['phone'] . "</span>
             <span>Email：" . $row['email'] . "</span>
           </a></div>
