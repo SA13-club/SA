@@ -208,7 +208,7 @@
           <div class='dcard-footer'>
             <span>聯絡人："  . $row['name'] . "</span>
             <span>電話：" . $row['phone'] . "</span>
-            <span>Email：" . $row['email'] . "</span>
+            <span>Email：" . $row['u_email'] . "</span>
           </a></div>
         </div>
       ";

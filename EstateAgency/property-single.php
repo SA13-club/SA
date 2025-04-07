@@ -49,21 +49,21 @@
 
       <nav id="navmenu" class="navmenu">
         <ul>
-          <li><a href="index.php" >主頁</a></li>
+          <li><a href="index.php">主頁</a></li>
           <li><a href="about.php">關於</a></li>
           <li><a href="services.php">服務</a></li>
           <li><a href="propertiesdemo.php" class="active">最新專案</a></li>
           <li><a href="agents.php">合作單位</a></li>
           <li><a href="contact.php">聯絡我們</a></li>
           <?php
-                if ($_SESSION['u_email']) {
-                    echo "<li><a href='Logout.php'>登出</a></li>";
-                    echo "<li><a href='account.php'>帳號管理</a></li>";
-                } else {
-                    echo "<li><a href='LogIn.html'>登入</a></li>";
-                    echo "<li><a href='#' data-bs-toggle='modal' data-bs-target='#SignInPermission'>註冊</a></li>";
-                }
-                ?>
+          if ($_SESSION['u_email']) {
+            echo "<li><a href='Logout.php'>登出</a></li>";
+            echo "<li><a href='account.php'>帳號管理</a></li>";
+          } else {
+            echo "<li><a href='LogIn.html'>登入</a></li>";
+            echo "<li><a href='#' data-bs-toggle='modal' data-bs-target='#SignInPermission'>註冊</a></li>";
+          }
+          ?>
           <!-- <li><a href="LogIn.html">登入</a></li>
           <li><a href="#" data-bs-toggle="modal" data-bs-target="#SignInPermission">註冊</a></li> -->
 
@@ -94,14 +94,14 @@
             <li><a href="index.php">首頁</a></li>
             <li><a href="propertiesdemo.php">最新專案</a></li>
             <?php
-              $id=$_GET['id'];
-              $link = mysqli_connect('localhost', 'root', '', 'sa');
-              $sql = "SELECT * FROM demanded where id='$id'";
-              $result = mysqli_query($link, $sql);
-              while ($row = mysqli_fetch_assoc($result)) {
-                echo "<li class='current'><a >" . $row['title'] . "</a></li>";
-              }
-              ?>
+            $id = $_GET['id'];
+            $link = mysqli_connect('localhost', 'root', '', 'sa');
+            $sql = "SELECT * FROM demanded where id='$id'";
+            $result = mysqli_query($link, $sql);
+            while ($row = mysqli_fetch_assoc($result)) {
+              echo "<li class='current'><a >" . $row['title'] . "</a></li>";
+            }
+            ?>
           </ol>
         </div>
       </nav>
@@ -117,7 +117,7 @@
 
             <div class="portfolio-description">
               <?php
-              $id=$_GET['id'];
+              $id = $_GET['id'];
               $link = mysqli_connect('localhost', 'root', '', 'sa');
               $sql = "SELECT * FROM demanded where id='$id'";
               $result = mysqli_query($link, $sql);
@@ -137,7 +137,7 @@
                         <p><strong>具體內容：</strong>" . $row['content'] . "</p>
                         <p><strong>聯絡人：</strong>" . $row['name'] . "</p>
                         <p><strong>電話：</strong>" . $row['phone'] . "</p>
-                        <p><strong>Email：</strong>" . $row['email'] . "</p>
+                        <p><strong>Email：</strong>" . $row['u_email'] . "</p>
                         <p><strong>身份類型：</strong>" . $row['u_permission'] . "</p>
                         <p><strong>截止日期：</strong>" . $row['date'] . "</p>
                       </div>
@@ -184,40 +184,38 @@
             <div class="portfolio-info">
               <h3>基本資料</h3>
               <!-- <?php
-              $id=$_GET['id'];
-              $link = mysqli_connect('localhost', 'root', '', 'sa');
-              $sql = "SELECT * FROM demanded where id='$id'";
-              $result = mysqli_query($link, $sql);
+                    $id = $_GET['id'];
+                    $link = mysqli_connect('localhost', 'root', '', 'sa');
+                    $sql = "SELECT * FROM demanded where id='$id'";
+                    $result = mysqli_query($link, $sql);
 
-              // echo "<h2 class='section-title'><strong>最新專案列表</strong></h2><br>";
-              while ($row = mysqli_fetch_assoc($result)) {
-                echo "
+                    // echo "<h2 class='section-title'><strong>最新專案列表</strong></h2><br>";
+                    while ($row = mysqli_fetch_assoc($result)) {
+                      echo "
                         <p><strong>聯絡人：</strong>" . $row['name'] . "</p>
                         <p><strong>電話：</strong>" . $row['phone'] . "</p>
-                        <p><strong>Email：</strong>" . $row['email'] . "</p>
+                        <p><strong>Email：</strong>" . $row['u_email'] . "</p>
                         <p><strong>截止日期：</strong>" . $row['date'] . "</p>
 ";
-              }
-              ?> -->
+                    }
+                    ?> -->
               <ul>
-                <li><strong>發布單位:</strong><?php
-$link = mysqli_connect('localhost', 'root', '', 'sa');
+                <?php
+                                          $link = mysqli_connect('localhost', 'root', '', 'sa');
 
-$sql = "SELECT c.c_name 
-        FROM corporation_account c 
-        JOIN demanded d ON c.u_email = d.email";
+                                          $sql = "SELECT c.c_name FROM corporation_account c JOIN demanded d ON c.u_email = d.u_email";
 
-$result = mysqli_query($link, $sql);
+                                          $result = mysqli_query($link, $sql);
 
-if ($row = mysqli_fetch_assoc($result)) {
-    echo "<li><strong>發布單位:</strong> {$row['c_name']}</li>";
-} else {
-    echo "<li>查無公司資料</li>";
-}
+                                          if ($row = mysqli_fetch_assoc($result)) {
+                                            echo "<li><strong>發布單位:</strong> {$row['c_name']}</li>";
+                                          } else {
+                                            echo "<li>查無公司資料</li>";
+                                          }
 
-mysqli_close($link);
-?>
-</li>
+                                          mysqli_close($link);
+                                          ?>
+                </li>
                 <li><strong>狀態:</strong> 招募中</li>
                 <li><strong>聯絡人:</strong> 可愛的狗狗</li>
                 <li><strong>電話:</strong>099</li>

@@ -77,8 +77,9 @@
       gap: 15px;
       flex-wrap: wrap;
     }
-    .filter-bar py-3 border-bottom bg-light{
-      background-color:white;
+
+    .filter-bar py-3 border-bottom bg-light {
+      background-color: white;
     }
   </style>
 </head>
@@ -91,26 +92,26 @@
       <a href="index.php" class="logo d-flex align-items-center">
         <!-- Uncomment the line below if you also wish to use an image logo -->
         <!-- <img src="assets/img/logo.png" alt=""> -->
-        <h1 class="sitename">社團企業<span>媒合平台</span></h1>
+        <h1 class="sitename">Co<span>Lab</span></h1>
       </a>
 
       <nav id="navmenu" class="navmenu">
         <ul>
-          <li><a href="index.php" >主頁</a></li>
+          <li><a href="index.php">主頁</a></li>
           <li><a href="about.php">關於</a></li>
           <li><a href="services.php">服務</a></li>
           <li><a href="propertiesdemo.php" class="active">最新專案</a></li>
           <li><a href="agents.php">合作單位</a></li>
           <li><a href="contact.php">聯絡我們</a></li>
           <?php
-                if ($_SESSION['u_email']) {
-                    echo "<li><a href='Logout.php'>登出</a></li>";
-                    echo "<li><a href='account.php'>帳號管理</a></li>";
-                } else {
-                    echo "<li><a href='LogIn.html'>登入</a></li>";
-                    echo "<li><a href='#' data-bs-toggle='modal' data-bs-target='#SignInPermission'>註冊</a></li>";
-                }
-                ?>
+          if ($_SESSION['u_email']) {
+            echo "<li><a href='Logout.php'>登出</a></li>";
+            echo "<li><a href='account.php'>帳號管理</a></li>";
+          } else {
+            echo "<li><a href='LogIn.html'>登入</a></li>";
+            echo "<li><a href='#' data-bs-toggle='modal' data-bs-target='#SignInPermission'>註冊</a></li>";
+          }
+          ?>
           <!-- <li><a href="LogIn.html">登入</a></li>
           <li><a href="#" data-bs-toggle="modal" data-bs-target="#SignInPermission">註冊</a></li> -->
 
@@ -157,48 +158,48 @@
           </div>
         </div>
         <br>
-                <!-- Filter Bar -->
-       <!-- Filter Bar (Dynamic from DB) -->
-<!-- Filter Bar in sortdemo.php -->
-<section class="filter-bar py-3 border-bottom bg-light">
-  <div class="container">
-    <form method="get" action="sortdemo.php" class="d-flex flex-wrap gap-2 justify-content-center align-items-center">
-      <label class="form-label me-2 mb-0">依標籤篩選：</label>
+        <!-- Filter Bar -->
+        <!-- Filter Bar (Dynamic from DB) -->
+        <!-- Filter Bar in sortdemo.php -->
+        <section class="filter-bar py-3 border-bottom bg-light">
+          <div class="container">
+            <form method="get" action="sortdemo.php" class="d-flex flex-wrap gap-2 justify-content-center align-items-center">
+              <label class="form-label me-2 mb-0">依標籤篩選：</label>
 
-      <?php
-      $link = mysqli_connect('localhost', 'root', '', 'sa');
-      $tagQuery = "SELECT DISTINCT tag FROM demanded WHERE tag IS NOT NULL AND tag != ''";
-      $tagResult = mysqli_query($link, $tagQuery);
+              <?php
+              $link = mysqli_connect('localhost', 'root', '', 'sa');
+              $tagQuery = "SELECT DISTINCT tag FROM demanded WHERE tag IS NOT NULL AND tag != ''";
+              $tagResult = mysqli_query($link, $tagQuery);
 
-      while ($row = mysqli_fetch_assoc($tagResult)) {
-        $tag = $row['tag'];
-        echo "<button type='submit' name='tag' value='{$tag}' class='btn btn-outline-primary'>{$tag}</button>";
-      }
-      ?>
+              while ($row = mysqli_fetch_assoc($tagResult)) {
+                $tag = $row['tag'];
+                echo "<button type='submit' name='tag' value='{$tag}' class='btn btn-outline-primary'>{$tag}</button>";
+              }
+              ?>
 
-      <!-- ✅ 清除篩選按鈕，導回顯示全部的頁面（例如 demand-list.php） -->
-      <a href="./propertiesdemo.php" class="btn btn-outline-secondary">清除篩選</a>
-    </form>
-  </div>
-</section>
+              <!-- ✅ 清除篩選按鈕，導回顯示全部的頁面（例如 demand-list.php） -->
+              <a href="./propertiesdemo.php" class="btn btn-outline-secondary">清除篩選</a>
+            </form>
+          </div>
+        </section>
 
 
 
-<?php
-$link = mysqli_connect('localhost', 'root', '', 'sa');
+        <?php
+        $link = mysqli_connect('localhost', 'root', '', 'sa');
 
-if (isset($_GET['tag'])) {
-  $tag = $_GET['tag'];
+        if (isset($_GET['tag'])) {
+          $tag = $_GET['tag'];
 
-  $stmt = $link->prepare("SELECT * FROM demanded WHERE tag = ?");
-  $stmt->bind_param("s", $tag);
-  $stmt->execute();
-  $result = $stmt->get_result();
+          $stmt = $link->prepare("SELECT * FROM demanded WHERE tag = ?");
+          $stmt->bind_param("s", $tag);
+          $stmt->execute();
+          $result = $stmt->get_result();
 
-  echo "<h3 class='text-center my-4'>目前篩選：{$tag}</h3>";
+          echo "<h3 class='text-center my-4'>目前篩選：{$tag}</h3>";
 
-  while ($row = $result->fetch_assoc()) {
-    echo "
+          while ($row = $result->fetch_assoc()) {
+            echo "
       <div class='dcard-post'>
         <a href='property-single.php?id={$row['id']}'>
           <div class='dcard-header'>
@@ -211,16 +212,16 @@ if (isset($_GET['tag'])) {
           <div class='dcard-footer'>
             <span>聯絡人："  . $row['name'] . "</span>
             <span>電話：" . $row['phone'] . "</span>
-            <span>Email：" . $row['email'] . "</span>
+            <span>Email：" . $row['u_email'] . "</span>
           </div>
         </a>
       </div>
     ";
-  }
-} else {
-  echo "<p class='text-center mt-5'>未選擇標籤</p>";
-}
-?>
+          }
+        } else {
+          echo "<p class='text-center mt-5'>未選擇標籤</p>";
+        }
+        ?>
 
         </div>
         </div>
