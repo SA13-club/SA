@@ -30,6 +30,7 @@
   VALUES ('$title', '$content', '$tag', '$target', '$name', '$email', '$phone', '$date')";
     if (mysqli_query($conn, $sql)) {
         echo "<h1 align='center'>新增完成</h1>";
+        header("Location: propertiesdemo.php");
     }
     ?>
 </body>
