@@ -147,8 +147,7 @@
         <br>
                 <!-- Filter Bar -->
        <!-- Filter Bar (Dynamic from DB) -->
-<!-- Filter Bar: 點選後跳轉到 sortdemo.php -->
-<!-- Filter Bar: 點選後跳轉到 sortdemo.php -->
+<!-- Filter Bar in sortdemo.php -->
 <section class="filter-bar py-3 border-bottom bg-light">
   <div class="container">
     <form method="get" action="sortdemo.php" class="d-flex flex-wrap gap-2 justify-content-center align-items-center">
@@ -165,7 +164,7 @@
       }
       ?>
 
-      <!-- ✅ 清除篩選的按鈕，回到全部資料頁面 -->
+      <!-- ✅ 清除篩選按鈕，導回顯示全部的頁面（例如 demand-list.php） -->
       <a href="./propertiesdemo.php" class="btn btn-outline-secondary">清除篩選</a>
     </form>
   </div>
@@ -173,18 +172,22 @@
 
 
 
+<?php
+$link = mysqli_connect('localhost', 'root', '', 'sa');
 
-        <div class='row gy-4'>
+if (isset($_GET['tag'])) {
+  $tag = $_GET['tag'];
 
-          <div class="container">
-            <?php
-            $link = mysqli_connect('localhost', 'root', '', 'sa');
-            $sql = 'SELECT * FROM demanded';
-            $result = mysqli_query($link, $sql);
+  $stmt = $link->prepare("SELECT * FROM demanded WHERE tag = ?");
+  $stmt->bind_param("s", $tag);
+  $stmt->execute();
+  $result = $stmt->get_result();
 
-            while ($row = mysqli_fetch_assoc($result)) {
-              echo "
-        <div class='dcard-post'>
+  echo "<h3 class='text-center my-4'>目前篩選：{$tag}</h3>";
+
+  while ($row = $result->fetch_assoc()) {
+    echo "
+      <div class='dcard-post'>
         <a href='property-single.php?id={$row['id']}'>
           <div class='dcard-header'>
             <span class='dcard-tag'>#" . $row['tag'] . "</span>
@@ -197,12 +200,15 @@
             <span>聯絡人："  . $row['name'] . "</span>
             <span>電話：" . $row['phone'] . "</span>
             <span>Email：" . $row['email'] . "</span>
-          </a></div>
-        </div>
-      ";
-            }
-            ?>
           </div>
+        </a>
+      </div>
+    ";
+  }
+} else {
+  echo "<p class='text-center mt-5'>未選擇標籤</p>";
+}
+?>
 
         </div>
         </div>
