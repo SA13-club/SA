@@ -183,6 +183,22 @@
           <div class="col-lg-3" data-aos="fade-up" data-aos-delay="100">
             <div class="portfolio-info">
               <h3>基本資料</h3>
+              <!-- <?php
+              $id=$_GET['id'];
+              $link = mysqli_connect('localhost', 'root', '12345678', 'sa');
+              $sql = "SELECT * FROM demanded where id='$id'";
+              $result = mysqli_query($link, $sql);
+
+              // echo "<h2 class='section-title'><strong>最新專案列表</strong></h2><br>";
+              while ($row = mysqli_fetch_assoc($result)) {
+                echo "
+                        <p><strong>聯絡人：</strong>" . $row['name'] . "</p>
+                        <p><strong>電話：</strong>" . $row['phone'] . "</p>
+                        <p><strong>Email：</strong>" . $row['email'] . "</p>
+                        <p><strong>截止日期：</strong>" . $row['date'] . "</p>
+";
+              }
+              ?> -->
               <ul>
                 <li><strong>發布單位:</strong> 台積電</li>
                 <li><strong>狀態:</strong> 招募中</li>
