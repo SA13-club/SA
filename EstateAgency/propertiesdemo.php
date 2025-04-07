@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>Properties - EstateAgency Bootstrap Template</title>
+  <title>CoLaB</title>
   <meta name="description" content="">
   <meta name="keywords" content="">
 
@@ -91,15 +91,15 @@
       <a href="index.php" class="logo d-flex align-items-center">
         <!-- Uncomment the line below if you also wish to use an image logo -->
         <!-- <img src="assets/img/logo.png" alt=""> -->
-        <h1 class="sitename">社團企業<span>媒合平台</span></h1>
+        <h1 class="sitename">Co<span>LaB</span></h1>
       </a>
 
       <nav id="navmenu" class="navmenu">
         <ul>
-          <li><a href="index.php" >主頁</a></li>
+          <li><a href="index.php">主頁</a></li>
           <li><a href="about.html">關於</a></li>
           <li><a href="services.html">服務</a></li>
-          <li><a href="properties.html"class="active">最新專案</a></li>
+          <li><a href="properties.html" class="active">最新專案</a></li>
           <li><a href="agents.html">合作單位</a></li>
           <li><a href="contact.html">聯絡我們</a></li>
         </ul>
@@ -139,8 +139,12 @@
       <<div class='container'>
         <div class='row mb-4'>
           <div class='col-12 text-end'>
-            <a href='newproperty.html' class="btn btn-success">
-              <i class='bi bi-plus-circle me-2'></i>發布需求
+            <?php
+            if ($_SESSION['u_email']) {
+              echo " <a href='newproperty.html' class='btn btn-success'>
+              <i class='bi bi-plus-circle me-2'></i>發布需求";
+            }
+            ?>
             </a>
           </div>
         </div>
