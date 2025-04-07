@@ -150,9 +150,9 @@
                             <div class="col-md-5">
                                 <input type="password" class="form-control" name="u_password" placeholder="密碼" required="">
                             </div>
-                            <div class="col-md-2">
+                            <!-- <div class="col-md-2">
                                 <input type="text" class="form-control" name="u_permission" placeholder="企業" value="企業" readonly>
-                            </div>
+                            </div> -->
                             <div class="col-md-12">
                                 <textarea class="form-control" name="u_content" rows="3" placeholder="公司簡介" required=""></textarea>
                             </div>
