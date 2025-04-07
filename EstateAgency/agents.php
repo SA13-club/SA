@@ -49,11 +49,11 @@
 
       <nav id="navmenu" class="navmenu">
         <ul>
-          <li><a href="index.php" class="active">主頁</a></li>
+          <li><a href="index.php">主頁</a></li>
           <li><a href="about.php">關於</a></li>
           <li><a href="services.php">服務</a></li>
           <li><a href="propertiesdemo.php">最新專案</a></li>
-          <li><a href="agents.php">合作單位</a></li>
+          <li><a href="agents.php" class="active">合作單位</a></li>
           <li><a href="contact.php">聯絡我們</a></li>
           <?php
                 if ($_SESSION['u_email']) {

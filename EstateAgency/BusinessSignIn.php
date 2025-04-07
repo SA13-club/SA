@@ -49,7 +49,7 @@
 
       <nav id="navmenu" class="navmenu">
         <ul>
-          <li><a href="index.php" class="active">主頁</a></li>
+          <li><a href="index.php">主頁</a></li>
           <li><a href="about.php">關於</a></li>
           <li><a href="services.php">服務</a></li>
           <li><a href="propertiesdemo.php">最新專案</a></li>
@@ -61,7 +61,7 @@
                     echo "<li><a href='account.php'>帳號管理</a></li>";
                 } else {
                     echo "<li><a href='LogIn.html'>登入</a></li>";
-                    echo "<li><a href='#' data-bs-toggle='modal' data-bs-target='#SignInPermission'>註冊</a></li>";
+                    echo "<li><a href='#' data-bs-toggle='modal' data-bs-target='#SignInPermission' class='active'>註冊</a></li>";
                 }
                 ?>
           <!-- <li><a href="LogIn.html">登入</a></li>
