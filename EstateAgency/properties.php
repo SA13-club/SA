@@ -51,12 +51,24 @@
 
       <nav id="navmenu" class="navmenu">
         <ul>
-          <li><a href="index.php" >主頁</a></li>
+          <li><a href="index.php" class="active">主頁</a></li>
           <li><a href="about.html">關於</a></li>
           <li><a href="services.html">服務</a></li>
-          <li><a href="properties.html"class="active">最新專案</a></li>
+          <li><a href="propertiesdemo.php">最新專案</a></li>
           <li><a href="agents.html">合作單位</a></li>
           <li><a href="contact.html">聯絡我們</a></li>
+          <?php
+                if ($_SESSION['u_email']) {
+                    echo "<li><a href='Logout.php'>登出</a></li>";
+                    echo "<li><a href='account.php'>帳號管理</a></li>";
+                } else {
+                    echo "<li><a href='LogIn.html'>登入</a></li>";
+                    echo "<li><a href='#' data-bs-toggle='modal' data-bs-target='#SignInPermission'>註冊</a></li>";
+                }
+                ?>
+          <!-- <li><a href="LogIn.html">登入</a></li>
+          <li><a href="#" data-bs-toggle="modal" data-bs-target="#SignInPermission">註冊</a></li> -->
+
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>

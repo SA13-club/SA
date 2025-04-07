@@ -59,10 +59,8 @@
           <li><a href="contact.html">聯絡我們</a></li>
           <?php
                 if ($_SESSION['u_email']) {
-                    // echo "<span class='navbar-text text-white me-3'>您好，", $_SESSION['name'], $_SESSION['level'], "</span>"
                     echo "<li><a href='Logout.php'>登出</a></li>";
-                    // echo "<a href='link.php' class='btn btn-outline-primary me-2'>管理</a>";
-                    // echo "<a href='/homework/login/account.php' class='btn btn-outline-primary'>帳號管理</a>";
+                    echo "<li><a href='account.php'>帳號管理</a></li>";
                 } else {
                     echo "<li><a href='LogIn.html'>登入</a></li>";
                     echo "<li><a href='#' data-bs-toggle='modal' data-bs-target='#SignInPermission'>註冊</a></li>";
@@ -433,7 +431,7 @@
                 </div>
               </div>
             </div><!-- End testimonial item -->          
-            
+
           </div>
           <div class="swiper-pagination"></div>
         </div>

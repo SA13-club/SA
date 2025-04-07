@@ -36,7 +36,7 @@
   ======================================================== -->
 </head>
 
-<body class="agents-page">
+<body class="starter-page-page">
 
   <header id="header" class="header d-flex align-items-center fixed-top">
     <div class="container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
@@ -49,16 +49,27 @@
 
       <nav id="navmenu" class="navmenu">
         <ul>
-          <li><a href="index.php" >主頁</a></li>
+          <li><a href="index.php" class="active">主頁</a></li>
           <li><a href="about.html">關於</a></li>
           <li><a href="services.html">服務</a></li>
-          <li><a href="properties.html">最新專案</a></li>
-          <li><a href="agents.html"class="active">合作單位</a></li>
+          <li><a href="propertiesdemo.php">最新專案</a></li>
+          <li><a href="agents.html">合作單位</a></li>
           <li><a href="contact.html">聯絡我們</a></li>
+          <?php
+                if ($_SESSION['u_email']) {
+                    echo "<li><a href='Logout.php'>登出</a></li>";
+                    echo "<li><a href='account.php'>帳號管理</a></li>";
+                } else {
+                    echo "<li><a href='LogIn.html'>登入</a></li>";
+                    echo "<li><a href='#' data-bs-toggle='modal' data-bs-target='#SignInPermission'>註冊</a></li>";
+                }
+                ?>
+          <!-- <li><a href="LogIn.html">登入</a></li>
+          <li><a href="#" data-bs-toggle="modal" data-bs-target="#SignInPermission">註冊</a></li> -->
+
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
-
     </div>
   </header>
 
@@ -70,7 +81,7 @@
         <div class="container">
           <div class="row d-flex justify-content-center text-center">
             <div class="col-lg-8">
-              <h1>Agents</h1>
+              <h1>Starter Page</h1>
               <p class="mb-0">Odio et unde deleniti. Deserunt numquam exercitationem. Officiis quo odio sint voluptas consequatur ut a odio voluptatem. Sit dolorum debitis veritatis natus dolores. Quasi ratione sint. Sit quaerat ipsum dolorem.</p>
             </div>
           </div>
@@ -80,72 +91,26 @@
         <div class="container">
           <ol>
             <li><a href="index.php">Home</a></li>
-            <li class="current">Agents</li>
+            <li class="current">Starter Page</li>
           </ol>
         </div>
       </nav>
     </div><!-- End Page Title -->
 
-    <!-- Agents Section -->
-    <section id="agents" class="agents section">
+    <!-- Starter Section Section -->
+    <section id="starter-section" class="starter-section section">
 
-      <div class="container">
+      <!-- Section Title -->
+      <div class="container section-title" data-aos="fade-up">
+        <h2>Starter Section</h2>
+        <p>Necessitatibus eius consequatur ex aliquid fuga eum quidem sint consectetur velit</p>
+      </div><!-- End Section Title -->
 
-        <div class="row gy-5">
-
-          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
-            <div class="member">
-              <div class="pic"><img src="assets/img/team/team-1.jpg" class="img-fluid" alt=""></div>
-              <div class="member-info">
-                <h4>Walter White</h4>
-                <span>Chief Executive Officer</span>
-                <div class="social">
-                  <a href=""><i class="bi bi-twitter-x"></i></a>
-                  <a href=""><i class="bi bi-facebook"></i></a>
-                  <a href=""><i class="bi bi-instagram"></i></a>
-                  <a href=""><i class="bi bi-linkedin"></i></a>
-                </div>
-              </div>
-            </div>
-          </div><!-- End Team Member -->
-
-          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
-            <div class="member">
-              <div class="pic"><img src="assets/img/team/team-2.jpg" class="img-fluid" alt=""></div>
-              <div class="member-info">
-                <h4>Sarah Jhonson</h4>
-                <span>Rent Manager</span>
-                <div class="social">
-                  <a href=""><i class="bi bi-twitter-x"></i></a>
-                  <a href=""><i class="bi bi-facebook"></i></a>
-                  <a href=""><i class="bi bi-instagram"></i></a>
-                  <a href=""><i class="bi bi-linkedin"></i></a>
-                </div>
-              </div>
-            </div>
-          </div><!-- End Team Member -->
-
-          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
-            <div class="member">
-              <div class="pic"><img src="assets/img/team/team-3.jpg" class="img-fluid" alt=""></div>
-              <div class="member-info">
-                <h4>William Anderson</h4>
-                <span>Sale manager<br></span>
-                <div class="social">
-                  <a href=""><i class="bi bi-twitter-x"></i></a>
-                  <a href=""><i class="bi bi-facebook"></i></a>
-                  <a href=""><i class="bi bi-instagram"></i></a>
-                  <a href=""><i class="bi bi-linkedin"></i></a>
-                </div>
-              </div>
-            </div>
-          </div><!-- End Team Member -->
-
-        </div>
-
+      <div class="container" data-aos="fade-up">
+        <p>Use this page as a starter for your own custom pages.</p>
       </div>
 
-    </section><!-- /Agents Section -->
+    </section><!-- /Starter Section Section -->
 
   </main>
 

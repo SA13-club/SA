@@ -36,7 +36,7 @@
   ======================================================== -->
 </head>
 
-<body class="service-details-page">
+<body class="contact-page">
 
   <header id="header" class="header d-flex align-items-center fixed-top">
     <div class="container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
@@ -49,29 +49,24 @@
 
       <nav id="navmenu" class="navmenu">
         <ul>
-          <li><a href="index.php">Home</a></li>
-          <li><a href="about.html">About</a></li>
-          <li><a href="services.html">Services</a></li>
-          <li><a href="properties.html">Properties</a></li>
-          <li><a href="agents.html">Agents</a></li>
-          <li class="dropdown"><a href="#"><span>Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-            <ul>
-              <li><a href="#">Dropdown 1</a></li>
-              <li class="dropdown"><a href="#"><span>Deep Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-                <ul>
-                  <li><a href="#">Deep Dropdown 1</a></li>
-                  <li><a href="#">Deep Dropdown 2</a></li>
-                  <li><a href="#">Deep Dropdown 3</a></li>
-                  <li><a href="#">Deep Dropdown 4</a></li>
-                  <li><a href="#">Deep Dropdown 5</a></li>
-                </ul>
-              </li>
-              <li><a href="#">Dropdown 2</a></li>
-              <li><a href="#">Dropdown 3</a></li>
-              <li><a href="#">Dropdown 4</a></li>
-            </ul>
-          </li>
-          <li><a href="contact.html">Contact</a></li>
+          <li><a href="index.php" class="active">主頁</a></li>
+          <li><a href="about.html">關於</a></li>
+          <li><a href="services.html">服務</a></li>
+          <li><a href="propertiesdemo.php">最新專案</a></li>
+          <li><a href="agents.html">合作單位</a></li>
+          <li><a href="contact.html">聯絡我們</a></li>
+          <?php
+                if ($_SESSION['u_email']) {
+                    echo "<li><a href='Logout.php'>登出</a></li>";
+                    echo "<li><a href='account.php'>帳號管理</a></li>";
+                } else {
+                    echo "<li><a href='LogIn.html'>登入</a></li>";
+                    echo "<li><a href='#' data-bs-toggle='modal' data-bs-target='#SignInPermission'>註冊</a></li>";
+                }
+                ?>
+          <!-- <li><a href="LogIn.html">登入</a></li>
+          <li><a href="#" data-bs-toggle="modal" data-bs-target="#SignInPermission">註冊</a></li> -->
+
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
@@ -87,7 +82,7 @@
         <div class="container">
           <div class="row d-flex justify-content-center text-center">
             <div class="col-lg-8">
-              <h1>Service Details</h1>
+              <h1>Contact</h1>
               <p class="mb-0">Odio et unde deleniti. Deserunt numquam exercitationem. Officiis quo odio sint voluptas consequatur ut a odio voluptatem. Sit dolorum debitis veritatis natus dolores. Quasi ratione sint. Sit quaerat ipsum dolorem.</p>
             </div>
           </div>
@@ -97,73 +92,87 @@
         <div class="container">
           <ol>
             <li><a href="index.php">Home</a></li>
-            <li class="current">Service Details</li>
+            <li class="current">Contact</li>
           </ol>
         </div>
       </nav>
     </div><!-- End Page Title -->
 
-    <!-- Service Details Section -->
-    <section id="service-details" class="service-details section">
+    <!-- Contact Section -->
+    <section id="contact" class="contact section">
 
-      <div class="container">
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
 
-        <div class="row gy-5">
+        <div class="mb-4" data-aos="fade-up" data-aos-delay="200">
+          <iframe style="border:0; width: 100%; height: 270px;" src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d48389.78314118045!2d-74.006138!3d40.710059!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c25a22a3bda30d%3A0xb89d1fe6bc499443!2sDowntown%20Conference%20Center!5e0!3m2!1sen!2sus!4v1676961268712!5m2!1sen!2sus" frameborder="0" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div><!-- End Google Maps -->
 
-          <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+        <div class="row gy-4">
 
-            <div class="service-box">
-              <h4>Serices List</h4>
-              <div class="services-list">
-                <a href="#" class="active"><i class="bi bi-arrow-right-circle"></i><span>Web Design</span></a>
-                <a href="#"><i class="bi bi-arrow-right-circle"></i><span>Web Design</span></a>
-                <a href="#"><i class="bi bi-arrow-right-circle"></i><span>Product Management</span></a>
-                <a href="#"><i class="bi bi-arrow-right-circle"></i><span>Graphic Design</span></a>
-                <a href="#"><i class="bi bi-arrow-right-circle"></i><span>Marketing</span></a>
+          <div class="col-lg-4">
+            <div class="info-item d-flex" data-aos="fade-up" data-aos-delay="300">
+              <i class="bi bi-geo-alt flex-shrink-0"></i>
+              <div>
+                <h3>Address</h3>
+                <p>A108 Adam Street, New York, NY 535022</p>
               </div>
-            </div><!-- End Services List -->
+            </div><!-- End Info Item -->
 
-            <div class="service-box">
-              <h4>Download Catalog</h4>
-              <div class="download-catalog">
-                <a href="#"><i class="bi bi-filetype-pdf"></i><span>Catalog PDF</span></a>
-                <a href="#"><i class="bi bi-file-earmark-word"></i><span>Catalog DOC</span></a>
+            <div class="info-item d-flex" data-aos="fade-up" data-aos-delay="400">
+              <i class="bi bi-telephone flex-shrink-0"></i>
+              <div>
+                <h3>Call Us</h3>
+                <p>+1 5589 55488 55</p>
               </div>
-            </div><!-- End Services List -->
+            </div><!-- End Info Item -->
 
-            <div class="help-box d-flex flex-column justify-content-center align-items-center">
-              <i class="bi bi-headset help-icon"></i>
-              <h4>Have a Question?</h4>
-              <p class="d-flex align-items-center mt-2 mb-0"><i class="bi bi-telephone me-2"></i> <span>+1 5589 55488 55</span></p>
-              <p class="d-flex align-items-center mt-1 mb-0"><i class="bi bi-envelope me-2"></i> <a href="mailto:contact@example.com">contact@example.com</a></p>
-            </div>
+            <div class="info-item d-flex" data-aos="fade-up" data-aos-delay="500">
+              <i class="bi bi-envelope flex-shrink-0"></i>
+              <div>
+                <h3>Email Us</h3>
+                <p>info@example.com</p>
+              </div>
+            </div><!-- End Info Item -->
 
           </div>
 
-          <div class="col-lg-8 ps-lg-5" data-aos="fade-up" data-aos-delay="200">
-            <img src="assets/img/services.jpg" alt="" class="img-fluid services-img">
-            <h3>Temporibus et in vero dicta aut eius lidero plastis trand lined voluptas dolorem ut voluptas</h3>
-            <p>
-              Blanditiis voluptate odit ex error ea sed officiis deserunt. Cupiditate non consequatur et doloremque consequuntur. Accusantium labore reprehenderit error temporibus saepe perferendis fuga doloribus vero. Qui omnis quo sit. Dolorem architecto eum et quos deleniti officia qui.
-            </p>
-            <ul>
-              <li><i class="bi bi-check-circle"></i> <span>Aut eum totam accusantium voluptatem.</span></li>
-              <li><i class="bi bi-check-circle"></i> <span>Assumenda et porro nisi nihil nesciunt voluptatibus.</span></li>
-              <li><i class="bi bi-check-circle"></i> <span>Ullamco laboris nisi ut aliquip ex ea</span></li>
-            </ul>
-            <p>
-              Est reprehenderit voluptatem necessitatibus asperiores neque sed ea illo. Deleniti quam sequi optio iste veniam repellat odit. Aut pariatur itaque nesciunt fuga.
-            </p>
-            <p>
-              Sunt rem odit accusantium omnis perspiciatis officia. Laboriosam aut consequuntur recusandae mollitia doloremque est architecto cupiditate ullam. Quia est ut occaecati fuga. Distinctio ex repellendus eveniet velit sint quia sapiente cumque. Et ipsa perferendis ut nihil. Laboriosam vel voluptates tenetur nostrum. Eaque iusto cupiditate et totam et quia dolorum in. Sunt molestiae ipsum at consequatur vero. Architecto ut pariatur autem ad non cumque nesciunt qui maxime. Sunt eum quia impedit dolore alias explicabo ea.
-            </p>
-          </div>
+          <div class="col-lg-8">
+            <form action="forms/contact.php" method="post" class="php-email-form" data-aos="fade-up" data-aos-delay="200">
+              <div class="row gy-4">
+
+                <div class="col-md-6">
+                  <input type="text" name="name" class="form-control" placeholder="Your Name" required="">
+                </div>
+
+                <div class="col-md-6 ">
+                  <input type="email" class="form-control" name="email" placeholder="Your Email" required="">
+                </div>
+
+                <div class="col-md-12">
+                  <input type="text" class="form-control" name="subject" placeholder="Subject" required="">
+                </div>
+
+                <div class="col-md-12">
+                  <textarea class="form-control" name="message" rows="6" placeholder="Message" required=""></textarea>
+                </div>
+
+                <div class="col-md-12 text-center">
+                  <div class="loading">Loading</div>
+                  <div class="error-message"></div>
+                  <div class="sent-message">Your message has been sent. Thank you!</div>
+
+                  <button type="submit">Send Message</button>
+                </div>
+
+              </div>
+            </form>
+          </div><!-- End Contact Form -->
 
         </div>
 
       </div>
 
-    </section><!-- /Service Details Section -->
+    </section><!-- /Contact Section -->
 
   </main>
 

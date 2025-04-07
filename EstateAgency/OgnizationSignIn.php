@@ -46,15 +46,27 @@
         <!-- <img src="assets/img/logo.png" alt=""> -->
         <h1 class="sitename">Co<span>LaB</span></h1>
       </a>
-
+      
       <nav id="navmenu" class="navmenu">
         <ul>
           <li><a href="index.php" class="active">主頁</a></li>
           <li><a href="about.html">關於</a></li>
           <li><a href="services.html">服務</a></li>
-          <li><a href="properties.html">最新專案</a></li>
+          <li><a href="propertiesdemo.php">最新專案</a></li>
           <li><a href="agents.html">合作單位</a></li>
           <li><a href="contact.html">聯絡我們</a></li>
+          <?php
+                if ($_SESSION['u_email']) {
+                    echo "<li><a href='Logout.php'>登出</a></li>";
+                    echo "<li><a href='account.php'>帳號管理</a></li>";
+                } else {
+                    echo "<li><a href='LogIn.html'>登入</a></li>";
+                    echo "<li><a href='#' data-bs-toggle='modal' data-bs-target='#SignInPermission'>註冊</a></li>";
+                }
+                ?>
+          <!-- <li><a href="LogIn.html">登入</a></li>
+          <li><a href="#" data-bs-toggle="modal" data-bs-target="#SignInPermission">註冊</a></li> -->
+
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
@@ -66,38 +78,86 @@
 
     <!-- Page Title -->
     <div class="page-title" data-aos="fade">
-      <div class="heading">
-        <div class="container">
-          <div class="row d-flex justify-content-center text-center">
-            <div class="col-lg-8">
-              <h1>Starter Page</h1>
-              <p class="mb-0">Odio et unde deleniti. Deserunt numquam exercitationem. Officiis quo odio sint voluptas consequatur ut a odio voluptatem. Sit dolorum debitis veritatis natus dolores. Quasi ratione sint. Sit quaerat ipsum dolorem.</p>
-            </div>
-          </div>
-        </div>
-      </div>
       <nav class="breadcrumbs">
-        <div class="container">
+        <div class="container" style="padding: 85px 0 0 0;">
           <ol>
-            <li><a href="index.php">Home</a></li>
-            <li class="current">Starter Page</li>
+            <li><a href="index.php">首頁</a></li>
+            <li class="current">組織團體註冊</li>
           </ol>
         </div>
       </nav>
     </div><!-- End Page Title -->
 
     <!-- Starter Section Section -->
-    <section id="starter-section" class="starter-section section">
+    <section id="starter-section" class="starter-section section contact section">
 
       <!-- Section Title -->
       <div class="container section-title" data-aos="fade-up">
-        <h2>Starter Section</h2>
-        <p>Necessitatibus eius consequatur ex aliquid fuga eum quidem sint consectetur velit</p>
+        <h2>組織團體註冊</h2>
+        <p>歡迎學校各組織加入此合作招募平台！</p>
       </div><!-- End Section Title -->
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
+            <div class="col-lg-12">
+              <form action="orgdb.php" method="post" class="php-email-form" data-aos="fade-up" data-aos-delay="200">
+                <div class="row gy-4">
+                  <p>一、基本組織資訊</p>
+                  <div class="col-md-6">
+                    <input type="text" class="form-control" name="o_name" placeholder="組織名稱" required="">
+                  </div>
+                  <div class="col-md-6">
+                    <select class="form-select" id="validationCustom04" name="o_type" required>
+                      <option selected disabled value="_">請選擇組織類型</option>
+                      <option value="社團">社團</option>
+                      <option value="系學會">系學會</option>
+                    </select>
+                  </div>
 
-      <div class="container" data-aos="fade-up">
-        <p>Use this page as a starter for your own custom pages.</p>
-      </div>
+                  <p>二、負責人與聯絡資訊</p>
+                  
+                  <div class="col-md-6">
+                    <input type="text" class="form-control" name="s_name" placeholder="主要聯絡人姓名" required="">
+                  </div>
+                  <div class="col-md-6">
+                    <input type="text" class="form-control" name="s_type" placeholder="職稱" required="">
+                  </div>
+                  <div class="col-md-6">
+                    <input type="email" class="form-control" name="s_email" placeholder="聯絡人Email" required="">
+                  </div>
+                  <div class="col-md-6">
+                    <input type="tel" class="form-control" name="s_phone" placeholder="聯絡人手機號碼" required="">
+                  </div>
+                  
+                  <p>三、平台會員註冊</p>
+                  <div class="col-md-5">
+                    <input type="email" class="form-control" name="u_email" placeholder="Email" required="">
+                  </div>
+                  <div class="col-md-5">
+                    <input type="password" class="form-control" name="u_password" placeholder="密碼" required="">
+                  </div>
+                  <div class="col-md-2">
+                    <input type="text" class="form-control" name="u_permission" placeholder="組織團體" value="組織團體" readonly>
+                  </div>
+                  <div class="col-md-12">
+                    <textarea class="form-control" name="u_content" rows="3" placeholder="組織簡介" required=""></textarea>
+                  </div>
+
+                  <div class="col-12">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="invalidCheck">
+                      <label class="form-check-label" for="exampleCheck1">
+                        <a href="#">同意政策相關條款</a>
+                      </label>
+                    </div>
+                  </div>
+                  <div class="col-md-12 text-center">
+                    <button type="submit">註冊</button>
+                  </div>
+  
+                </div>
+              </form>
+          </div>
+  
+        </div>
 
     </section><!-- /Starter Section Section -->
 
@@ -174,7 +234,7 @@
 
   <!-- Vendor JS Files -->
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="assets/vendor/php-email-form/validate.js"></script>
+  <!-- <script src="assets/vendor/php-email-form/validate.js"></script> -->
   <script src="assets/vendor/aos/aos.js"></script>
   <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
   <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
