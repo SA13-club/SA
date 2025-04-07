@@ -138,6 +138,7 @@
                         <p><strong>聯絡人：</strong>" . $row['name'] . "</p>
                         <p><strong>電話：</strong>" . $row['phone'] . "</p>
                         <p><strong>Email：</strong>" . $row['email'] . "</p>
+                        <p><strong>身份類型：</strong>" . $row['u_permission'] . "</p>
                         <p><strong>截止日期：</strong>" . $row['date'] . "</p>
                       </div>
                     </div>

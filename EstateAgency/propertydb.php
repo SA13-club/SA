@@ -25,11 +25,13 @@
     $email = $_POST['email'];
     $phone = $_POST['phone'];
     $date = $_POST['date'];
+    $permission= $_SESSION['u_permission'];
     
-    $sql = "INSERT INTO demanded (title, content, tag, target, name, email, phone, date)
-  VALUES ('$title', '$content', '$tag', '$target', '$name', '$email', '$phone', '$date')";
+    $sql = "INSERT INTO demanded (title, content, tag, target, name, email, phone, date, u_permission)
+  VALUES ('$title', '$content', '$tag', '$target', '$name', '$email', '$phone', '$date','$permission')";
     if (mysqli_query($conn, $sql)) {
         echo "<h1 align='center'>新增完成</h1>";
+        header("Location: propertiesdemo.php");
     }
     ?>
 </body>
