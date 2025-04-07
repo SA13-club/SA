@@ -52,11 +52,11 @@
       <nav id="navmenu" class="navmenu">
         <ul>
           <li><a href="index.php" class="active">主頁</a></li>
-          <li><a href="about.html">關於</a></li>
-          <li><a href="services.html">服務</a></li>
+          <li><a href="about.php">關於</a></li>
+          <li><a href="services.php">服務</a></li>
           <li><a href="propertiesdemo.php">最新專案</a></li>
-          <li><a href="agents.html">合作單位</a></li>
-          <li><a href="contact.html">聯絡我們</a></li>
+          <li><a href="agents.php">合作單位</a></li>
+          <li><a href="contact.php">聯絡我們</a></li>
           <?php
                 if ($_SESSION['u_email']) {
                     echo "<li><a href='Logout.php'>登出</a></li>";
@@ -104,8 +104,8 @@
               </div>
               <div class="modal-body">
                 <a href="BusinessSignIn.php" class="btn-permission">企業</a>
-                <a href="OgnizationSignIn.html" class="btn-permission">組織團體</a>
-                <a href="PersonalSignIn.html" class="btn-permission">個人</a>
+                <a href="OgnizationSignIn.php" class="btn-permission">組織團體</a>
+                <a href="PersonalSignIn.php" class="btn-permission">個人</a>
               </div>
             </div>
           </div>
@@ -127,7 +127,7 @@
             <div>
               <!-- <p>Doral, Florida</p> -->
               <h2><span>個人 </span>Person</h2>
-              <a href="property-single.html" class="btn-get-started">rent | $ 3.000</a>
+              <a href="property-single.php" class="btn-get-started">rent | $ 3.000</a>
             </div>
           </div>
         </div><!-- End Carousel Item -->
@@ -164,7 +164,7 @@
               <div class="icon">
                 <i class="bi bi-activity"></i>
               </div>
-              <a href="service-details.html" class="stretched-link">
+              <a href="service-details.php" class="stretched-link">
                 <h3>標題</h3>
               </a>
               <p>內文</p>
@@ -176,7 +176,7 @@
               <div class="icon">
                 <i class="bi bi-broadcast"></i>
               </div>
-              <a href="service-details.html" class="stretched-link">
+              <a href="service-details.php" class="stretched-link">
                 <h3>標題</h3>
               </a>
               <p>內文</p>
@@ -188,7 +188,7 @@
               <div class="icon">
                 <i class="bi bi-easel"></i>
               </div>
-              <a href="service-details.html" class="stretched-link">
+              <a href="service-details.php" class="stretched-link">
                 <h3>標題</h3>
               </a>
               <p>內文</p>
@@ -200,11 +200,11 @@
               <div class="icon">
                 <i class="bi bi-bounding-box-circles"></i>
               </div>
-              <a href="service-details.html" class="stretched-link">
+              <a href="service-details.php" class="stretched-link">
                 <h3>標題</h3>
               </a>
               <p>內文</p>
-              <a href="service-details.html" class="stretched-link"></a>
+              <a href="service-details.php" class="stretched-link"></a>
             </div>
           </div><!-- End Service Item -->
 
@@ -213,11 +213,11 @@
               <div class="icon">
                 <i class="bi bi-calendar4-week"></i>
               </div>
-              <a href="service-details.html" class="stretched-link">
+              <a href="service-details.php" class="stretched-link">
                 <h3>標題</h3>
               </a>
               <p>內文</p>
-              <a href="service-details.html" class="stretched-link"></a>
+              <a href="service-details.php" class="stretched-link"></a>
             </div>
           </div><!-- End Service Item -->
 
@@ -226,11 +226,11 @@
               <div class="icon">
                 <i class="bi bi-chat-square-text"></i>
               </div>
-              <a href="service-details.html" class="stretched-link">
+              <a href="service-details.php" class="stretched-link">
                 <h3>標題</h3>
               </a>
               <p>內文</p>
-              <a href="service-details.html" class="stretched-link"></a>
+              <a href="service-details.php" class="stretched-link"></a>
             </div>
           </div><!-- End Service Item -->
 
