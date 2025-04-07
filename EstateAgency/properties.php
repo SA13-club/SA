@@ -52,11 +52,11 @@
       <nav id="navmenu" class="navmenu">
         <ul>
           <li><a href="index.php" class="active">主頁</a></li>
-          <li><a href="about.html">關於</a></li>
-          <li><a href="services.html">服務</a></li>
+          <li><a href="about.php">關於</a></li>
+          <li><a href="services.php">服務</a></li>
           <li><a href="propertiesdemo.php">最新專案</a></li>
-          <li><a href="agents.html">合作單位</a></li>
-          <li><a href="contact.html">聯絡我們</a></li>
+          <li><a href="agents.php">合作單位</a></li>
+          <li><a href="contact.php">聯絡我們</a></li>
           <?php
                 if ($_SESSION['u_email']) {
                     echo "<li><a href='Logout.php'>登出</a></li>";
@@ -106,7 +106,7 @@
       <div class="container">
         <div class="row mb-4">
           <div class="col-12 text-end">
-            <a href="newproperty.html" class="btn btn-primary">
+            <a href="newproperty.php" class="btn btn-primary">
               <i class="bi bi-plus-circle me-2"></i>New Property
             </a>
           </div>
@@ -118,7 +118,7 @@
               <img src="assets/img/properties/property-1.jpg" alt="" class="img-fluid">
               <div class="card-body">
                 <span class="sale-rent">企業籌資</span>
-                <h3><a href="property-single.html" class="stretched-link">204 Mount Olive Road Two</a></h3>
+                <h3><a href="property-single.php" class="stretched-link">204 Mount Olive Road Two</a></h3>
                 <div class="card-content d-flex flex-column justify-content-center text-center">
                   <div class="row propery-info">
                     <div class="col">名字</div>
@@ -146,7 +146,7 @@
               <img src="assets/img/properties/property-2.jpg" alt="" class="img-fluid">
               <div class="card-body">
                 <span class="sale-rent">Sale | $350.000</span>
-                <h3><a href="property-single.html" class="stretched-link">647 Molie Road</a></h3>
+                <h3><a href="property-single.php" class="stretched-link">647 Molie Road</a></h3>
                 <div class="card-content d-flex flex-column justify-content-center text-center">
                   <div class="row propery-info">
                     <div class="col">Area</div>
@@ -170,7 +170,7 @@
               <img src="assets/img/properties/property-3.jpg" alt="" class="img-fluid">
               <div class="card-body">
                 <span class="sale-rent">Sale | $580.000</span>
-                <h3><a href="property-single.html" class="stretched-link">711 Avenue Road</a></h3>
+                <h3><a href="property-single.php" class="stretched-link">711 Avenue Road</a></h3>
                 <div class="card-content d-flex flex-column justify-content-center text-center">
                   <div class="row propery-info">
                     <div class="col">Area</div>
@@ -194,7 +194,7 @@
               <img src="assets/img/properties/property-4.jpg" alt="" class="img-fluid">
               <div class="card-body">
                 <span class="sale-rent">Rent | $6500</span>
-                <h3><a href="property-single.html" class="stretched-link">117 Milk Road</a></h3>
+                <h3><a href="property-single.php" class="stretched-link">117 Milk Road</a></h3>
                 <div class="card-content d-flex flex-column justify-content-center text-center">
                   <div class="row propery-info">
                     <div class="col">Area</div>
@@ -218,7 +218,7 @@
               <img src="assets/img/properties/property-5.jpg" alt="" class="img-fluid">
               <div class="card-body">
                 <span class="sale-rent">Rent | $3000</span>
-                <h3><a href="property-single.html" class="stretched-link">678 Broad Road</a></h3>
+                <h3><a href="property-single.php" class="stretched-link">678 Broad Road</a></h3>
                 <div class="card-content d-flex flex-column justify-content-center text-center">
                   <div class="row propery-info">
                     <div class="col">Area</div>
@@ -242,7 +242,7 @@
               <img src="assets/img/properties/property-6.jpg" alt="" class="img-fluid">
               <div class="card-body">
                 <span class="sale-rent">Sale | $650.000</span>
-                <h3><a href="property-single.html" class="stretched-link">974 Denim Road</a></h3>
+                <h3><a href="property-single.php" class="stretched-link">974 Denim Road</a></h3>
                 <div class="card-content d-flex flex-column justify-content-center text-center">
                   <div class="row propery-info">
                     <div class="col">Area</div>

@@ -97,11 +97,11 @@
       <nav id="navmenu" class="navmenu">
         <ul>
           <li><a href="index.php" class="active">主頁</a></li>
-          <li><a href="about.html">關於</a></li>
-          <li><a href="services.html">服務</a></li>
+          <li><a href="about.php">關於</a></li>
+          <li><a href="services.php">服務</a></li>
           <li><a href="propertiesdemo.php">最新專案</a></li>
-          <li><a href="agents.html">合作單位</a></li>
-          <li><a href="contact.html">聯絡我們</a></li>
+          <li><a href="agents.php">合作單位</a></li>
+          <li><a href="contact.php">聯絡我們</a></li>
           <?php
                 if ($_SESSION['u_email']) {
                     echo "<li><a href='Logout.php'>登出</a></li>";
@@ -151,7 +151,7 @@
       <<div class='container'>
         <div class='row mb-4'>
           <div class='col-12 text-end'>
-            <a href='newproperty.html' class="btn btn-success">
+            <a href='newproperty.php' class="btn btn-success">
               <i class='bi bi-plus-circle me-2'></i>發布需求
             </a>
           </div>
