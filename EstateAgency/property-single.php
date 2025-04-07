@@ -95,7 +95,7 @@
             <li><a href="propertiesdemo.php">最新專案</a></li>
             <?php
               $id=$_GET['id'];
-              $link = mysqli_connect('localhost', 'root', '12345678', 'sa');
+              $link = mysqli_connect('localhost', 'root', '', 'sa');
               $sql = "SELECT * FROM demanded where id='$id'";
               $result = mysqli_query($link, $sql);
               while ($row = mysqli_fetch_assoc($result)) {
@@ -118,7 +118,7 @@
             <div class="portfolio-description">
               <?php
               $id=$_GET['id'];
-              $link = mysqli_connect('localhost', 'root', '12345678', 'sa');
+              $link = mysqli_connect('localhost', 'root', '', 'sa');
               $sql = "SELECT * FROM demanded where id='$id'";
               $result = mysqli_query($link, $sql);
 
@@ -184,7 +184,24 @@
             <div class="portfolio-info">
               <h3>基本資料</h3>
               <ul>
-                <li><strong>發布單位:</strong> 台積電</li>
+                <li><strong>發布單位:</strong><?php
+$link = mysqli_connect('localhost', 'root', '', 'sa');
+
+$sql = "SELECT c.c_name 
+        FROM corporation_account c 
+        JOIN demanded d ON c.u_email = d.email";
+
+$result = mysqli_query($link, $sql);
+
+if ($row = mysqli_fetch_assoc($result)) {
+    echo "<li><strong>發布單位:</strong> {$row['c_name']}</li>";
+} else {
+    echo "<li>查無公司資料</li>";
+}
+
+mysqli_close($link);
+?>
+</li>
                 <li><strong>狀態:</strong> 招募中</li>
                 <li><strong>聯絡人:</strong> 可愛的狗狗</li>
                 <li><strong>電話:</strong>09123456789</li>
