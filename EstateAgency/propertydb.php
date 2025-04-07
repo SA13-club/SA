@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="refresh" content="3; url=properties.html">
-    <title>Document</title>
+    <title>CoLaB</title>
 </head>
 
 <body>
