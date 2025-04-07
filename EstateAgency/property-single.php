@@ -183,44 +183,42 @@
           <div class="col-lg-3" data-aos="fade-up" data-aos-delay="100">
             <div class="portfolio-info">
               <h3>基本資料</h3>
-              <!-- <?php
-                    $id = $_GET['id'];
-                    $link = mysqli_connect('localhost', 'root', '', 'sa');
-                    $sql = "SELECT * FROM demanded where id='$id'";
-                    $result = mysqli_query($link, $sql);
+              <ul>
+                <?php
+                $link = mysqli_connect('localhost', 'root', '', 'sa');
 
-                    // echo "<h2 class='section-title'><strong>最新專案列表</strong></h2><br>";
-                    while ($row = mysqli_fetch_assoc($result)) {
-                      echo "
+                $sql = "SELECT c.c_name FROM corporation_account c JOIN demanded d ON c.u_email = d.u_email";
+
+                $result = mysqli_query($link, $sql);
+
+                if ($row = mysqli_fetch_assoc($result)) {
+                  echo "<li><strong>發布單位:</strong> {$row['c_name']}</li>";
+                } else {
+                  echo "<li>查無公司資料</li>";
+                }
+
+                mysqli_close($link);
+                ?>
+                <?php
+                $id = $_GET['id'];
+                $link = mysqli_connect('localhost', 'root', '', 'sa');
+                $sql = "SELECT * FROM demanded where id='$id'";
+                $result = mysqli_query($link, $sql);
+
+                // echo "<h2 class='section-title'><strong>最新專案列表</strong></h2><br>";
+                while ($row = mysqli_fetch_assoc($result)) {
+                  if ($row["date"] >= date("Y-m-d")) {
+                    echo "<p><strong>狀態：</strong>招募中</p>";
+                  }else {
+                    echo "<p><strong>狀態：</strong>已關閉</p>";
+                  }
+                  echo "
                         <p><strong>聯絡人：</strong>" . $row['name'] . "</p>
                         <p><strong>電話：</strong>" . $row['phone'] . "</p>
                         <p><strong>Email：</strong>" . $row['u_email'] . "</p>
-                        <p><strong>截止日期：</strong>" . $row['date'] . "</p>
-";
-                    }
-                    ?> -->
-              <ul>
-                <?php
-                                          $link = mysqli_connect('localhost', 'root', '', 'sa');
-
-                                          $sql = "SELECT c.c_name FROM corporation_account c JOIN demanded d ON c.u_email = d.u_email";
-
-                                          $result = mysqli_query($link, $sql);
-
-                                          if ($row = mysqli_fetch_assoc($result)) {
-                                            echo "<li><strong>發布單位:</strong> {$row['c_name']}</li>";
-                                          } else {
-                                            echo "<li>查無公司資料</li>";
-                                          }
-
-                                          mysqli_close($link);
-                                          ?>
-                </li>
-                <li><strong>狀態:</strong> 招募中</li>
-                <li><strong>聯絡人:</strong> 可愛的狗狗</li>
-                <li><strong>電話:</strong>099</li>
-                <li><strong>email:</strong> gmail.com</li>
-                <li><strong>需求類型:</strong> 贊助</li>
+                        <p><strong>截止日期：</strong>" . $row['date'] . "</p>";
+                }
+                ?>
               </ul>
             </div>
           </div>
