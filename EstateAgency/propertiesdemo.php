@@ -161,17 +161,13 @@
           </div>
         </div>
         <br>
-                <!-- Filter Bar -->
-       <!-- Filter Bar (Dynamic from DB) -->
-<!-- Filter Bar: 點選後跳轉到 sortdemo.php -->
-<!-- Filter Bar: 點選後跳轉到 sortdemo.php -->
-<section class="filter-bar py-3 border-bottom bg-light">
-  <div class="container">
+<section class="filter-bar py-3  bg-light">
+  <div class="container " >
     <form method="get" action="sortdemo.php" class="d-flex flex-wrap gap-2 justify-content-center align-items-center">
       <label class="form-label me-2 mb-0">依標籤篩選：</label>
 
       <?php
-      $link = mysqli_connect('localhost', 'root', '', 'sa');
+      $link = mysqli_connect('localhost', 'root', '12345678', 'sa');
       $tagQuery = "SELECT DISTINCT tag FROM demanded WHERE tag IS NOT NULL AND tag != ''";
       $tagResult = mysqli_query($link, $tagQuery);
 
@@ -190,11 +186,11 @@
 
 
 
-        <div class='row gy-4'>
+        <div class='row py-5' >
 
           <div class="container">
             <?php
-            $link = mysqli_connect('localhost', 'root', '', 'sa');
+            $link = mysqli_connect('localhost', 'root', '12345678', 'sa');
             $sql = 'SELECT * FROM demanded';
             $result = mysqli_query($link, $sql);
 
