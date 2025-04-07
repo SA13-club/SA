@@ -185,7 +185,7 @@
               <h3>基本資料</h3>
               <!-- <?php
               $id=$_GET['id'];
-              $link = mysqli_connect('localhost', 'root', '12345678', 'sa');
+              $link = mysqli_connect('localhost', 'root', '', 'sa');
               $sql = "SELECT * FROM demanded where id='$id'";
               $result = mysqli_query($link, $sql);
 
@@ -220,7 +220,7 @@ mysqli_close($link);
 </li>
                 <li><strong>狀態:</strong> 招募中</li>
                 <li><strong>聯絡人:</strong> 可愛的狗狗</li>
-                <li><strong>電話:</strong>09123456789</li>
+                <li><strong>電話:</strong>099</li>
                 <li><strong>email:</strong> gmail.com</li>
                 <li><strong>需求類型:</strong> 贊助</li>
               </ul>

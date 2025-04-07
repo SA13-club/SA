@@ -3,7 +3,7 @@ session_start();
 $u_email = $_POST['u_email'];
 $u_password = $_POST['u_password'];
 
-$link = mysqli_connect('localhost', 'root', '12345678', 'sa');
+$link = mysqli_connect('localhost', 'root', '', 'sa');
 $sql = "SELECT * FROM user_account WHERE u_email='$u_email' AND u_password='$u_password'";
 $rs = mysqli_query($link, $sql);
 

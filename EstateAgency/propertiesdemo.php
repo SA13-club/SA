@@ -167,7 +167,7 @@
       <label class="form-label me-2 mb-0">依標籤篩選：</label>
 
       <?php
-      $link = mysqli_connect('localhost', 'root', '12345678', 'sa');
+      $link = mysqli_connect('localhost', 'root', '', 'sa');
       $tagQuery = "SELECT DISTINCT tag FROM demanded WHERE tag IS NOT NULL AND tag != ''";
       $tagResult = mysqli_query($link, $tagQuery);
 
@@ -190,7 +190,7 @@
 
           <div class="container">
             <?php
-            $link = mysqli_connect('localhost', 'root', '12345678', 'sa');
+            $link = mysqli_connect('localhost', 'root', '', 'sa');
             $sql = 'SELECT * FROM demanded';
             $result = mysqli_query($link, $sql);
 
