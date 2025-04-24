@@ -33,15 +33,27 @@
   $u_password = $_POST['u_password'];
   $u_permission = $_POST['u_permission'];
   $u_content = $_POST['u_content'];
-  $sql = "INSERT INTO corporation_account (c_name, c_type, c_industry, c_address, c_email, c_phone, e_name, e_type, e_email, e_phone, u_email, u_password, u_permission, u_content)
-  VALUES ('$c_name', '$c_type', '$c_industry', '$c_address', '$c_email', '$c_phone', '$e_name', '$e_type', '$e_email', '$e_phone', '$u_email', '$u_password','$u_permission', '$u_content')";
-  if (mysqli_query($conn, $sql)) {
-    echo "<h1 align='center'>新增完成</h1>";
-  }else{
-    echo "<h1 align='center'>新增g 194</h1>";
-  }
-  $sql2 = "INSERT INTO user_account (u_email, u_password, u_permission) VALUES('$u_email', '$u_password', '$u_permission')";
-  mysqli_query($conn, $sql2);
+ 
+$sql1 = "INSERT INTO user_account (u_email, u_password, u_permission, u_content)
+VALUES ('$u_email', '$u_password', '$u_permission', '$u_content')";
+
+if (mysqli_query($conn, $sql1)) {
+    $sql2 = "INSERT INTO corporation_registrations (
+      u_email, c_name, c_type, c_industry, c_address, c_email, c_phone,
+      e_name, e_type, e_email, e_phone, u_content
+    ) VALUES (
+      '$u_email', '$c_name', '$c_type', '$c_industry', '$c_address', '$c_email', '$c_phone',
+      '$e_name', '$e_type', '$e_email', '$e_phone', '$u_content'
+    )";
+
+    if (mysqli_query($conn, $sql2)) {
+        echo "<h1 align='center'>新增完成</h1>";
+    } else {
+        echo "<h1 align='center'>新增公司資料失敗</h1>";
+    }
+} else {
+    echo "<h1 align='center'>新增帳戶資料失敗</h1>";
+}
 
   ?>
 </body>
