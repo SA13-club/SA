@@ -99,60 +99,153 @@
             </div><!-- End Section Title -->
             <div class="container" data-aos="fade-up" data-aos-delay="100">
                 <div class="col-lg-12">
-                    <form action="propertydb.php" method="post" class="php-email-form" data-aos="fade-up"
-                        data-aos-delay="200">
+                    <form action="propertydb.php" method="post" class="php-email-form" data-aos="fade-up" data-aos-delay="200">
                         <div class="row gy-4">
-                            <p>一、需求標題</p>
                             <div class="col-md-6">
-                                <input type="text" class="form-control" name="title" placeholder="請輸入簡要說明" required>
+                                <p>需求標題</p>
+                                <input type="text" class="form-control" name="d_title" placeholder="請輸入簡要說明" required>
                             </div>
 
-                            <p>二、需求詳細描述</p>
                             <div class="col-md-12">
-                                <textarea class="form-control" name="content" rows="3" placeholder="請詳細說明需求和期望"
-                                    required></textarea>
+                                <p>需求詳細描述</p>
+                                <textarea class="form-control" name="d_content" rows="3" placeholder="請詳細說明需求和期望" required></textarea>
                             </div>
 
-                            <p>三、請選擇需求類型</p>
                             <div class="col-md-6">
-                                <select class="form-select" id="validationCustom04" name="tag" required>
-                                    <option selected disabled value="_">需求類型</option>
+                                <p>需求類型</p>
+                                <select class="form-select" id="validationCustom04" name="d_tag" required>
+                                    <option selected disabled value="_">請選擇需求類型</option>
                                     <option value="贊助">贊助</option>
                                     <option value="合作">合作</option>
                                     <option value="招募">招募</option>
                                     <option value="實習">實習</option>
                                 </select>
                             </div>
-                            <p>四、預期目標</p>
+
+                            <!-- 動態欄位插入位置 -->
+                            <div class="col-md-12" id="extra-fields"></div>
+
                             <div class="col-md-12">
-                                <textarea class="form-control" name="target" rows="3" placeholder="請描述您希望通過此需求達成的具體目標"
-                                    required></textarea>
+                                <p>預期目標</p>
+                                <textarea class="form-control" name="d_target" rows="3" placeholder="請描述您希望通過此需求達成的具體目標" required=""></textarea>
                             </div>
 
-                            <p>五、負責人與聯絡資訊</p>
+                            <div class="col-md-12">
+                                <p>負責人與聯絡資訊</p>
+                                <input type="text" class="form-control" name="d_name" placeholder="主要聯絡人姓名" required="">
+                            </div>
+                            <div class="col-md-6">
+                                <input type="email" class="form-control" name="d_email" placeholder="聯絡人Email" required="">
+                            </div>
+                            <div class="col-md-6">
+                                <input type="tel" class="form-control" name="d_phone" placeholder="聯絡人手機號碼" required="">
+                            </div>
+                            
 
                             <div class="col-md-6">
-                                <input type="text" class="form-control" name="name" placeholder="主要聯絡人姓名" required="">
-                            </div>
-                            <div class="col-md-6">
-                                <input type="email" class="form-control" name="email" placeholder="聯絡人Email"
-                                    required="">
-                            </div>
-                            <div class="col-md-6">
-                                <input type="tel" class="form-control" name="phone" placeholder="聯絡人手機號碼" required="">
-                            </div>
-                            <p>六、需求截止日期</p>
-                            <div class="col-md-6">
-                                <input type="date" name="date" class="form-control">
+                                <p>需求截止日期</p>
+                                <input type="d_date" name="date" class="form-control">
                             </div>
                             <div class="col-md-12 text-center">
                                 <button type="submit">發布需求</button>
                             </div>
                         </div>
-                </div>
-                </form>
-            </div>
+                    </form>
+                    <script>
+                        const typeSelect = document.getElementById("validationCustom04");
+                        const extraFields = document.getElementById("extra-fields");
 
+                        typeSelect.addEventListener("change", function () {
+                            const selected = this.value;
+                            extraFields.innerHTML = ""; // 清空之前欄位
+
+                            if (selected === "贊助") {
+                            extraFields.innerHTML = `
+                                <div class="row gy-4">
+                                <div class="col-md-7">
+                                    <p>贊助相關資訊</p>
+                                    <select class="form-select" id="sponsorTypeSelect" name="donate_type" required>
+                                    <option selected disabled value="_">請選擇贊助方式</option>
+                                    <option value="金錢">金錢</option>
+                                    <option value="物資">物資</option>
+                                    <option value="服務">服務</option>
+                                    <option value="其他">其他</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-7" id="sponsorSpecificInput"></div>
+                                <div class="col-md-12">
+                                    <input type="text" class="form-control" name="donate_exposure" placeholder="預期品牌曝光方式" required>
+                                </div>
+                                </div>
+                            `;
+
+                            const sponsorTypeSelect = document.getElementById("sponsorTypeSelect");
+                            const sponsorSpecificInput = document.getElementById("sponsorSpecificInput");
+
+                            sponsorTypeSelect.addEventListener("change", function () {
+                                const type = this.value;
+                                if (type === "金錢") {
+                                sponsorSpecificInput.innerHTML = `<input type="text" class="form-control" name="donate_money" placeholder="請輸入贊助金額" required>`;
+                                } else if (type === "物資") {
+                                sponsorSpecificInput.innerHTML = `<input type="text" class="form-control" name="donate_product" placeholder="請輸入物資內容" required>`;
+                                } else if (type === "服務") {
+                                sponsorSpecificInput.innerHTML = `<input type="text" class="form-control" name="donate_service" placeholder="請輸入服務內容" required>`;
+                                } else {
+                                sponsorSpecificInput.innerHTML = `<input type="text" class="form-control" name="donate_other" placeholder="請輸入贊助內容" required>`;
+                                }
+                            });
+                            } else if (selected === "合作") {
+                            extraFields.innerHTML = `
+                                <div class="row gy-4">
+                                <div class="col-md-6">
+                                <p>合作詳情</p>
+                                <input type="text" class="form-control" name="collab_type" placeholder="合作形式（如講座、場地、物資）" required>
+                                </div>
+                                <div class="col-md-12">
+                                <input type="text" class="form-control" name="collab_detail" placeholder="合作條件或限制（如需審核、參與人數）" required>
+                                </div>
+                                </div>
+                            `;
+                            } else if (selected === "招募") {
+                            extraFields.innerHTML = `
+                                <div class="row gy-4">
+                                <div class="col-md-8">
+                                <p>招募職缺資訊</p>
+                                <input type="text" class="form-control" name="recruit_title" placeholder="招募職缺名稱" required>
+                                </div>
+                                <div class="col-md-8">
+                                <input type="text" class="form-control" name="recruit_address" placeholder="工作地點" required>
+                                </div>
+                                <div class="col-md-12">
+                                <textarea class="form-control" name="recruit_detail" rows="3" placeholder="職缺說明與條件" required></textarea>
+                                </div>
+                                </div>
+                            `;
+                            } else if (selected === "實習") {
+                            extraFields.innerHTML = `
+                                <div class="row gy-4">
+                                <div class="col-md-7">
+                                <p>實習資訊</p>
+                                <input type="text" class="form-control" name="intern_name" placeholder="實習職位名稱" required>
+                                </div>
+                                <div class="col-md-7">
+                                <input type="text" class="form-control" name="intern_money" placeholder="提供薪資金額(若無請填0)" required>
+                                </div>
+                                <div class="col-md-6">
+                                <p>實習開始時間</p>
+                                <input type="date" class="form-control" name="intern_begin" placeholder="實習開始時間" required>
+                                </div>
+                                <div class="col-md-6">
+                                <p>實習結束時間</p>
+                                <input type="date" class="form-control" name="intern_end" placeholder="實習結束時間" required>
+                                </div>
+                                </div>
+                            `;
+                            }
+                        });
+                        </script>
+
+                </div>
             </div>
 
         </section><!-- /Starter Section Section -->
