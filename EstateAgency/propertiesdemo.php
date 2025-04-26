@@ -208,7 +208,7 @@ $sql = "SELECT *
                 <div class='dcard-post' data-category='{$row['tag']}'>
                 <a href='property-single.php?id={$row['d_id']}'>
                   <div class='dcard-header'>
-                    <span class='dcard-tag'>#" . $row['t.tag'] . "</span>
+                    <span class='dcard-tag'>#" . $row['tag'] . "</span>
                     
                   </div>
                   
