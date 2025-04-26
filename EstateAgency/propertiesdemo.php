@@ -150,19 +150,23 @@
             <div class="d-flex flex-wrap gap-2 justify-content-center align-items-center">
               <label class="form-label me-2 mb-0">依標籤篩選：</label>
               <?php
-              $link = mysqli_connect('localhost', 'root', '', 'sa');
-              $u_permission = $_SESSION['u_permission'];
+$link = mysqli_connect('localhost', 'root', '', 'sa');
+$u_permission = $_SESSION['u_permission'];
 
-              $tagQuery = "SELECT DISTINCT tag FROM demanded 
-        LEFT JOIN org_donate od ON d.d_id = od.d_id
-        LEFT JOIN cor_intern ci ON d.d_id = ci.d_id
-        LEFT JOIN cor_spons cs ON d.d_id = cs.d_id WHERE tag IS NOT NULL AND tag != '' AND d.u_permission != '$u_permission'";
-              $tagResult = mysqli_query($link, $tagQuery);
-              while ($row = mysqli_fetch_assoc($tagResult)) {
-                $tag = $row['demandtype'];
-                echo "<button type='button' class='btn btn-outline-primary filter-button' data-filter='{$tag}'>{$tag}</button>";
-              }              
-              ?>
+$tagQuery = "SELECT DISTINCT d.tag FROM demanded d 
+  LEFT JOIN org_donate od ON d.d_id = od.d_id
+  LEFT JOIN cor_intern ci ON d.d_id = ci.d_id
+  LEFT JOIN cor_spons cs ON d.d_id = cs.d_id 
+WHERE d.tag IS NOT NULL AND d.tag != '' AND d.u_permission != '$u_permission'";
+
+$tagResult = mysqli_query($link, $tagQuery);
+
+while ($row = mysqli_fetch_assoc($tagResult)) {
+  $tag = $row['tag']; // <-- 注意這裡取 'tag'
+  echo "<button type='button' class='btn btn-outline-primary filter-button' data-filter='{$tag}'>{$tag}</button>";
+}
+?>
+
               
               <button type="button" id="clearFilters" class="btn btn-outline-secondary">清除篩選</button>
 
@@ -201,19 +205,17 @@ $sql = "SELECT *
 
               while ($row = mysqli_fetch_assoc($result)) {
                 echo "
-                <div class='dcard-post' data-category='{$row['demandtype']}'>
+                <div class='dcard-post' data-category='{$row['tag']}'>
                 <a href='property-single.php?id={$row['d_id']}'>
                   <div class='dcard-header'>
-                    <span class='dcard-tag'>#" . $row['demandtype'] . "</span>
-                    <span class='dcard-title'>" . $row['title'] . "</span>
+                    <span class='dcard-tag'>#" . $row['t.tag'] . "</span>
+                    
                   </div>
-                  <div class='dcard-body'>
-                    <p>" . $row['content'] . "</p>
-                  </div>
+                  
                   <div class='dcard-footer'>
-                    <span>聯絡人："  . $row['name'] . "</span>
-                    <span>電話：" . $row['phone'] . "</span>
-                    <span>Email：" . $row['u_email'] . "</span>
+                    <span>聯絡人："  . $row['c_name'] . "</span>
+                    <span>電話：" . $row['c_phone'] . "</span>
+                    <span>Email：" . $row['c_email'] . "</span>
                   </a></div>
                 </div>
               ";
