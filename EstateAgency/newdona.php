@@ -301,21 +301,34 @@
                     <input type="number" class="form-control" name="recruit_number" placeholder="招募人數">
                 </div>
                 <div class="col-md-4">
+                    <label>薪資</label>
+                    <input type="text" class="form-control" name="salary" placeholder="薪資">
+                </div>
+                <div class="col-md-4">
                     <label>地點</label>
                     <select id="city" class="form-select" name="recruit_city">
                         <option selected disabled value="">選擇縣市</option>
                         <option value="台北市">台北市</option>
                         <option value="新北市">新北市</option>
                         <option value="桃園市">桃園市</option>
-                        <!-- (後續略) -->
+                        
                     </select>
                 </div>
                 <div class="col-md-4">
+                <label></label>
                     <select id="district" class="form-select" name="recruit_district">
                         <option selected disabled value="">選擇行政區</option>
                     </select>
                 </div>
-
+                  <div class="col-md-4">
+                    <label>上班時段</label>
+                    <input type="text" class="form-control" name="worktime" placeholder="上班時段">
+                </div>
+                <br>
+                 <div class="col-md-4">
+                    <label>工作技能</label>
+                    <input type="text" class="form-control" name="jobskill" placeholder="工作技能">
+                </div>
                 <div class="col-md-12">
                     <textarea class="form-control" name="recruit_detail" rows="3" placeholder="職缺說明與條件"></textarea>
                 </div>
