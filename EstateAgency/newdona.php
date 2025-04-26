@@ -263,7 +263,7 @@
     <div class="col-md-6">
         <select class="form-select" id="demandtype2" name="tag" >
             <option selected disabled value="_">需求類型</option>
-            <option value="spon">贊助</option>
+            <option value="贊助">贊助</option>
             <option value="合作">合作</option>
             <option value="招募">招募</option>
             <option value="實習">實習</option>
