@@ -144,7 +144,7 @@
 
                             <div class="col-md-6">
                                 <p>需求截止日期</p>
-                                <input type="d_date" name="date" class="form-control">
+                                <input type="date" name="date" class="form-control">
                             </div>
                             <div class="col-md-12 text-center">
                                 <button type="submit">發布需求</button>
