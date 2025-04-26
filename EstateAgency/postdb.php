@@ -12,11 +12,15 @@ if ($conn->connect_error) {
 }
 
 $u_permission = $_SESSION['u_permission'];
-$u_email =$_SESSION['u_email'];
 $tag = $_POST['tag'];
+$c_email=$_POST['c_email']
+$c_phone=$_POST['c_phone']
+$c_name=$_POST['c_name']
+$deadline=$POST['deadline']
+
 
 // 1. 先插入 demanded
-$sql1 = "INSERT INTO demanded (u_email, u_permission) VALUES ('$u_email','$u_permission')";
+$sql1 = "INSERT INTO demanded (u_permission) VALUES ('$u_permission')";
 if (!mysqli_query($conn, $sql1)) {
     die("插入 demanded 失敗: " . mysqli_error($conn));
 }
@@ -45,9 +49,9 @@ if ($u_permission == '組織團體') {
         $product_methods_sql = ($product_methods_json !== NULL) ? "'$product_methods_json'" : "NULL";
 
         $sql2 = "INSERT INTO org_donate 
-        (d_id, event_name, event_participate, event_description, sponsor_method, sponsor_amount, money_exposure, product_methods)
+        (d_id, event_name, event_participate, event_description, sponsor_method, sponsor_amount, money_exposure, product_methods,c_email,c_phone,c_name,deadline)
         VALUES 
-        ('$d_id', '$event_name', '$event_participate', '$event_description', '$sponsor_method', $sponsor_amount_sql, $money_exposure_sql, $product_methods_sql)";
+        ('$d_id', '$event_name', '$event_participate', '$event_description', '$sponsor_method', $sponsor_amount_sql, $money_exposure_sql, $product_methods_sql,'$c_email','$c_phone','$c_name','$deadline')";
 
         if (mysqli_query($conn, $sql2)) {
             echo "<h1 align='center'>捐贈資料新增完成！</h1>";
@@ -72,9 +76,9 @@ if ($u_permission == '組織團體') {
         $coop_end_sql = ($coop_end !== NULL) ? "'$coop_end'" : "NULL";
 
         $sql2 = "INSERT INTO org_coop
-        (d_id, coop_name, coop_description, coop_type, coop_benefit, coop_start, coop_end)
+        (d_id, coop_name, coop_description, coop_type, coop_benefit, coop_start, coop_end,c_email,c_phone,c_name,deadline)
         VALUES 
-        ('$d_id', $coop_name_sql, $coop_description_sql, $coop_type_sql, $coop_benefit_sql, $coop_start_sql, $coop_end_sql)";
+        ('$d_id', $coop_name_sql, $coop_description_sql, $coop_type_sql, $coop_benefit_sql, $coop_start_sql, $coop_end_sql,'$c_email','$c_phone','$c_name','$deadline')";
 
         if (mysqli_query($conn, $sql2)) {
             echo "<h1 align='center'>合作資料新增完成！</h1>";
@@ -104,9 +108,9 @@ if ($u_permission == '組織團體') {
         $product_methods_sql = ($product_methods_json !== NULL) ? "'$product_methods_json'" : "NULL";
 
         $sql2 = "INSERT INTO cor_spons 
-        (d_id, sponsor_method, sponsor_amount, money_exposure, product_methods)
+        (d_id, sponsor_method, sponsor_amount, money_exposure, product_methods,c_email,c_phone,c_name,deadline)
         VALUES 
-        ('$d_id', '$sponsor_method', $sponsor_amount_sql, $money_exposure_sql, $product_methods_sql)";
+        ('$d_id', '$sponsor_method', $sponsor_amount_sql, $money_exposure_sql, $product_methods_sql,'$c_email','$c_phone','$c_name','$deadline')";
 
         if (mysqli_query($conn, $sql2)) {
             echo "<h1 align='center'>企業贊助資料新增完成！</h1>";
@@ -189,9 +193,9 @@ if ($u_permission == '組織團體') {
         $requirements_sql = ($requirements_json !== NULL) ? "'$requirements_json'" : "NULL";
 
         $sql2 = "INSERT INTO cor_intern
-        (d_id, intern_title, intern_number, salary, intern_city, intern_district, worktime, jobskill, intern_detail, requirements)
+        (d_id, intern_title, intern_number, salary, intern_city, intern_district, worktime, jobskill, intern_detail, requirements,c_email,c_phone,c_name,deadline)
         VALUES 
-        ('$d_id', '$intern_title', '$intern_number', '$salary', '$intern_city', '$intern_district', '$worktime', '$jobskill', '$intern_detail', $requirements_sql)";
+        ('$d_id', '$intern_title', '$intern_number', '$salary', '$intern_city', '$intern_district', '$worktime', '$jobskill', '$intern_detail', '$requirements_sql','$c_email','$c_phone','$c_name','$deadline')";
 
         if (mysqli_query($conn, $sql2)) {
             echo "<h1 align='center'>企業實習資料新增完成！</h1>";
