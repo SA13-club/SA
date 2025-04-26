@@ -86,7 +86,7 @@ if ($u_permission == '組織團體') {
     }
 } elseif ($u_permission == '企業') {
     // 處理企業四種：spon / 合作 / 招募 / 實習
-    if ($tag === 'spon') {
+    if ($tag === '贊助') {
         // 處理企業贊助 org_sponsorship
         $sponsor_method = $_POST['sponsor_method'];
         $sponsor_amount = isset($_POST['sponsor_amount']) ? $_POST['sponsor_amount'] : NULL;

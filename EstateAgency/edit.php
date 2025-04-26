@@ -132,37 +132,117 @@
             <div class="container">
                 <?php
                 $link = mysqli_connect('localhost', 'root', '', 'sa');
-                $sql = 'SELECT * FROM demanded';
+                mysqli_set_charset($link, "utf8mb4");
+
+                session_start();
+                $u_email = $_SESSION['u_email'];
+
+                // 查 demanded 基本資料
+                $sql = "SELECT * FROM demanded WHERE u_email='$u_email'";
                 $result = mysqli_query($link, $sql);
 
                 while ($row = mysqli_fetch_assoc($result)) {
+                    $d_id = $row['d_id'];
+                    $tag = $row['tag'];
+                    $u_permission = $row['u_permission'];
+
+                    $detail = "";
+
+                    // 先判斷 u_permission，再判斷 tag，決定要 JOIN 哪一張表
+                    if ($u_permission == '組織團體') {
+                        if ($tag == 'spon') {
+                            $detail_sql = "SELECT * FROM org_donate WHERE d_id='$d_id'";
+                        } elseif ($tag == '合作') {
+                            $detail_sql = "SELECT * FROM org_coop WHERE d_id='$d_id'";
+                        } else {
+                            $detail_sql = null;
+                        }
+                    } elseif ($u_permission == '企業') {
+                        if ($tag == '贊助') {
+                            $detail_sql = "SELECT * FROM cor_spons WHERE d_id='$d_id'";
+                        } elseif ($tag == '合作') {
+                            $detail_sql = "SELECT * FROM cor_coop WHERE d_id='$d_id'";
+                        } elseif ($tag == '招募') {
+                            $detail_sql = "SELECT * FROM cor_recruit WHERE d_id='$d_id'";
+                        } elseif ($tag == '實習') {
+                            $detail_sql = "SELECT * FROM cor_intern WHERE d_id='$d_id'";
+                        } else {
+                            $detail_sql = null;
+                        }
+                    } else {
+                        $detail_sql = null;
+                    }
+
+                    if ($detail_sql) {
+                        $detail_result = mysqli_query($link, $detail_sql);
+                        if ($detail_row = mysqli_fetch_assoc($detail_result)) {
+                            // 顯示細節內容
+                            if ($tag == 'spon') {
+                                $detail = "
+                    <p>活動名稱：{$detail_row['event_name']}</p>
+                    <p>預計人數：{$detail_row['event_participate']}</p>
+                    <p>活動描述：{$detail_row['event_description']}</p>
+                    <p>贊助方式：{$detail_row['sponsor_method']}</p>
+                ";
+                            } elseif ($tag == '合作') {
+                                $detail = "
+                    <p>合作名稱：{$detail_row['coop_name']}</p>
+                    <p>合作描述：{$detail_row['coop_description']}</p>
+                    <p>合作類型：{$detail_row['coop_type']}</p>
+                ";
+                            } elseif ($tag == '贊助') {
+                                $detail = "
+                    <p>贊助方式：{$detail_row['sponsor_method']}</p>
+                    <p>贊助金額：{$detail_row['sponsor_amount']}</p>
+                ";
+                            } elseif ($tag == '招募') {
+                                $detail = "
+                    <p>職缺名稱：{$detail_row['recruit_title']}</p>
+                    <p>招募人數：{$detail_row['recruit_number']}</p>
+                    <p>薪資待遇：{$detail_row['salary']}</p>
+                ";
+                            } elseif ($tag == '實習') {
+                                $detail = "
+                    <p>實習職缺：{$detail_row['intern_title']}</p>
+                    <p>實習人數：{$detail_row['intern_number']}</p>
+                    <p>薪資待遇：{$detail_row['salary']}</p>
+                ";
+                            }
+                        }
+                    }
+
+                    // 顯示主表 + 細節
                     echo "
-                    <div class='dcard-post'>
-                        <div class='dcard-header'>
-                        <span class='text-success'>#{$row['tag']}</span>
-                        <span>{$row['title']}</span>
-                        </div>
-                        <div class='dcard-body'>
-                        <p>{$row['content']}</p>
-                        </div>
-                        <div class='dcard-footer'>
-                        <div>
-                            <span>聯絡人：{$row['name']}</span>
-                            <span> | 電話：{$row['phone']}</span>
-                            <span> | Email：{$row['u_email']}</span>
-                        </div>
-                        <div>
-                            <a href='editpost.php?id={$row['id']}' class='btn btn-sm btn-success me-2' style='background-color: #28c76f; border-color: #28c76f;'>
-                            <i class='bi bi-pencil'></i> 修改
-                            </a>
-                            <a href='deletepost.php?id={$row['id']}' class='btn btn-sm btn-danger' onclick='return confirm(\"確定要刪除這篇文章嗎？\")'>
-                            <i class='bi bi-trash'></i> 刪除
-                            </a>
-                        </div>
-                        </div>
-                    </div>";
+    <div class='dcard-post'>
+        <div class='dcard-header'>
+            <span class='text-success'>#{$row['tag']}</span>
+            <span>{$row['title']}</span>
+        </div>
+        <div class='dcard-body'>
+            <p>{$row['content']}</p>
+            {$detail}
+        </div>
+        <div class='dcard-footer'>
+            <div>
+                <span>聯絡人：{$detail_row['c_name']}</span>
+                <span> | 電話：{$detail_row['c_phone']}</span>
+                <span> | Email：{$detail_row['c_email']}</span>
+            </div>
+            <div>
+                <a href='editpost.php?id={$row['d_id']}' class='btn btn-sm btn-success me-2' style='background-color: #28c76f; border-color: #28c76f;'>
+                    <i class='bi bi-pencil'></i> 修改
+                </a>
+                <a href='deletepost.php?id={$row['d_id']}' class='btn btn-sm btn-danger' onclick='return confirm(\"確定要刪除這篇文章嗎？\")'>
+                    <i class='bi bi-trash'></i> 刪除
+                </a>
+            </div>
+        </div>
+    </div>";
                 }
+
+                mysqli_close($link);
                 ?>
+
             </div>
 
         </section>
