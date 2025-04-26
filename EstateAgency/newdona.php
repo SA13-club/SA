@@ -597,7 +597,7 @@
                     if (sponsorSection2) sponsorSection2.style.display = "none";
                     if (internsection) internsection.style.display = "none";
 
-                    if (value === "spon" && sponsorSection2) {
+                    if (value === "贊助" && sponsorSection2) {
                         sponsorSection2.style.display = "block";
                     } else if (value === "實習" && internsection) {
                         internsection.style.display = "block";
