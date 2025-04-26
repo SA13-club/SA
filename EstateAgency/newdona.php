@@ -133,18 +133,18 @@
                                 
                                 <div class="row gy-3">
                                     <div class="col-md-4">
-                                        <input type="text" class="form-control" name="eventname" placeholder="活動名稱" required>
+                                        <input type="text" class="form-control" name="eventname" placeholder="活動名稱" >
                                     </div>
                                     <div class="col-md-4">
-                                        <input type="text" class="form-control" name="eventparticipate" placeholder="預計活動人數" required>
+                                        <input type="text" class="form-control" name="eventparticipate" placeholder="預計活動人數" >
                                     </div>
                             
                                 <div class="col-md-12">
-                                    <textarea class="form-control" name="target" rows="3" placeholder="活動描述" required></textarea>
+                                    <textarea class="form-control" name="target" rows="3" placeholder="活動描述" ></textarea>
                                 </div>
                             
                                 <div class="col-md-4">
-                                    <select class="form-select" id="sponsor_method" name="sponsor_method" required>
+                                    <select class="form-select" id="sponsor_method" name="sponsor_method" >
                                       <option selected disabled value="_" >贊助方式</option>
                                       <option value="money">金錢</option>
                                       <option value="product">產品</option>
@@ -152,7 +152,7 @@
                                 </div>
                                 <div id="sponsor_amount"  style="display: none;">               
                                     <div class="col-md-4">
-                                        <select class="form-select" name="sponsor_amount"  required>
+                                        <select class="form-select" name="sponsor_amount"  >
                                         <option selected disabled value="_">贊助金額</option>
                                         <option value="10000">10000以內</option>
                                         <option value="20000">10000~20000</option>
@@ -225,19 +225,19 @@
                                     <div class="col-md-6">
                                         <label>合作預期效益（可複選）</label>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="benefit" value="提升知名度" id="awareness">
+                                            <input class="form-check-input" type="checkbox" name="benefit[]" value="提升知名度" id="awareness">
                                             <label class="form-check-label" for="awareness">提升知名度</label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="benefit" value="增加資源" id="resources">
+                                            <input class="form-check-input" type="checkbox" name="benefit[]" value="增加資源" id="resources">
                                             <label class="form-check-label" for="resources">增加資源</label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="benefit" value="拓展關係網" id="network">
+                                            <input class="form-check-input" type="checkbox" name="benefit[]" value="拓展關係網" id="network">
                                             <label class="form-check-label" for="network">拓展關係網</label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="benefit" value="技術交流" id="exchange">
+                                            <input class="form-check-input" type="checkbox" name="benefit[]" value="技術交流" id="exchange">
                                             <label class="form-check-label" for="exchange">技術交流</label>
                                         </div>
                                     </div>
