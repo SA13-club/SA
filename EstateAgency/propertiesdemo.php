@@ -125,18 +125,8 @@
 
     <!-- Page Title -->
     <div class="page-title" data-aos="fade">
-      <div class="heading">
-        <div class="container">
-          <div class="row d-flex justify-content-center text-center">
-            <div class="col-lg-8">
-              <h1>最新專案</h1>
-              <!-- <p class="mb-0">Odio et unde deleniti. Deserunt numquam exercitationem. Officiis quo odio sint voluptas consequatur ut a odio voluptatem. Sit dolorum debitis veritatis natus dolores. Quasi ratione sint. Sit quaerat ipsum dolorem.</p> -->
-            </div>
-          </div>
-        </div>
-      </div>
       <nav class="breadcrumbs">
-        <div class="container">
+        <div class="container" style="padding: 85px 0 0 0;">
           <ol>
             <li><a href="index.php">首頁</a></li>
             <li class="current">最新專案</li>
@@ -148,77 +138,74 @@
     <!-- Real Estate Section -->
     <section id="real-estate" class="real-estate section">
 
-      <<div class='container'>
-        <div class='row mb-4'>
-          <div class='col-12 text-end'>
-            <?php
-            if ($_SESSION['u_email']) {
-              echo " <a href='newproperty.php' class='btn btn-success'>
-              <i class='bi bi-plus-circle me-2'></i>發布需求";
-            }
-            ?>
-            </a>
+      <!-- Section Title -->
+      <div class="container section-title" data-aos="fade-up">
+        <h2>最新專案</h2>
+      </div><!-- End Section Title -->
+
+      <div class='container'>
+
+        <section class="filter-bar py-3  bg-light">
+          <div class="container " >
+            <div class="d-flex flex-wrap gap-2 justify-content-center align-items-center">
+              <label class="form-label me-2 mb-0">依標籤篩選：</label>
+              <?php
+              $link = mysqli_connect('localhost', 'root', '', 'sa');
+              $tagQuery = "SELECT DISTINCT tag FROM demanded WHERE tag IS NOT NULL AND tag != ''";
+              $tagResult = mysqli_query($link, $tagQuery);
+              while ($row = mysqli_fetch_assoc($tagResult)) {
+                $tag = $row['tag'];
+                echo "<button type='button' class='btn btn-outline-primary filter-button' data-filter='{$tag}'>{$tag}</button>";
+              }              
+              ?>
+              
+              <button type="button" id="clearFilters" class="btn btn-outline-secondary">清除篩選</button>
+
+            </div>
           </div>
-        </div>
-        <br>
-<section class="filter-bar py-3  bg-light">
-  <div class="container " >
-    <form method="get" action="sortdemo.php" class="d-flex flex-wrap gap-2 justify-content-center align-items-center">
-      <label class="form-label me-2 mb-0">依標籤篩選：</label>
-
-      <?php
-      $link = mysqli_connect('localhost', 'root', '', 'sa');
-      $tagQuery = "SELECT DISTINCT tag FROM demanded WHERE tag IS NOT NULL AND tag != ''";
-      $tagResult = mysqli_query($link, $tagQuery);
-
-      while ($row = mysqli_fetch_assoc($tagResult)) {
-        $tag = $row['tag'];
-        echo "<button type='submit' name='tag' value='{$tag}' class='btn btn-outline-primary'>{$tag}</button>";
-      }
-      ?>
-
-      <!-- ✅ 清除篩選的按鈕，回到全部資料頁面 -->
-      <a href="./propertiesdemo.php" class="btn btn-outline-secondary">清除篩選</a>
-    </form>
-  </div>
-</section>
-
-
-
-
+        </section>
         <div class='row py-5' >
 
-          <div class="container">
-            <?php
-            $link = mysqli_connect('localhost', 'root', '', 'sa');
-            $sql = 'SELECT * FROM demanded';
-            $result = mysqli_query($link, $sql);
+            <div class="container">
+              <div class='row mb-4'>
+                <div class='col-12 text-end'>
+                  <?php
+                  if ($_SESSION['u_email']) {
+                    echo " <a href='newproperty.php' class='btn btn-success'>
+                    <i class='bi bi-plus-circle me-2'></i>發布需求";
+                  }
+                  ?>
+                  </a>
+                </div>
+              </div>
+              <?php
+              $link = mysqli_connect('localhost', 'root', '', 'sa');
+              $sql = 'SELECT * FROM demanded';
+              $result = mysqli_query($link, $sql);
 
-            while ($row = mysqli_fetch_assoc($result)) {
-              echo "
-        <div class='dcard-post'>
-        <a href='property-single.php?id={$row['id']}'>
-          <div class='dcard-header'>
-            <span class='dcard-tag'>#" . $row['tag'] . "</span>
-            <span class='dcard-title'>" . $row['title'] . "</span>
-          </div>
-          <div class='dcard-body'>
-            <p>" . $row['content'] . "</p>
-          </div>
-          <div class='dcard-footer'>
-            <span>聯絡人："  . $row['name'] . "</span>
-            <span>電話：" . $row['phone'] . "</span>
-            <span>Email：" . $row['u_email'] . "</span>
-          </a></div>
+              while ($row = mysqli_fetch_assoc($result)) {
+                echo "
+                <div class='dcard-post' data-category='{$row['tag']}'>
+                <a href='property-single.php?id={$row['id']}'>
+                  <div class='dcard-header'>
+                    <span class='dcard-tag'>#" . $row['tag'] . "</span>
+                    <span class='dcard-title'>" . $row['title'] . "</span>
+                  </div>
+                  <div class='dcard-body'>
+                    <p>" . $row['content'] . "</p>
+                  </div>
+                  <div class='dcard-footer'>
+                    <span>聯絡人："  . $row['name'] . "</span>
+                    <span>電話：" . $row['phone'] . "</span>
+                    <span>Email：" . $row['u_email'] . "</span>
+                  </a></div>
+                </div>
+              ";
+              }
+              ?>
+            </div>
         </div>
-      ";
-            }
-            ?>
-          </div>
-
-        </div>
-        </div>
-
+      </div>
     </section><!-- /Real Estate Section -->
 
   </main>
@@ -273,6 +260,40 @@
 
   <!-- Main JS File -->
   <script src="assets/js/main.js"></script>
+  <script>
+    const buttons = document.querySelectorAll('.filter-button');
+const cards = document.querySelectorAll('.dcard-post'); // ← 改這裡！
+const clearButton = document.getElementById('clearFilters');
+
+function updateVisibleCards() {
+  const activeFilters = Array.from(buttons)
+    .filter(btn => btn.classList.contains('active'))
+    .map(btn => btn.dataset.filter);
+
+  cards.forEach(card => {
+    const category = card.dataset.category;
+    const shouldShow = activeFilters.length === 0 || activeFilters.includes(category);
+    card.style.display = shouldShow ? 'block' : 'none';
+  });
+}
+
+buttons.forEach(button => {
+  button.addEventListener('click', () => {
+    button.classList.toggle('active');
+    updateVisibleCards();
+  });
+});
+
+clearButton.addEventListener('click', () => {
+  buttons.forEach(btn => btn.classList.remove('active'));
+  updateVisibleCards();
+});
+
+updateVisibleCards(); // 初始顯示全部卡片
+
+  </script>
+
+
 
 </body>
 
