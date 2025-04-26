@@ -99,7 +99,7 @@
             </div><!-- End Section Title -->
             <div class="container" data-aos="fade-up" data-aos-delay="100">
                 <div class="col-lg-12">
-                    <form action="propertydb.php" method="post" class="php-email-form" data-aos="fade-up"
+                    <form action="postdb.php" method="post" class="php-email-form" data-aos="fade-up"
                         data-aos-delay="200">
                         <div class="row gy-4">
                             <!-- <p>一、需求標題</p>
@@ -144,13 +144,13 @@
                                 </div>
                             
                                 <div class="col-md-4">
-                                    <select class="form-select" id="sponsor_method" required>
+                                    <select class="form-select" id="sponsor_method" name="sponsor_method" required>
                                       <option selected disabled value="_" >贊助方式</option>
                                       <option value="money">金錢</option>
                                       <option value="product">產品</option>
                                     </select>
                                 </div>
-                                <div id="sponsor_amount" style="display: none;">               
+                                <div id="sponsor_amount" name="sponsor_amount" style="display: none;">               
                                     <div class="col-md-4">
                                         <select class="form-select"   required>
                                         <option selected disabled value="_">贊助金額</option>
@@ -205,15 +205,15 @@
                                 
                                 <div class="row gy-3">
                                     <div class="col-md-4">
-                                        <input type="text" class="form-control" name="coopname" placeholder="合作項目名稱" required>
+                                        <input type="text" class="form-control" name="coopname" placeholder="合作項目名稱" >
                                     </div>
                                     
                                     <div class="col-md-12">
-                                        <textarea class="form-control" name="coopdesc" rows="3" placeholder="合作內容描述" required></textarea>
+                                        <textarea class="form-control" name="coopdesc" rows="3" placeholder="合作內容描述" ></textarea>
                                     </div>
                                     
                                     <div class="col-md-4">
-                                        <select class="form-select" id="coop_type" name="coop_type" required>
+                                        <select class="form-select" id="coop_type" name="coop_type" >
                                             <option selected disabled value="_">合作類型</option>
                                             <option value="活動合辦">活動合辦</option>
                                             <option value="資源共享">資源共享</option>
@@ -246,10 +246,10 @@
                                         <label>合作時間</label>
                                         <div class="row">
                                             <div class="col-md-4">
-                                                <input type="date" class="form-control" name="coopstart" placeholder="開始日期" required>
+                                                <input type="date" class="form-control" name="coopstart" placeholder="開始日期" >
                                             </div>
                                             <div class="col-md-4">
-                                                <input type="date" class="form-control" name="coopend" placeholder="結束日期" required>
+                                                <input type="date" class="form-control" name="coopend" placeholder="結束日期" >
                                             </div>
                                         </div>
                                     </div>
@@ -261,7 +261,7 @@
                                 echo '
     <p>一、請選擇需求類型</p>
     <div class="col-md-6">
-        <select class="form-select" id="demandtype2" name="tag" required>
+        <select class="form-select" id="demandtype2" name="tag" >
             <option selected disabled value="_">需求類型</option>
             <option value="spon">贊助</option>
             <option value="合作">合作</option>
@@ -276,7 +276,7 @@
             <p>二、贊助細節</p>
             <div class="row gy-3">
                 <div class="col-md-4">
-                    <select class="form-select" id="sponsor_method2" name="sponsor_method" required>
+                    <select class="form-select" id="sponsor_method2" name="sponsor_method" >
                         <option selected disabled value="_">贊助方式</option>
                         <option value="money">金錢</option>
                         <option value="product">產品</option>
@@ -286,7 +286,7 @@
                 <!-- 金錢贊助細節 -->
                 <div id="sponsor_amount2" style="display: none;">
                     <div class="col-md-4">
-                        <select class="form-select" id="sponsor_amount_select" name="sponsor_amount" required>
+                        <select class="form-select" id="sponsor_amount_select" name="sponsor_amount" >
                             <option selected disabled value="_">贊助金額</option>
                             <option value="10000">10000以內</option>
                             <option value="20000">10000~20000</option>
