@@ -34,6 +34,38 @@
   * Author: BootstrapMade.com
   * License: https://bootstrapmade.com/license/
   ======================================================== -->
+    <style>
+        .dcard-post {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .dcard-header {
+            display: flex;
+            gap: 10px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .dcard-body {
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+        }
+
+        .dcard-footer {
+            font-size: 0.85rem;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
 </head>
 
 <body class="starter-page-page">
@@ -82,7 +114,8 @@
                 <div class="container" style="padding: 85px 0 0 0;">
                     <ol>
                         <li><a href="index.php">首頁</a></li>
-                        <li class="current">帳號資料管理</li>
+                        <li>帳號資料管理</li>
+                        <li class="current">文章管理</li>
                     </ol>
                 </div>
             </nav>
@@ -92,90 +125,42 @@
         <section id="starter-section" class="starter-section section contact section">
 
             <!-- Section Title -->
-            <div class="container section-title" data-aos="fade-up">
-                <h2>帳號資料管理</h2>
-                <div class="text-end">
-                    <a href="edit.php" class="btn btn-success" style="background-color: #28c76f; border-color: #28c76f;">編輯文章</a>
-                </div>
-            </div>
+            <div class="container py-5">
+                <h2 class="text-center mb-4">管理文章</h2>
 
-            <div class="container" data-aos="fade-up" data-aos-delay="100">
-                <div class="col-lg-12">
-                    <form action="accountdb.php" method="post" class="php-email-form" data-aos="fade-up" data-aos-delay="200">
-                        <div class="row gy-4">
-                            <?php
-                            if ($_SESSION['u_permission'] == "企業") {
-                                echo "<p>基本公司資訊</p>
-                            <div class='col-md-6'>
-                                <input type='text' class='form-control' name='c_name' placeholder='公司名稱' required=''>
-                            </div>
-                            <div class='col-md-3'>
-                                <input type='text' class='form-control' name='c_type' placeholder='公司類型' required=''>
-                            </div>
-                            <div class='col-md-3'>
-                                <select class='form-select' id='validationCustom04' name='c_industry' required>
-                                    <option selected disabled value='_'>請選擇產業類別</option>
-                                    <option value='大眾傳播相關業'>大眾傳播相關業</option>
-                                    <option value='旅遊／休閒／運動業'>旅遊／休閒／運動業</option>
-                                    <option value='住宿／餐飲服務業'>住宿／餐飲服務業</option>
-                                </select>
-                            </div>
-                            <div class='col-md-5'>
-                                <input type='text' class='form-control' name='c_address' placeholder='公司地址' required=''>
-                            </div>
-                            <div class='col-md-4'>
-                                <input type='email' class='form-control' name='c_email' placeholder='公司Email' required=''>
-                            </div>
-                            <div class='col-md-3'>
-                                <input type='tel' class='form-control' name='c_phone' placeholder='公司電話' required=''>
-                            </div>";
-                            }
+                <?php
+                $link = mysqli_connect('localhost', 'root', '', 'sa');
+                $sql = 'SELECT * FROM demanded';
+                $result = mysqli_query($link, $sql);
 
-                            if ($_SESSION['u_permission'] == "企業" || $_SESSION['u_permission'] == "組織團體")
-                                echo "<p>負責人與聯絡資訊</p>
-                            <div class='col-md-6'>
-                                <input type='text' class='form-control' name='e_name' placeholder='主要聯絡人姓名' required=''>
-                            </div>
-                            <div class='col-md-6'>
-                                <input type='text' class='form-control' name='e_type' placeholder='職稱' required=''>
-                            </div>
-                            <div class='col-md-6'>
-                                <input type='email' class='form-control' name='e_email' placeholder='聯絡人Email' required=''>
-                            </div>
-                            <div class='col-md-6'>
-                                <input type='tel' class='form-control' name='e_phone' placeholder='聯絡人手機號碼' required=''>
-                            </div>";
-                            ?>
-                            <p>平台會員訊息</p>
-                            <div class="col-md-5">
-                                <input type="email" class="form-control" name="u_email" placeholder="Email" required="">
-                            </div>
-                            <div class="col-md-5">
-                                <input type="password" class="form-control" name="u_password" placeholder="密碼" required="">
-                            </div>
-                            <!-- <div class="col-md-2">
-                                <input type="text" class="form-control" name="u_permission" placeholder="企業" value="企業" readonly>
-                            </div> -->
-                            <div class="col-md-12">
-                                <textarea class="form-control" name="u_content" rows="3" placeholder="公司簡介" required=""></textarea>
-                            </div>
-
-                            <div class="col-12">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="" id="invalidCheck">
-                                    <label class="form-check-label" for="exampleCheck1">
-                                        <a href="#">同意政策相關條款</a>
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-md-12 text-center">
-                                <button type="submit">更改</button>
-                            </div>
-
-                        </div>
-                    </form>
-                </div>
-
+                while ($row = mysqli_fetch_assoc($result)) {
+                    echo "
+      <div class='dcard-post'>
+        <div class='dcard-header'>
+          <span class='text-success'>#{$row['tag']}</span>
+          <span>{$row['title']}</span>
+        </div>
+        <div class='dcard-body'>
+          <p>{$row['content']}</p>
+        </div>
+        <div class='dcard-footer'>
+          <div>
+            <span>聯絡人：{$row['name']}</span>
+            <span> | 電話：{$row['phone']}</span>
+            <span> | Email：{$row['u_email']}</span>
+          </div>
+          <div>
+            <a href='editpost.php?id={$row['id']}' class='btn btn-sm btn-success me-2' style='background-color: #28c76f; border-color: #28c76f;'>
+              <i class='bi bi-pencil'></i> 修改
+            </a>
+            <a href='deletepost.php?id={$row['id']}' class='btn btn-sm btn-danger' onclick='return confirm(\"確定要刪除這篇文章嗎？\")'>
+              <i class='bi bi-trash'></i> 刪除
+            </a>
+          </div>
+        </div>
+      </div>";
+                }
+                ?>
             </div>
 
         </section>

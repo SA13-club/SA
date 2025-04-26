@@ -51,27 +51,27 @@
 
             <nav id="navmenu" class="navmenu">
                 <ul>
-                  <li><a href="index.php"  >主頁</a></li>
-                  <li><a href="about.php">關於</a></li>
-                  <li><a href="services.php">服務</a></li>
-                  <li><a href="propertiesdemo.php" class="active">最新專案</a></li>
-                  <li><a href="agents.php">合作單位</a></li>
-                  <li><a href="contact.php">聯絡我們</a></li>
-                  <?php
-                        if ($_SESSION['u_email']) {
-                            echo "<li><a href='Logout.php'>登出</a></li>";
-                            echo "<li><a href='account.php'>帳號管理</a></li>";
-                        } else {
-                            echo "<li><a href='LogIn.html'>登入</a></li>";
-                            echo "<li><a href='#' data-bs-toggle='modal' data-bs-target='#SignInPermission'>註冊</a></li>";
-                        }
-                        ?>
-                  <!-- <li><a href="LogIn.html">登入</a></li>
+                    <li><a href="index.php">主頁</a></li>
+                    <li><a href="about.php">關於</a></li>
+                    <li><a href="services.php">服務</a></li>
+                    <li><a href="propertiesdemo.php" class="active">最新專案</a></li>
+                    <li><a href="agents.php">合作單位</a></li>
+                    <li><a href="contact.php">聯絡我們</a></li>
+                    <?php
+                    if ($_SESSION['u_email']) {
+                        echo "<li><a href='Logout.php'>登出</a></li>";
+                        echo "<li><a href='account.php'>帳號管理</a></li>";
+                    } else {
+                        echo "<li><a href='LogIn.html'>登入</a></li>";
+                        echo "<li><a href='#' data-bs-toggle='modal' data-bs-target='#SignInPermission'>註冊</a></li>";
+                    }
+                    ?>
+                    <!-- <li><a href="LogIn.html">登入</a></li>
                   <li><a href="#" data-bs-toggle="modal" data-bs-target="#SignInPermission">註冊</a></li> -->
-        
+
                 </ul>
                 <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
-              </nav>
+            </nav>
 
         </div>
     </header>
@@ -84,7 +84,9 @@
                 <div class="container" style="padding: 85px 0 0 0;">
                     <ol>
                         <li><a href="index.php">首頁</a></li>
-                        <li class="current">發布需求</li>
+                        <li>帳號資料管理</li>
+                        <li>文章管理</li>
+                        <li class="current">修改文章</li>
                     </ol>
                 </div>
             </nav>
@@ -95,7 +97,7 @@
 
             <!-- Section Title -->
             <div class="container section-title" data-aos="fade-up">
-                <h2>發布需求</h2>
+                <h2>修改文章</h2>
             </div><!-- End Section Title -->
             <div class="container" data-aos="fade-up" data-aos-delay="100">
                 <div class="col-lg-12">
@@ -140,14 +142,14 @@
                             <div class="col-md-6">
                                 <input type="tel" class="form-control" name="d_phone" placeholder="聯絡人手機號碼" required="">
                             </div>
-                            
+
 
                             <div class="col-md-6">
                                 <p>需求截止日期</p>
-                                <input type="d_date" name="date" class="form-control">
+                                <input type="date" name="date" class="form-control">
                             </div>
                             <div class="col-md-12 text-center">
-                                <button type="submit">發布需求</button>
+                                <button type="submit">發布修改</button>
                             </div>
                         </div>
                     </form>
@@ -155,12 +157,12 @@
                         const typeSelect = document.getElementById("validationCustom04");
                         const extraFields = document.getElementById("extra-fields");
 
-                        typeSelect.addEventListener("change", function () {
+                        typeSelect.addEventListener("change", function() {
                             const selected = this.value;
                             extraFields.innerHTML = ""; // 清空之前欄位
 
                             if (selected === "贊助") {
-                            extraFields.innerHTML = `
+                                extraFields.innerHTML = `
                                 <div class="row gy-4">
                                 <div class="col-md-7">
                                     <p>贊助相關資訊</p>
@@ -179,23 +181,23 @@
                                 </div>
                             `;
 
-                            const sponsorTypeSelect = document.getElementById("sponsorTypeSelect");
-                            const sponsorSpecificInput = document.getElementById("sponsorSpecificInput");
+                                const sponsorTypeSelect = document.getElementById("sponsorTypeSelect");
+                                const sponsorSpecificInput = document.getElementById("sponsorSpecificInput");
 
-                            sponsorTypeSelect.addEventListener("change", function () {
-                                const type = this.value;
-                                if (type === "金錢") {
-                                sponsorSpecificInput.innerHTML = `<input type="text" class="form-control" name="donate_money" placeholder="請輸入贊助金額" required>`;
-                                } else if (type === "物資") {
-                                sponsorSpecificInput.innerHTML = `<input type="text" class="form-control" name="donate_product" placeholder="請輸入物資內容" required>`;
-                                } else if (type === "服務") {
-                                sponsorSpecificInput.innerHTML = `<input type="text" class="form-control" name="donate_service" placeholder="請輸入服務內容" required>`;
-                                } else {
-                                sponsorSpecificInput.innerHTML = `<input type="text" class="form-control" name="donate_other" placeholder="請輸入贊助內容" required>`;
-                                }
-                            });
+                                sponsorTypeSelect.addEventListener("change", function() {
+                                    const type = this.value;
+                                    if (type === "金錢") {
+                                        sponsorSpecificInput.innerHTML = `<input type="text" class="form-control" name="donate_money" placeholder="請輸入贊助金額" required>`;
+                                    } else if (type === "物資") {
+                                        sponsorSpecificInput.innerHTML = `<input type="text" class="form-control" name="donate_product" placeholder="請輸入物資內容" required>`;
+                                    } else if (type === "服務") {
+                                        sponsorSpecificInput.innerHTML = `<input type="text" class="form-control" name="donate_service" placeholder="請輸入服務內容" required>`;
+                                    } else {
+                                        sponsorSpecificInput.innerHTML = `<input type="text" class="form-control" name="donate_other" placeholder="請輸入贊助內容" required>`;
+                                    }
+                                });
                             } else if (selected === "合作") {
-                            extraFields.innerHTML = `
+                                extraFields.innerHTML = `
                                 <div class="row gy-4">
                                 <div class="col-md-6">
                                 <p>合作詳情</p>
@@ -207,7 +209,7 @@
                                 </div>
                             `;
                             } else if (selected === "招募") {
-                            extraFields.innerHTML = `
+                                extraFields.innerHTML = `
                                 <div class="row gy-4">
                                 <div class="col-md-8">
                                 <p>招募職缺資訊</p>
@@ -222,7 +224,7 @@
                                 </div>
                             `;
                             } else if (selected === "實習") {
-                            extraFields.innerHTML = `
+                                extraFields.innerHTML = `
                                 <div class="row gy-4">
                                 <div class="col-md-7">
                                 <p>實習資訊</p>
@@ -243,7 +245,7 @@
                             `;
                             }
                         });
-                        </script>
+                    </script>
 
                 </div>
             </div>
