@@ -13,10 +13,10 @@ if ($conn->connect_error) {
 
 $u_permission = $_SESSION['u_permission'];
 $tag = $_POST['tag'];
-$c_email=$_POST['c_email']
-$c_phone=$_POST['c_phone']
-$c_name=$_POST['c_name']
-$deadline=$POST['deadline']
+$c_email = $_POST['c_email'];
+$c_phone = $_POST['c_phone'];
+$c_name = $_POST['c_name'];
+$deadline = $POST['deadline'];
 
 
 // 1. 先插入 demanded
