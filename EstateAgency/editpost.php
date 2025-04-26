@@ -84,8 +84,8 @@
                 <div class="container" style="padding: 85px 0 0 0;">
                     <ol>
                         <li><a href="index.php">首頁</a></li>
-                        <li>帳號資料管理</li>
-                        <li>文章管理</li>
+                        <li><a href="account.php">帳號資料管理</a></li>
+                        <li><a href="edit.php">文章管理</a></li>
                         <li class="current">修改文章</li>
                     </ol>
                 </div>

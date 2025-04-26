@@ -114,7 +114,7 @@
                 <div class="container" style="padding: 85px 0 0 0;">
                     <ol>
                         <li><a href="index.php">首頁</a></li>
-                        <li>帳號資料管理</li>
+                        <li><a href="account.php">帳號資料管理</a></li>
                         <li class="current">文章管理</li>
                     </ol>
                 </div>
@@ -124,10 +124,12 @@
         <!-- Starter Section Section -->
         <section id="starter-section" class="starter-section section contact section">
 
-            <!-- Section Title -->
-            <div class="container py-5">
-                <h2 class="text-center mb-4">管理文章</h2>
+            <div class="container section-title" data-aos="fade-up">
+                <h2>管理文章</h2>
+            </div><!-- End Section Title -->
 
+            <!-- Section Title -->
+            <div class="container">
                 <?php
                 $link = mysqli_connect('localhost', 'root', '', 'sa');
                 $sql = 'SELECT * FROM demanded';
@@ -135,30 +137,30 @@
 
                 while ($row = mysqli_fetch_assoc($result)) {
                     echo "
-      <div class='dcard-post'>
-        <div class='dcard-header'>
-          <span class='text-success'>#{$row['tag']}</span>
-          <span>{$row['title']}</span>
-        </div>
-        <div class='dcard-body'>
-          <p>{$row['content']}</p>
-        </div>
-        <div class='dcard-footer'>
-          <div>
-            <span>聯絡人：{$row['name']}</span>
-            <span> | 電話：{$row['phone']}</span>
-            <span> | Email：{$row['u_email']}</span>
-          </div>
-          <div>
-            <a href='editpost.php?id={$row['id']}' class='btn btn-sm btn-success me-2' style='background-color: #28c76f; border-color: #28c76f;'>
-              <i class='bi bi-pencil'></i> 修改
-            </a>
-            <a href='deletepost.php?id={$row['id']}' class='btn btn-sm btn-danger' onclick='return confirm(\"確定要刪除這篇文章嗎？\")'>
-              <i class='bi bi-trash'></i> 刪除
-            </a>
-          </div>
-        </div>
-      </div>";
+                    <div class='dcard-post'>
+                        <div class='dcard-header'>
+                        <span class='text-success'>#{$row['tag']}</span>
+                        <span>{$row['title']}</span>
+                        </div>
+                        <div class='dcard-body'>
+                        <p>{$row['content']}</p>
+                        </div>
+                        <div class='dcard-footer'>
+                        <div>
+                            <span>聯絡人：{$row['name']}</span>
+                            <span> | 電話：{$row['phone']}</span>
+                            <span> | Email：{$row['u_email']}</span>
+                        </div>
+                        <div>
+                            <a href='editpost.php?id={$row['id']}' class='btn btn-sm btn-success me-2' style='background-color: #28c76f; border-color: #28c76f;'>
+                            <i class='bi bi-pencil'></i> 修改
+                            </a>
+                            <a href='deletepost.php?id={$row['id']}' class='btn btn-sm btn-danger' onclick='return confirm(\"確定要刪除這篇文章嗎？\")'>
+                            <i class='bi bi-trash'></i> 刪除
+                            </a>
+                        </div>
+                        </div>
+                    </div>";
                 }
                 ?>
             </div>
