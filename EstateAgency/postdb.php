@@ -11,8 +11,7 @@ if ($conn->connect_error) {
     die("連線失敗: " . $conn->connect_error);
 }
 
-$u_permission = $_SESSION['u_permission']
-$u_email = $_SESSION['u_email'];
+$u_permission = $_SESSION['u_permission'];
 $tag = $_POST['tag'];
 $c_email=$_POST['c_email']
 $c_phone=$_POST['c_phone']
@@ -21,7 +20,7 @@ $deadline=$POST['deadline']
 
 
 // 1. 先插入 demanded
-$sql1 = "INSERT INTO demanded (u_permission,u_email) VALUES ('$u_permission','$u_email')";
+$sql1 = "INSERT INTO demanded (u_permission) VALUES ('$u_permission')";
 if (!mysqli_query($conn, $sql1)) {
     die("插入 demanded 失敗: " . mysqli_error($conn));
 }
@@ -29,7 +28,7 @@ $d_id = mysqli_insert_id($conn); // 取得 d_id
 
 // 2. 根據 u_permission 來區分
 if ($u_permission == '組織團體') {
-    if ($tag === 'donate') {
+    if ($tag === 'spon') {
         // 處理捐贈
         $event_name = $_POST['eventname'];
         $event_participate = intval($_POST['eventparticipate']);
