@@ -196,7 +196,7 @@ if ($u_permission == '組織團體') {
         $sql2 = "INSERT INTO cor_intern
         (d_id, intern_title, intern_number, salary, intern_city, intern_district, worktime, jobskill, intern_detail, requirements,c_email,c_phone,c_name,deadline)
         VALUES 
-        ('$d_id', '$intern_title', '$intern_number', '$salary', '$intern_city', '$intern_district', '$worktime', '$jobskill', '$intern_detail', '$requirements_sql','$c_email','$c_phone','$c_name','$deadline')";
+        ('$d_id', '$intern_title', '$intern_number', '$salary', '$intern_city', '$intern_district', '$worktime', '$jobskill', '$intern_detail',$requirements_sql,'$c_email','$c_phone','$c_name','$deadline')";
 
         if (mysqli_query($conn, $sql2)) {
             echo "<h1 align='center'>企業實習資料新增完成！</h1>";

@@ -216,10 +216,8 @@
     <div class='dcard-post'>
         <div class='dcard-header'>
             <span class='text-success'>#{$row['tag']}</span>
-            <span>{$row['title']}</span>
         </div>
         <div class='dcard-body'>
-            <p>{$row['content']}</p>
             {$detail}
         </div>
         <div class='dcard-footer'>
