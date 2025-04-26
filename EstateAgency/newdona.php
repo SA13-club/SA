@@ -150,9 +150,9 @@
                                       <option value="product">產品</option>
                                     </select>
                                 </div>
-                                <div id="sponsor_amount" name="sponsor_amount" style="display: none;">               
+                                <div id="sponsor_amount"  style="display: none;">               
                                     <div class="col-md-4">
-                                        <select class="form-select"   required>
+                                        <select class="form-select" name="sponsor_amount"  required>
                                         <option selected disabled value="_">贊助金額</option>
                                         <option value="10000">10000以內</option>
                                         <option value="20000">10000~20000</option>
@@ -405,14 +405,14 @@
                             <p>三、負責人與聯絡資訊</p>
 
                             <div class="col-md-5">
-                                <input type="text" class="form-control" name="name" placeholder="主要聯絡人姓名" required="">
+                                <input type="text" class="form-control" name="u_name" placeholder="主要聯絡人姓名" required="">
                             </div>
                             <div class="col-md-5">
-                                <input type="email" class="form-control" name="email" placeholder="聯絡人Email"
+                                <input type="email" class="form-control" name="u_email" placeholder="聯絡人Email"
                                     required="">
                             </div>
                             <div class="col-md-5">
-                                <input type="tel" class="form-control" name="phone" placeholder="聯絡人手機號碼" required="">
+                                <input type="tel" class="form-control" name="u_phone" placeholder="聯絡人手機號碼" required="">
                             </div>
                             <p>四、需求截止日期</p>
                             <div class="col-md-5">
