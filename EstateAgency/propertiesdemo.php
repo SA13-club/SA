@@ -151,10 +151,15 @@
               <label class="form-label me-2 mb-0">依標籤篩選：</label>
               <?php
               $link = mysqli_connect('localhost', 'root', '', 'sa');
-              $tagQuery = "SELECT DISTINCT tag FROM demanded WHERE tag IS NOT NULL AND tag != ''";
+              $u_permission = $_SESSION['u_permission'];
+
+              $tagQuery = "SELECT DISTINCT tag FROM demanded 
+        LEFT JOIN org_donate od ON d.d_id = od.d_id
+        LEFT JOIN cor_intern ci ON d.d_id = ci.d_id
+        LEFT JOIN cor_spons cs ON d.d_id = cs.d_id WHERE tag IS NOT NULL AND tag != '' AND d.u_permission != '$u_permission'";
               $tagResult = mysqli_query($link, $tagQuery);
               while ($row = mysqli_fetch_assoc($tagResult)) {
-                $tag = $row['tag'];
+                $tag = $row['demandtype'];
                 echo "<button type='button' class='btn btn-outline-primary filter-button' data-filter='{$tag}'>{$tag}</button>";
               }              
               ?>
@@ -180,15 +185,26 @@
               </div>
               <?php
               $link = mysqli_connect('localhost', 'root', '', 'sa');
-              $sql = 'SELECT * FROM demanded';
+              $u_permission = $_SESSION['u_permission'];
+$sql = "SELECT * 
+        FROM demanded d
+        LEFT JOIN org_donate od ON d.d_id = od.d_id
+        LEFT JOIN cor_intern ci ON d.d_id = ci.d_id
+        LEFT JOIN cor_spons cs ON d.d_id = cs.d_id
+        WHERE d.u_permission != '$u_permission'";
+
+
+
+
+             
               $result = mysqli_query($link, $sql);
 
               while ($row = mysqli_fetch_assoc($result)) {
                 echo "
-                <div class='dcard-post' data-category='{$row['tag']}'>
-                <a href='property-single.php?id={$row['id']}'>
+                <div class='dcard-post' data-category='{$row['demandtype']}'>
+                <a href='property-single.php?id={$row['d_id']}'>
                   <div class='dcard-header'>
-                    <span class='dcard-tag'>#" . $row['tag'] . "</span>
+                    <span class='dcard-tag'>#" . $row['demandtype'] . "</span>
                     <span class='dcard-title'>" . $row['title'] . "</span>
                   </div>
                   <div class='dcard-body'>
