@@ -51,27 +51,27 @@
 
             <nav id="navmenu" class="navmenu">
                 <ul>
-                  <li><a href="index.php"  >主頁</a></li>
-                  <li><a href="about.php">關於</a></li>
-                  <li><a href="services.php">服務</a></li>
-                  <li><a href="propertiesdemo.php" class="active">最新專案</a></li>
-                  <li><a href="agents.php">合作單位</a></li>
-                  <li><a href="contact.php">聯絡我們</a></li>
-                  <?php
-                        if ($_SESSION['u_email']) {
-                            echo "<li><a href='Logout.php'>登出</a></li>";
-                            echo "<li><a href='account.php'>帳號管理</a></li>";
-                        } else {
-                            echo "<li><a href='LogIn.html'>登入</a></li>";
-                            echo "<li><a href='#' data-bs-toggle='modal' data-bs-target='#SignInPermission'>註冊</a></li>";
-                        }
-                        ?>
-                  <!-- <li><a href="LogIn.html">登入</a></li>
+                    <li><a href="index.php">主頁</a></li>
+                    <li><a href="about.php">關於</a></li>
+                    <li><a href="services.php">服務</a></li>
+                    <li><a href="propertiesdemo.php" class="active">最新專案</a></li>
+                    <li><a href="agents.php">合作單位</a></li>
+                    <li><a href="contact.php">聯絡我們</a></li>
+                    <?php
+                    if ($_SESSION['u_email']) {
+                        echo "<li><a href='Logout.php'>登出</a></li>";
+                        echo "<li><a href='account.php'>帳號管理</a></li>";
+                    } else {
+                        echo "<li><a href='LogIn.html'>登入</a></li>";
+                        echo "<li><a href='#' data-bs-toggle='modal' data-bs-target='#SignInPermission'>註冊</a></li>";
+                    }
+                    ?>
+                    <!-- <li><a href="LogIn.html">登入</a></li>
                   <li><a href="#" data-bs-toggle="modal" data-bs-target="#SignInPermission">註冊</a></li> -->
-        
+
                 </ul>
                 <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
-              </nav>
+            </nav>
 
         </div>
     </header>
@@ -112,11 +112,11 @@
                                 <textarea class="form-control" name="content" rows="3" placeholder="請詳細說明需求和期望"
                                     required></textarea>
                             </div> -->
-<?php
-$u_permission=$_SESSION['u_permission'];
+                            <?php
+                            $u_permission = $_SESSION['u_permission'];
 
-if($u_permission=='組織團體'){
-echo'
+                            if ($u_permission == '組織團體') {
+                                echo '
                             <p>一、請選擇需求類型</p>
             <div class="col-md-6">
             <select class="form-select" id="demandtype" name="tag" required>
@@ -210,9 +210,9 @@ echo'
     </div>
   </div>
 </div>
-';}
-elseif ($u_permission == '企業') {
-    echo '
+';
+                            } elseif ($u_permission == '企業') {
+                                echo '
     <p>一、請選擇需求類型</p>
     <div class="col-md-6">
         <select class="form-select" id="demandtype2" name="tag" required>
@@ -338,8 +338,8 @@ elseif ($u_permission == '企業') {
             </div>
         </div>
     </div>';
-}
-?>
+                            }
+                            ?>
 
 
 
@@ -373,7 +373,7 @@ elseif ($u_permission == '企業') {
 
     </main>
 
-    
+
 
 
 
@@ -481,129 +481,103 @@ elseif ($u_permission == '企業') {
 
 
 
-                
+
     <script>
-  const typeSelect = document.getElementById("demandtype");
-  const sponsorSection = document.getElementById("sponsorSection");
-  
+        document.addEventListener("DOMContentLoaded", function() {
+            // 組織團體相關
+            const typeSelect = document.getElementById("demandtype");
+            const sponsorSection = document.getElementById("sponsorSection");
 
-  typeSelect.addEventListener("change", function () {
-    const value = this.value;
+            if (typeSelect) {
+                typeSelect.addEventListener("change", function() {
+                    const value = this.value;
+                    if (sponsorSection) {
+                        sponsorSection.style.display = value === "spon" ? "block" : "none";
+                    }
+                });
+            }
 
-    // 隱藏所有區塊
-    sponsorSection.style.display = "none";
-    
+            const sponsor_method = document.getElementById("sponsor_method");
+            const sponsor_amount = document.getElementById("sponsor_amount");
+            const productdona = document.getElementById("productdona");
 
-    // 顯示對應的區塊
-    if (value === "spon") {
-      sponsorSection.style.display = "block";
-    } 
-  });
+            if (sponsor_method) {
+                sponsor_method.addEventListener("change", function() {
+                    const value = this.value;
+                    if (sponsor_amount) sponsor_amount.style.display = "none";
+                    if (productdona) productdona.style.display = "none";
 
+                    if (value === "money" && sponsor_amount) {
+                        sponsor_amount.style.display = "block";
+                    } else if (value === "product" && productdona) {
+                        productdona.style.display = "block";
+                    }
+                });
+            }
 
+            // 企業相關
+            const typeSelect2 = document.getElementById("demandtype2");
+            const sponsorSection2 = document.getElementById("sponsorSection2");
+            const internsection = document.getElementById("internsection");
 
-  const sponsor_method = document.getElementById("sponsor_method");
-  const sponsor_amount= document.getElementById("sponsor_amount");
-  const productdona= document.getElementById("productdona");
-  
+            if (typeSelect2) {
+                typeSelect2.addEventListener("change", function() {
+                    const value = this.value;
+                    if (sponsorSection2) sponsorSection2.style.display = "none";
+                    if (internsection) internsection.style.display = "none";
 
-    sponsor_method.addEventListener("change", function () {
-    const value = this.value;
+                    if (value === "spon" && sponsorSection2) {
+                        sponsorSection2.style.display = "block";
+                    } else if (value === "實習" && internsection) {
+                        internsection.style.display = "block";
+                    }
+                });
+            }
 
-    // 隱藏所有區塊
-    sponsor_amount.style.display = "none";
-    productdona.style.display = "none";
-    
+            const sponsor_method2 = document.getElementById("sponsor_method2");
+            const sponsor_amount2 = document.getElementById("sponsor_amount2");
+            const productdona2 = document.getElementById("productdona2");
 
-    // 顯示對應的區塊
-    if (value === "money") {
-        sponsor_amount.style.display = "block";
-    } else if(value=="product")
-    {
-        productdona.style.display = "block";
-    }
-  });
+            if (sponsor_method2) {
+                sponsor_method2.addEventListener("change", function() {
+                    const value = this.value;
+                    if (sponsor_amount2) sponsor_amount2.style.display = "none";
+                    if (productdona2) productdona2.style.display = "none";
 
+                    if (value === "money" && sponsor_amount2) {
+                        sponsor_amount2.style.display = "block";
+                    } else if (value === "product" && productdona2) {
+                        productdona2.style.display = "block";
+                    }
+                });
+            }
+        });
+        //行政區
+        const districtData = {
+            "台北市": ["中正區", "大同區", "中山區", "松山區", "大安區", "萬華區", "信義區", "士林區", "北投區", "內湖區", "南港區", "文山區"],
+            "新北市": ["板橋區", "新莊區", "中和區", "永和區", "土城區", "樹林區", "三重區", "新店區", "蘆洲區", "汐止區", "淡水區", "三峽區", "鶯歌區", "瑞芳區", "五股區", "泰山區", "林口區", "深坑區", "石碇區", "坪林區", "三芝區", "石門區", "八里區", "平溪區", "雙溪區", "貢寮區", "金山區", "萬里區", "烏來區"],
+            "桃園市": ["桃園區", "中壢區", "平鎮區", "八德區", "楊梅區", "蘆竹區", "大溪區", "龍潭區", "龜山區", "大園區", "觀音區", "新屋區", "復興區"],
+            "台中市": ["中區", "東區", "南區", "西區", "北區", "北屯區", "西屯區", "南屯區", "太平區", "大里區", "霧峰區", "烏日區", "豐原區", "后里區", "石岡區", "東勢區", "和平區", "新社區", "潭子區", "大雅區", "神岡區", "大肚區", "沙鹿區", "龍井區", "梧棲區", "清水區", "大甲區", "外埔區", "大安區"],
+            // 可以繼續補齊其他縣市喔
+        };
 
-  
+        document.getElementById('city').addEventListener('change', function() {
+            const city = this.value;
+            const districtSelect = document.getElementById('district');
 
+            // 清空原本的行政區選項
+            districtSelect.innerHTML = '<option selected disabled value="">選擇行政區</option>';
 
-
-
-
-
-
-  
-  const typeSelect2 = document.getElementById("demandtype2");
-  const sponsorSection2 = document.getElementById("sponsorSection2");
-  const internsection = document.getElementById("internsection");
-  
-
-  typeSelect2.addEventListener("change", function () {
-    const value = this.value;
-
-    // 隱藏所有區塊
-    sponsorSection2.style.display = "none";
-    internsection.style.display="none";
-    // 顯示對應的區塊
-    if (value === "spon") {
-        sponsorSection2.style.display = "block";
-    } 
-    else if (value === "實習"){
-        internsection.style.display="block";
-
-    }
-  });
-
-
-
-  const sponsor_method2 = document.getElementById("sponsor_method2");
-  const sponsor_amount2= document.getElementById("sponsor_amount2");
-  const productdona2= document.getElementById("productdona2");
-  
-
-    sponsor_method2.addEventListener("change", function () {
-    const value = this.value;
-
-    // 隱藏所有區塊
-    sponsor_amount2.style.display = "none";
-    productdona2.style.display = "none";
-    
-
-    // 顯示對應的區塊
-    if (value === "money") {
-        sponsor_amount2.style.display = "block";
-    } else if(value=="product")
-    {
-        productdona2.style.display = "block";
-    }
-  });
-//行政區
-                        const districtData = {
-                            "台北市": ["中正區", "大同區", "中山區", "松山區", "大安區", "萬華區", "信義區", "士林區", "北投區", "內湖區", "南港區", "文山區"],
-                            "新北市": ["板橋區", "新莊區", "中和區", "永和區", "土城區", "樹林區", "三重區", "新店區", "蘆洲區", "汐止區", "淡水區", "三峽區", "鶯歌區", "瑞芳區", "五股區", "泰山區", "林口區", "深坑區", "石碇區", "坪林區", "三芝區", "石門區", "八里區", "平溪區", "雙溪區", "貢寮區", "金山區", "萬里區", "烏來區"],
-                            "桃園市": ["桃園區", "中壢區", "平鎮區", "八德區", "楊梅區", "蘆竹區", "大溪區", "龍潭區", "龜山區", "大園區", "觀音區", "新屋區", "復興區"],
-                            "台中市": ["中區", "東區", "南區", "西區", "北區", "北屯區", "西屯區", "南屯區", "太平區", "大里區", "霧峰區", "烏日區", "豐原區", "后里區", "石岡區", "東勢區", "和平區", "新社區", "潭子區", "大雅區", "神岡區", "大肚區", "沙鹿區", "龍井區", "梧棲區", "清水區", "大甲區", "外埔區", "大安區"],
-                            // 可以繼續補齊其他縣市喔
-                        };
-
-                        document.getElementById('city').addEventListener('change', function() {
-                            const city = this.value;
-                            const districtSelect = document.getElementById('district');
-                            
-                            // 清空原本的行政區選項
-                            districtSelect.innerHTML = '<option selected disabled value="">選擇行政區</option>';
-                            
-                            if (districtData[city]) {
-                                districtData[city].forEach(function(district) {
-                                    const option = document.createElement('option');
-                                    option.value = district;
-                                    option.textContent = district;
-                                    districtSelect.appendChild(option);
-                                });
-                            }
-                        });
-                        </script>
+            if (districtData[city]) {
+                districtData[city].forEach(function(district) {
+                    const option = document.createElement('option');
+                    option.value = district;
+                    option.textContent = district;
+                    districtSelect.appendChild(option);
+                });
+            }
+        });
+    </script>
 
 
 
