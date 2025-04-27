@@ -77,8 +77,9 @@
       gap: 15px;
       flex-wrap: wrap;
     }
-    .filter-bar py-3 border-bottom bg-light{
-      background-color:white;
+
+    .filter-bar py-3 border-bottom bg-light {
+      background-color: white;
     }
   </style>
 </head>
@@ -96,21 +97,21 @@
 
       <nav id="navmenu" class="navmenu">
         <ul>
-          <li><a href="index.php" >主頁</a></li>
+          <li><a href="index.php">主頁</a></li>
           <li><a href="about.php">關於</a></li>
           <li><a href="services.php">服務</a></li>
           <li><a href="propertiesdemo.php" class="active">最新專案</a></li>
           <li><a href="agents.php">合作單位</a></li>
           <li><a href="contact.php">聯絡我們</a></li>
           <?php
-                if ($_SESSION['u_email']) {
-                    echo "<li><a href='Logout.php'>登出</a></li>";
-                    echo "<li><a href='account.php'>帳號管理</a></li>";
-                } else {
-                    echo "<li><a href='LogIn.html'>登入</a></li>";
-                    echo "<li><a href='#' data-bs-toggle='modal' data-bs-target='#SignInPermission'>註冊</a></li>";
-                }
-                ?>
+          if ($_SESSION['u_email']) {
+            echo "<li><a href='Logout.php'>登出</a></li>";
+            echo "<li><a href='account.php'>帳號管理</a></li>";
+          } else {
+            echo "<li><a href='LogIn.html'>登入</a></li>";
+            echo "<li><a href='#' data-bs-toggle='modal' data-bs-target='#SignInPermission'>註冊</a></li>";
+          }
+          ?>
           <!-- <li><a href="LogIn.html">登入</a></li>
           <li><a href="#" data-bs-toggle="modal" data-bs-target="#SignInPermission">註冊</a></li> -->
 
@@ -146,82 +147,143 @@
       <div class='container'>
 
         <section class="filter-bar py-3  bg-light">
-          <div class="container " >
+          <div class="container ">
             <div class="d-flex flex-wrap gap-2 justify-content-center align-items-center">
               <label class="form-label me-2 mb-0">依標籤篩選：</label>
               <?php
-$link = mysqli_connect('localhost', 'root', '', 'sa');
-$u_permission = $_SESSION['u_permission'];
+              $link = mysqli_connect('localhost', 'root', '', 'sa');
+              $u_permission = $_SESSION['u_permission'];
 
-$tagQuery = "SELECT DISTINCT d.tag FROM demanded d 
+              $tagQuery = "SELECT DISTINCT d.tag FROM demanded d 
   LEFT JOIN org_donate od ON d.d_id = od.d_id
   LEFT JOIN cor_intern ci ON d.d_id = ci.d_id
   LEFT JOIN cor_spons cs ON d.d_id = cs.d_id 
 WHERE d.tag IS NOT NULL AND d.tag != '' AND d.u_permission != '$u_permission'";
 
-$tagResult = mysqli_query($link, $tagQuery);
+              $tagResult = mysqli_query($link, $tagQuery);
 
-while ($row = mysqli_fetch_assoc($tagResult)) {
-  $tag = $row['tag']; // <-- 注意這裡取 'tag'
-  echo "<button type='button' class='btn btn-outline-primary filter-button' data-filter='{$tag}'>{$tag}</button>";
-}
-?>
+              while ($row = mysqli_fetch_assoc($tagResult)) {
+                $tag = $row['tag']; // <-- 注意這裡取 'tag'
+                echo "<button type='button' class='btn btn-outline-primary filter-button' data-filter='{$tag}'>{$tag}</button>";
+              }
+              ?>
 
-              
+
               <button type="button" id="clearFilters" class="btn btn-outline-secondary">清除篩選</button>
 
             </div>
           </div>
         </section>
-        <div class='row py-5' >
+        <div class='row py-5'>
 
-            <div class="container">
-              <div class='row mb-4'>
-                <div class='col-12 text-end'>
-                  <?php
-                  if ($_SESSION['u_email']) {
-                    echo " <a href='newproperty.php' class='btn btn-success'>
+          <div class="container">
+            <div class='row mb-4'>
+              <div class='col-12 text-end'>
+                <?php
+                if ($_SESSION['u_email']) {
+                  echo " <a href='newproperty.php' class='btn btn-success'>
                     <i class='bi bi-plus-circle me-2'></i>發布需求";
-                  }
-                  ?>
-                  </a>
-                </div>
+                }
+                ?>
+                </a>
               </div>
-              <?php
-              $link = mysqli_connect('localhost', 'root', '', 'sa');
-              $u_permission = $_SESSION['u_permission'];
-$sql = "SELECT * 
+            </div>
+            <?php
+            session_start(); // 確保有啟用 session
+            $link = mysqli_connect('localhost', 'root', '', 'sa');
+
+            if (!$link) {
+              die('連線失敗: ' . mysqli_connect_error());
+            }
+
+            $u_permission = $_SESSION['u_permission'] ?? '';
+
+            // 根據權限組織不同的 SQL
+            if ($u_permission == '組織團體') {
+              $sql = "
+        SELECT 
+            d.*, 
+            ci.c_name AS intern_c_name, ci.c_phone AS intern_c_phone, ci.c_email AS intern_c_email,
+            cs.c_name AS spons_c_name, cs.c_phone AS spons_c_phone, cs.c_email AS spons_c_email
         FROM demanded d
-        LEFT JOIN org_donate od ON d.d_id = od.d_id
         LEFT JOIN cor_intern ci ON d.d_id = ci.d_id
         LEFT JOIN cor_spons cs ON d.d_id = cs.d_id
-        WHERE d.u_permission != '$u_permission'";
+        WHERE d.u_permission != ?
+    ";
+            } elseif ($u_permission == '企業') {
+              $sql = "
+        SELECT 
+            d.*, 
+            od.c_name AS donate_c_name, od.c_phone AS donate_c_phone, od.c_email AS donate_c_email,
+            oc.c_name AS coop_c_name, oc.c_phone AS coop_c_phone, oc.c_email AS coop_c_email
+        FROM demanded d
+        LEFT JOIN org_coop oc ON d.d_id = oc.d_id
+        LEFT JOIN org_donate od ON d.d_id = od.d_id
+        WHERE d.u_permission != ?
+    ";
+            } else {
+              die('權限錯誤');
+            }
 
+            // 使用 prepared statement，防止 SQL injection
+            $stmt = mysqli_prepare($link, $sql);
+            mysqli_stmt_bind_param($stmt, 's', $u_permission);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
 
+            // 取出所有資料
+            while ($row = mysqli_fetch_assoc($result)) {
+              echo "
+    <div class='dcard-post' data-category='{$row['tag']}'>
+        <a href='property-single.php?id={$row['d_id']}'>
+        <div class='dcard-header'>
+            <span class='dcard-tag'>#{$row['tag']}</span>
+        </div>
+        <div class='dcard-footer'>
+    ";
 
-
-             
-              $result = mysqli_query($link, $sql);
-
-              while ($row = mysqli_fetch_assoc($result)) {
-                echo "
-                <div class='dcard-post' data-category='{$row['tag']}'>
-                <a href='property-single.php?id={$row['d_id']}'>
-                  <div class='dcard-header'>
-                    <span class='dcard-tag'>#" . $row['tag'] . "</span>
-                    
-                  </div>
-                  
-                  <div class='dcard-footer'>
-                    <span>聯絡人："  . $row['c_name'] . "</span>
-                    <span>電話：" . $row['c_phone'] . "</span>
-                    <span>Email：" . $row['c_email'] . "</span>
-                  </a></div>
-                </div>
-              ";
+              if ($u_permission == '組織團體') {
+                if (!empty($row['intern_c_name'])) {
+                  echo "
+                <span>聯絡人：{$row['intern_c_name']}</span>
+                <span>電話：{$row['intern_c_phone']}</span>
+                <span>Email：{$row['intern_c_email']}</span>
+            ";
+                } elseif (!empty($row['spons_c_name'])) {
+                  echo "
+                <span>聯絡人：{$row['spons_c_name']}</span>
+                <span>電話：{$row['spons_c_phone']}</span>
+                <span>Email：{$row['spons_c_email']}</span>
+            ";
+                } else {
+                  echo "<span>尚無聯絡資料</span>";
+                }
+              } elseif ($u_permission == '企業') {
+                if (!empty($row['donate_c_name'])) {
+                  echo "
+                <span>聯絡人：{$row['donate_c_name']}</span>
+                <span>電話：{$row['donate_c_phone']}</span>
+                <span>Email：{$row['donate_c_email']}</span>
+            ";
+                } elseif (!empty($row['coop_c_name'])) {
+                  echo "
+                <span>聯絡人：{$row['coop_c_name']}</span>
+                <span>電話：{$row['coop_c_phone']}</span>
+                <span>Email：{$row['coop_c_email']}</span>
+            ";
+                } else {
+                  echo "<span>尚無聯絡資料</span>";
+                }
               }
-              ?>
-            </div>
+
+              echo "
+        </div></a>
+    </div>
+    ";
+            }
+            ?>
+
+          </div>
         </div>
       </div>
     </section><!-- /Real Estate Section -->
@@ -280,35 +342,34 @@ $sql = "SELECT *
   <script src="assets/js/main.js"></script>
   <script>
     const buttons = document.querySelectorAll('.filter-button');
-const cards = document.querySelectorAll('.dcard-post'); // ← 改這裡！
-const clearButton = document.getElementById('clearFilters');
+    const cards = document.querySelectorAll('.dcard-post'); // ← 改這裡！
+    const clearButton = document.getElementById('clearFilters');
 
-function updateVisibleCards() {
-  const activeFilters = Array.from(buttons)
-    .filter(btn => btn.classList.contains('active'))
-    .map(btn => btn.dataset.filter);
+    function updateVisibleCards() {
+      const activeFilters = Array.from(buttons)
+        .filter(btn => btn.classList.contains('active'))
+        .map(btn => btn.dataset.filter);
 
-  cards.forEach(card => {
-    const category = card.dataset.category;
-    const shouldShow = activeFilters.length === 0 || activeFilters.includes(category);
-    card.style.display = shouldShow ? 'block' : 'none';
-  });
-}
+      cards.forEach(card => {
+        const category = card.dataset.category;
+        const shouldShow = activeFilters.length === 0 || activeFilters.includes(category);
+        card.style.display = shouldShow ? 'block' : 'none';
+      });
+    }
 
-buttons.forEach(button => {
-  button.addEventListener('click', () => {
-    button.classList.toggle('active');
-    updateVisibleCards();
-  });
-});
+    buttons.forEach(button => {
+      button.addEventListener('click', () => {
+        button.classList.toggle('active');
+        updateVisibleCards();
+      });
+    });
 
-clearButton.addEventListener('click', () => {
-  buttons.forEach(btn => btn.classList.remove('active'));
-  updateVisibleCards();
-});
+    clearButton.addEventListener('click', () => {
+      buttons.forEach(btn => btn.classList.remove('active'));
+      updateVisibleCards();
+    });
 
-updateVisibleCards(); // 初始顯示全部卡片
-
+    updateVisibleCards(); // 初始顯示全部卡片
   </script>
 
 

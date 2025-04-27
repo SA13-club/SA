@@ -17,7 +17,7 @@ $tag = $_POST['tag'];
 $c_email = $_POST['c_email'];
 $c_phone = $_POST['c_phone'];
 $c_name = $_POST['c_name'];
-$deadline = $POST['deadline'];
+$deadline = $_POST['deadline'];
 
 
 // 1. 先插入 demanded
