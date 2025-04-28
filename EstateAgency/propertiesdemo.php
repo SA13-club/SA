@@ -37,6 +37,7 @@
   * License: https://bootstrapmade.com/license/
   ======================================================== -->
   <style>
+    
     .dcard-post {
       border: 1px solid #ddd;
       border-radius: 10px;
@@ -212,7 +213,7 @@ WHERE d.tag IS NOT NULL AND d.tag != '' AND d.u_permission != '$u_permission'";
               <div class='col-12 text-end'>
                 <?php
                 if ($_SESSION['u_email']) {
-                  echo " <a href='newproperty.php' class='btn btn-success'>
+                  echo " <a href='newdona.php' class='btn btn-success'>
                     <i class='bi bi-plus-circle me-2'></i>發布需求";
                 }
                 ?>
@@ -278,53 +279,72 @@ WHERE d.tag IS NOT NULL AND d.tag != '' AND d.u_permission != '$u_permission'";
             // 取出所有資料
             while ($row = mysqli_fetch_assoc($result)) {
               echo "
-    <div class='dcard-post' data-category='{$row['tag']}'>
-        <a href='property-single.php?id={$row['d_id']}'>
-        <div class='dcard-header'>
-            <span class='dcard-tag'>#{$row['tag']}</span>
-        </div>
-        <div class='dcard-footer'>
-    ";
-
-              if ($u_permission == '組織團體') {
-                if (!empty($row['intern_c_name'])) {
-                  echo "
-                <span>聯絡人：{$row['intern_c_name']}</span>
-                <span>電話：{$row['intern_c_phone']}</span>
-                <span>Email：{$row['intern_c_email']}</span>
-            ";
-                } elseif (!empty($row['spons_c_name'])) {
-                  echo "
-                <span>聯絡人：{$row['spons_c_name']}</span>
-                <span>電話：{$row['spons_c_phone']}</span>
-                <span>Email：{$row['spons_c_email']}</span>
-            ";
-                } else {
-                  echo "<span>尚無聯絡資料</span>";
-                }
-              } elseif ($u_permission == '企業') {
-                if (!empty($row['donate_c_name'])) {
-                  echo "
-                <span>聯絡人：{$row['donate_c_name']}</span>
-                <span>電話：{$row['donate_c_phone']}</span>
-                <span>Email：{$row['donate_c_email']}</span>
-            ";
-                } elseif (!empty($row['coop_c_name'])) {
-                  echo "
-                <span>聯絡人：{$row['coop_c_name']}</span>
-                <span>電話：{$row['coop_c_phone']}</span>
-                <span>Email：{$row['coop_c_email']}</span>
-            ";
-                } else {
-                  echo "<span>尚無聯絡資料</span>";
-                }
+              <div class='dcard-post' data-category='{$row['tag']}'>
+                  <a href='property-single.php?id={$row['d_id']}'>
+                      <div class='dcard-header'>
+                          <span class='dcard-tag'>#{$row['tag']}</span>
+                      </div>
+                      <div class='dcard-body'>
+              ";
+          
+              // 【新增】主標題
+              if (!empty($row['coop_name'])) {
+                  echo "<p><strong>✏️ 合作標題：</strong> " . htmlspecialchars($row['coop_name']) . "</p>";
+              } elseif (!empty($row['event_name'])) {
+                  echo "<p><strong>✏️ 活動標題：</strong> " . htmlspecialchars($row['event_name']) . "</p>";
+              } elseif (!empty($row['intern_title'])) {
+                  echo "<p><strong>✏️ 職缺標題：</strong> " . htmlspecialchars($row['intern_title']) . "</p>";
+              } elseif (!empty($row['sponsor_method'])) {
+                  echo "<p><strong>✏️ 贊助方式：</strong> " . htmlspecialchars($row['sponsor_method']) . "</p>";
+              } else {
+                  echo "<p><strong>✏️ 標題：</strong> 無標題</p>";
               }
-
+          
+              echo "<div class='dcard-footer'>";
+          
+              // 聯絡資訊
+              if ($u_permission == '組織團體') {
+                  if (!empty($row['intern_c_name'])) {
+                      echo "
+                          <span>👤 聯絡人：{$row['intern_c_name']}</span>
+                          <span>📞 電話：{$row['intern_c_phone']}</span>
+                          <span>✉️ Email：{$row['intern_c_email']}</span>
+                      ";
+                  } elseif (!empty($row['spons_c_name'])) {
+                      echo "
+                          <span>👤 聯絡人：{$row['spons_c_name']}</span>
+                          <span>📞 電話：{$row['spons_c_phone']}</span>
+                          <span>✉️ Email：{$row['spons_c_email']}</span>
+                      ";
+                  } else {
+                      echo "<span>尚無聯絡資料</span>";
+                  }
+              } elseif ($u_permission == '企業') {
+                  if (!empty($row['donate_c_name'])) {
+                      echo "
+                          <span>👤 聯絡人：{$row['donate_c_name']}</span>
+                          <span>📞 電話：{$row['donate_c_phone']}</span>
+                          <span>✉️ Email：{$row['donate_c_email']}</span>
+                      ";
+                  } elseif (!empty($row['coop_c_name'])) {
+                      echo "
+                          <span>👤 聯絡人：{$row['coop_c_name']}</span>
+                          <span>📞 電話：{$row['coop_c_phone']}</span>
+                          <span>✉️ Email：{$row['coop_c_email']}</span>
+                      ";
+                  } else {
+                      echo "<span>尚無聯絡資料</span>";
+                  }
+              }
+          
               echo "
-        </div></a>
-    </div>
-    ";
-            }
+                      </div> <!-- dcard-footer -->
+                  </div> <!-- dcard-body -->
+                  </a>
+              </div>
+              ";
+          }
+            
             ?>
 
           </div>

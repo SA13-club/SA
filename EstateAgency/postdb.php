@@ -95,7 +95,8 @@ if ($u_permission == '組織團體') {
         // 處理企業贊助 org_sponsorship
         $sponsor_method = $_POST['sponsor_method'];
         $sponsor_amount = isset($_POST['sponsor_amount']) ? $_POST['sponsor_amount'] : NULL;
-
+        $title=$_POST['title'];
+        $content=$_POST['content'];
         $money_exposure = [];
         if (isset($_POST['postbrand'])) $money_exposure[] = '海報商標';
         if (isset($_POST['postad'])) $money_exposure[] = '海報置入';
@@ -109,9 +110,9 @@ if ($u_permission == '組織團體') {
         $product_methods_sql = ($product_methods_json !== NULL) ? "'$product_methods_json'" : "NULL";
 
         $sql2 = "INSERT INTO cor_spons 
-        (d_id, sponsor_method, sponsor_amount, money_exposure, product_methods,c_email,c_phone,c_name,deadline)
+        (d_id, sponsor_method, sponsor_amount, money_exposure, product_methods,c_email,c_phone,c_name,deadline,title,content)
         VALUES 
-        ('$d_id', '$sponsor_method', $sponsor_amount_sql, $money_exposure_sql, $product_methods_sql,'$c_email','$c_phone','$c_name','$deadline')";
+        ('$d_id', '$sponsor_method', $sponsor_amount_sql, $money_exposure_sql, $product_methods_sql,'$c_email','$c_phone','$c_name','$deadline','$title','$content')";
 
         if (mysqli_query($conn, $sql2)) {
             echo "<h1 align='center'>企業贊助資料新增完成！</h1>";
