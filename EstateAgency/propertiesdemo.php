@@ -212,7 +212,7 @@ WHERE d.tag IS NOT NULL AND d.tag != '' AND d.u_permission != '$u_permission'";
               <div class='col-12 text-end'>
                 <?php
                 if ($_SESSION['u_email']) {
-                  echo " <a href='newproperty.php' class='btn btn-success'>
+                  echo " <a href='newdona.php' class='btn btn-success'>
                     <i class='bi bi-plus-circle me-2'></i>發布需求";
                 }
                 ?>
