@@ -222,7 +222,20 @@ WHERE d.tag IS NOT NULL AND d.tag != '' AND d.u_permission != '$u_permission'";
         WHERE d.u_permission != ?
     ";
             } else {
-              die('權限錯誤');
+              $sql = "
+        SELECT 
+            d.*, 
+            ci.c_name AS intern_c_name, ci.c_phone AS intern_c_phone, ci.c_email AS intern_c_email,
+            cs.c_name AS spons_c_name, cs.c_phone AS spons_c_phone, cs.c_email AS spons_c_email,
+            od.c_name AS donate_c_name, od.c_phone AS donate_c_phone, od.c_email AS donate_c_email,
+            oc.c_name AS coop_c_name, oc.c_phone AS coop_c_phone, oc.c_email AS coop_c_email
+        FROM demanded d
+        LEFT JOIN org_coop oc ON d.d_id = oc.d_id
+        LEFT JOIN org_donate od ON d.d_id = od.d_id
+        LEFT JOIN cor_intern ci ON d.d_id = ci.d_id
+        LEFT JOIN cor_spons cs ON d.d_id = cs.d_id
+        WHERE d.u_permission != ?
+    ";
             }
 
             // 使用 prepared statement，防止 SQL injection
@@ -369,7 +382,6 @@ WHERE d.tag IS NOT NULL AND d.tag != '' AND d.u_permission != '$u_permission'";
       updateVisibleCards();
     });
 
-    updateVisibleCards(); // 初始顯示全部卡片
   </script>
 
 
