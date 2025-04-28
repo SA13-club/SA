@@ -275,22 +275,20 @@
         <!-- 贊助細節區塊 -->
         <div id="sponsorSection2" style="display: none;">
             <p>二、贊助細節</p>
-            <div class="col-md-6 mb-3">
-            <label for="title" class="form-label">贊助標題</label>
-            <input type="text" class="form-control" id="title" name="title" placeholder="請輸入贊助標題" required="">
-        </div>
+            <div class="col-md-5 mb-3 ">
+                <input type="text" class="form-control" id="title" name="title" placeholder="請輸入贊助標題" required="">
+            </div>
             <div class="row gy-3">
-                <div class="col-md-4">
-                    <input type="text" class="form-control" name="title" placeholder="贊助標題" required="">
-                </div>  
-                <div class="col-md-4">
+                
+                <div class="col-md-5">
                     <select class="form-select" id="sponsor_method2" name="sponsor_method" >
                         <option selected disabled value="_">贊助方式</option>
                         <option value="money">金錢</option>
                         <option value="product">產品</option>
                     </select>
                 </div>
-
+                <div class="col-md-6 mb-3">
+                </div> 
                 <!-- 金錢贊助細節 -->
                 <div id="sponsor_amount2" style="display: none;">
                     <div class="col-md-4">
@@ -324,7 +322,9 @@
                         </div>
                     </div>
                 </div>
-
+                <div class="col-md-5 mb-3">
+                    <input type="text" class="form-control" id="content" name="content" placeholder="請輸入宣傳詳細內容" required="">
+                </div> 
                 <!-- 產品贊助細節 -->
                 <div id="productdona2" style="display: none;">
                     <div class="col-md-6" id="product_options">
