@@ -169,7 +169,7 @@
               echo "
 <div class='dcard-post' style='border:1px solid #ccc; border-radius:10px; padding:20px; margin:20px 0; background:#f9f9f9;'>
   <div class='dcard-header' style='margin-bottom:20px;'>
-    <h2 style='margin:0; font-size:26px;'>🏷️ " . htmlspecialchars($content_row['title'] ?? '無公司名稱') . "</h2>
+    <h2 style='margin:0; font-size:26px;'>✏️ " . htmlspecialchars($content_row['title'] ?? '無標題') . "</h2>
   </div>
   <div class='dcard-body' style='font-size:16px; line-height:1.8;'>
     <p></p>
