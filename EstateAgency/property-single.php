@@ -93,7 +93,7 @@
           <ol>
             <li><a href="index.php">首頁</a></li>
             <li><a href="propertiesdemo.php">最新專案</a></li>
-           
+
           </ol>
         </div>
       </nav>
@@ -108,97 +108,151 @@
           <div class="col-lg-8" data-aos="fade-up">
 
             <div class="portfolio-description">
-            <?php
-$link = mysqli_connect('localhost', 'root', '', 'sa');
+              <?php
+              $link = mysqli_connect('localhost', 'root', '', 'sa');
 
-// 確認 d_id 有傳
-if (!isset($_GET['d_id']) || empty($_GET['d_id'])) {
-    die('錯誤：缺少 d_id！');
-}
-$d_id = $_GET['d_id'];
+              $d_id = $_GET['id'];
 
-// 找 tag
-$sql_findtag = "SELECT tag FROM demanded WHERE d_id='$d_id'";
-$tag_result = mysqli_query($link, $sql_findtag);
-$tag_row = mysqli_fetch_assoc($tag_result);
+              // 找 tag
+              $sql_findtag = "SELECT tag FROM demanded WHERE d_id='$d_id'";
+              $tag_result = mysqli_query($link, $sql_findtag);
+              $tag_row = mysqli_fetch_assoc($tag_result);
 
-if (!$tag_row) {
-    die('錯誤：找不到這個需求！');
-}
+              if (!$tag_row) {
+                die('錯誤：找不到這個需求！');
+              }
 
-$tag = $tag_row['tag'];
+              $tag = $tag_row['tag'];
 
-// 測試看看拿到什麼tag
-// echo "tag: $tag"; exit;
+              // 根據 tag 決定查哪張表
+              switch ($tag) {
+                case '合作':
+                  $table = 'org_coop';
+                  break;
+                case 'spon':
+                  $table = 'org_donate';
+                  break;
+                case '招募':
+                  $table = 'cor_intern';
+                  break;
+                case '贊助':
+                  $table = 'cor_spons';
+                  break;
+                default:
+                  die('錯誤：未知的標籤類型！');
+              }
 
-// 根據 tag 決定查哪張表
-switch ($tag) {
-    case 'spon':
-        $table = 'org_donate';
-        break;
-    case '招募':
-        $table = 'cor_intern';
-        break;
-    case '合作':
-        $table = 'cor_spons';
-        break;
-    default:
-        die('錯誤：未知的標籤類型！');
-}
+              // 查真正的內容
+              $content_sql = "SELECT * FROM $table WHERE d_id='$d_id'";
+              $content_result = mysqli_query($link, $content_sql);
+              $content_row = mysqli_fetch_assoc($content_result);
 
-// 查真正的內容
-$content_sql = "SELECT * FROM $table WHERE d_id='$d_id'";
-$content_result = mysqli_query($link, $content_sql);
-$content_row = mysqli_fetch_assoc($content_result);
+              if (!$content_row) {
+                echo "<p>找不到相關資料</p>";
+                exit;
+              }
 
-if ($content_row) {
-    echo "
-    <div class='dcard-post'>
-      <div class='dcard-header'>
-        <span class='dcard-tag'>#" . ($content_row['c_name'] ?? '無標題') . "</span>
-      </div>
-      <div class='dcard-body'>
-        <div class='dcard-footer'>
-          <p><strong>預期目標：</strong></p>
-          <p><strong>具體內容：</strong>" . ($content_row['c_email'] ?? '無說明') . "</p>
-        </div>
-      </div>
-      <hr class='dcard-divider'>
-    ";
-} else {
-    echo "<p>找不到相關資料</p>";
-}
-?>
+              // 解析 JSON 欄位
+              $money_exposure = [];
+              if (!empty($content_row['money_exposure'])) {
+                $money_exposure = json_decode($content_row['money_exposure'], true);
+              }
 
-              <!-- <div class="testimonial-item">
-                <p>
-                  <span>Export tempor illum tamen malis malis eram quae irure esse labore quem cillum quid cillum eram malis quorum velit fore eram velit sunt aliqua noster fugiat irure amet legam anim culpa.</span>
-                </p>
-                <div>
-                  <img src="assets/img/testimonials/testimonials-2.jpg" class="testimonial-img" alt="">
-                  <h3>Sara Wilsson</h3>
-                  <h4>Agent</h4>
-                </div>
-              </div>
-            </div>
-            <ul class="nav nav-pills mb-3">
-              <li><a class="nav-link active" data-bs-toggle="pill" href="#real-estate-2-tab1">Video</a></li>
-              <li><a class="nav-link" data-bs-toggle="pill" href="#real-estate-2-tab2">Floor Plans</a></li>
-              <li><a class="nav-link" data-bs-toggle="pill" href="#real-estate-2-tab3">Location</a></li>
-            </ul>
+              $product_methods = [];
+              if (!empty($content_row['product_methods'])) {
+                $product_methods = json_decode($content_row['product_methods'], true);
+              }
 
-            <div class="tab-content">
+              $deadline = ($content_row['deadline'] === '0000-00-00') ? '無截止日期' : htmlspecialchars($content_row['deadline']);
 
-              <div class="tab-pane fade show active" id="real-estate-2-tab1">
+              // 開始顯示
+              echo "
+<div class='dcard-post' style='border:1px solid #ccc; border-radius:10px; padding:20px; margin:20px 0; background:#f9f9f9;'>
+  <div class='dcard-header' style='margin-bottom:20px;'>
+    <h2 style='margin:0; font-size:26px;'> " . htmlspecialchars($content_row['c_name'] ?? '無公司名稱') . "</h2>
+  </div>
+  <div class='dcard-body' style='font-size:16px; line-height:1.8;'>
+    <p></p>
+    <hr style='margin:15px 0;'>
+";
 
-              </div>
-              <div class="tab-pane fade" id="real-estate-2-tab2">
-                <img src="assets/img/floor-plan.jpg" alt="" class="img-fluid">
-              </div>
+              switch ($tag) {
+                case '合作':
+                  echo "
+        <p>🤝 <strong>合作名稱：</strong> " . htmlspecialchars($content_row['coop_name'] ?? '無資料') . "</p>
+        <p>📝 <strong>合作說明：</strong> " . htmlspecialchars($content_row['coop_description'] ?? '無資料') . "</p>
+        <p>📂 <strong>合作類型：</strong> " . htmlspecialchars($content_row['coop_type'] ?? '無資料') . "</p>";
 
-              -->
+                  if (!empty($content_row['coop_benefit'])) {
+                    $coop_benefit = json_decode($content_row['coop_benefit'], true);
+                    echo "<p>🎯 <strong>合作效益：</strong></p><ul style='margin-left:20px;'>";
+                    foreach ($coop_benefit as $benefit) {
+                      echo "<li>" . htmlspecialchars($benefit) . "</li>";
+                    }
+                    echo "</ul>";
+                  }
+                  echo "
+        <p>🗓️ <strong>合作期間：</strong> " . htmlspecialchars($content_row['coop_start']) . " ～ " . htmlspecialchars($content_row['coop_end']) . "</p>
+        ";
+                  break;
+
+                case 'spon': // org_donate
+                  echo "
+        <p>🎈 <strong>活動名稱：</strong> " . htmlspecialchars($content_row['event_name'] ?? '無資料') . "</p>
+        <p>🙋‍♂️ <strong>參與方式：</strong> " . htmlspecialchars($content_row['event_participate'] ?? '無資料') . "</p>
+        <p>📝 <strong>活動描述：</strong> " . htmlspecialchars($content_row['event_description'] ?? '無資料') . "</p>
+        <p>💰 <strong>贊助方式：</strong> " . htmlspecialchars($content_row['sponsor_method'] ?? '無資料') . "</p>
+        <p>💸 <strong>贊助金額：</strong> " . number_format($content_row['sponsor_amount']) . " 元</p>
+        ";
+                  break;
+
+                case '贊助': // cor_spons
+                  echo "
+        <p>💰 <strong>贊助方式：</strong> " . htmlspecialchars($content_row['sponsor_method'] ?? '無資料') . "</p>
+        <p>💸 <strong>贊助金額：</strong> " . number_format($content_row['sponsor_amount']) . " 元</p>
+        ";
+                  break;
+
+                case '招募': // cor_intern
+                  echo "
+        <p>🧑‍💼 <strong>職缺名稱：</strong> " . htmlspecialchars($content_row['intern_title'] ?? '無資料') . "</p>
+        <p>👥 <strong>招募人數：</strong> " . htmlspecialchars($content_row['intern_number'] ?? '無資料') . " 人</p>
+        <p>💵 <strong>薪資：</strong> " . htmlspecialchars($content_row['salary'] ?? '無資料') . "</p>
+        <p>📍 <strong>地區：</strong> " . htmlspecialchars($content_row['intern_city'] . ' ' . $content_row['intern_district']) . "</p>
+        <p>🕰️ <strong>工作時間：</strong> " . htmlspecialchars($content_row['worktime'] ?? '無資料') . "</p>
+        <p>🛠️ <strong>技能要求：</strong> " . htmlspecialchars($content_row['jobskill'] ?? '無資料') . "</p>
+        <p>📋 <strong>實習內容：</strong> " . htmlspecialchars($content_row['intern_detail'] ?? '無資料') . "</p>
+        <p>📜 <strong>其他需求：</strong> " . htmlspecialchars($content_row['requirements'] ?? '無資料') . "</p>
+        ";
+                  break;
+              }
+
+              // 顯示曝光方式
+              if (!empty($money_exposure)) {
+                echo "<p>📢 <strong>金錢曝光方式：</strong></p><ul style='margin-left:20px;'>";
+                foreach ($money_exposure as $exposure) {
+                  echo "<li>" . htmlspecialchars($exposure) . "</li>";
+                }
+                echo "</ul>";
+              }
+
+              if (!empty($product_methods)) {
+                echo "<p>🎁 <strong>產品曝光方式：</strong></p><ul style='margin-left:20px;'>";
+                foreach ($product_methods as $product) {
+                  echo "<li>" . htmlspecialchars($product) . "</li>";
+                }
+                echo "</ul>";
+              }
+
+              // 最後是建立時間跟截止
+              echo "
+    <p>🕓 <strong>建立時間：</strong> " . htmlspecialchars($content_row['created_at']) . "</p>
+    <p>⏳ <strong>截止日期：</strong> $deadline</p>
+  </div>
+</div>
+";
+              ?>
               <div class="tab-pane fade" id="real-estate-2-tab3">
-                <!-- <iframe style="border:0; width: 100%; height: 400px;" src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d48389.78314118045!2d-74.006138!3d40.710059!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c25a22a3bda30d%3A0xb89d1fe6bc499443!2sDowntown%20Conference%20Center!5e0!3m2!1sen!2sus!4v1676961268712!5m2!1sen!2sus" frameborder="0" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe> -->
               </div>
             </div>
 
@@ -208,7 +262,11 @@ if ($content_row) {
             <div class="portfolio-info">
               <h3>基本資料</h3>
               <ul>
-                
+                <?php
+                echo "<li><p>🏢 <strong>公司名稱：</strong> " . htmlspecialchars($content_row['c_name'] ?? '無資料') . "</p></li>
+                      <li><p>📧 <strong>聯絡信箱：</strong> " . htmlspecialchars($content_row['c_email'] ?? '無資料') . "</p></li>
+                      <li><p>📞 <strong>聯絡電話：</strong> " . htmlspecialchars($content_row['c_phone'] ?? '無資料') . "</p></li>";
+                ?>
               </ul>
             </div>
           </div>
