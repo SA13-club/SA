@@ -36,10 +36,31 @@
   * Author: BootstrapMade.com
   * License: https://bootstrapmade.com/license/
   ======================================================== -->
+  <style>
+    .chat-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #0084ff;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  z-index: 999;
+  transition: background-color 0.3s;
+}
+
+.chat-button:hover {
+  background-color: #006bbf;
+}
+
+  </style>
+
 </head>
 
 <body class="index-page">
-
   <header id="header" class="header d-flex align-items-center fixed-top">
     <div class="container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
 
@@ -522,7 +543,8 @@
 
   <!-- Main JS File -->
   <script src="assets/js/main.js"></script>
-
+  
+  <a href="/SA/EstateAgency/chat/public/index.html" target="_blank" class="chat-button">聊天室</a>
 </body>
 
 </html>

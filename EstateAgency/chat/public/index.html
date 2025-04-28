@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <title>聊天室登入系統</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- 登入頁面 -->
+  <div class="login-page" id="loginPage">
+    <h2>請登入</h2>
+    <input type="text" id="loginName" placeholder="請輸入你的帳號" />
+    <input type="text" id="targetName" placeholder="請輸入聊天對象帳號" />
+    <button onclick="login()">登入</button>
+  </div>
+
+  <!-- 聊天室頁面 -->
+  <div class="chat-container hidden" id="chatPage">
+    <div class="chat-header">
+      <span id="chatTitle">聊天室</span>
+      <span class="user-label" id="currentUser"></span>
+    </div>
+    <div id="chat" class="chat-box"></div>
+    <div class="input-area">
+      <input type="text" id="message" placeholder="輸入訊息..." />
+      <button onclick="sendMessage()">送出</button>
+    </div>
+  </div>
+
+  <script>
+    let currentUsername = '';
+let currentTarget = '';
+const socket = new WebSocket('ws://localhost:8080'); // 連接 WebSocket Server
+const chat = document.getElementById('chat');
+
+let pendingMessages = []; // 🔥 暫存訊息用！
+
+socket.onmessage = (e) => {
+  try {
+    const data = JSON.parse(e.data);
+
+    // ⚡ 登入前收到的先暫存
+    if (!currentUsername || !currentTarget) {
+      pendingMessages.push(data);
+      return;
+    }
+
+    // ⚡ 登入後，正常顯示
+    if (
+      (data.username === currentUsername && data.to === currentTarget) ||
+      (data.username === currentTarget && data.to === currentUsername)
+    ) {
+      displayMessage(data);
+    }
+  } catch (error) {
+    console.error('解析訊息失敗：', error);
+  }
+};
+
+function sendMessage() {
+  const message = document.getElementById('message').value.trim();
+  if (message && currentUsername && currentTarget) {
+    const payload = {
+      username: currentUsername,
+      to: currentTarget,
+      message: message
+    };
+    socket.send(JSON.stringify(payload));
+    document.getElementById('message').value = '';
+  } else {
+    alert('訊息或登入資料有問題！');
+  }
+}
+
+function login() {
+  const name = document.getElementById('loginName').value.trim();
+  const target = document.getElementById('targetName').value.trim();
+  if (name && target) {
+    currentUsername = name;
+    currentTarget = target;
+    document.getElementById('currentUser').textContent = `使用者：${name}`;
+    document.getElementById('chatTitle').textContent = `你正在和【${target}】聊天`;
+    document.getElementById('loginPage').classList.add('hidden');
+    document.getElementById('chatPage').classList.remove('hidden');
+
+    // 🔥 登入後，把暫存的歷史訊息批量顯示
+    pendingMessages.forEach(data => {
+      if (
+        (data.username === currentUsername && data.to === currentTarget) ||
+        (data.username === currentTarget && data.to === currentUsername)
+      ) {
+        displayMessage(data);
+      }
+    });
+    pendingMessages = []; // 清空暫存
+  } else {
+    alert('請輸入你的帳號和聊天對象！');
+  }
+}
+
+function displayMessage(data) {
+  const div = document.createElement('div');
+  const isSelf = data.username === currentUsername;
+  div.classList.add('bubble', isSelf ? 'me' : 'other');
+  div.innerHTML = `<strong>${data.username}</strong><br>${data.message}`;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+  </script>
+</body>
+</html>
