@@ -149,7 +149,7 @@
           <!-- 搜尋區塊 -->
 <section class="search-bar py-4 bg-light">
   <div class="container">
-    <form action="你的搜尋處理頁面.php" method="GET" class="row g-2 align-items-center justify-content-center">
+    <form action="./propertiesfind.php" method="GET" class="row g-2 align-items-center justify-content-center">
 
       <!-- 第一個下拉框：選擇類型 -->
       <div class="col-md-3">
