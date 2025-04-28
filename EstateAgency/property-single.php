@@ -265,7 +265,7 @@
               <h3>基本資料</h3>
               <ul>
                 <?php
-                echo "<li><p>🏢 <strong>公司名稱：</strong> " . htmlspecialchars($content_row['c_name'] ?? '無資料') . "</p></li>
+                echo "<li><p>🏢 <strong>公司名稱：</strong><a href='profile.php?d_id=$d_id'> " . htmlspecialchars($content_row['c_name'] ?? '無資料') . "</a></p></li>
                       <li><p>📧 <strong>聯絡信箱：</strong> " . htmlspecialchars($content_row['c_email'] ?? '無資料') . "</p></li>
                       <li><p>📞 <strong>聯絡電話：</strong> " . htmlspecialchars($content_row['c_phone'] ?? '無資料') . "</p></li>";
                 ?>
