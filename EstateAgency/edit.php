@@ -134,7 +134,7 @@
                 $link = mysqli_connect('localhost', 'root', '', 'sa');
                 mysqli_set_charset($link, "utf8mb4");
 
-                session_start();
+                
                 $u_email = $_SESSION['u_email'];
 
                 // 查 demanded 基本資料

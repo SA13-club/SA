@@ -364,7 +364,7 @@
                     </div>
                 </div>
                 <div class="col-md-5 mb-3">
-                    <input type="text" class="form-control" id="content" name="content" placeholder="請輸入宣傳詳細內容" required="">
+                    <textarea class="form-control" id="content" name="content" placeholder="請輸入宣傳詳細內容" required=""></textarea>
                 </div> 
                 <!-- 產品贊助細節 -->
                 <div id="productdona2" style="display: none;">
