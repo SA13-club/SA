@@ -189,7 +189,7 @@ WHERE d.tag IS NOT NULL AND d.tag != '' AND d.u_permission != '$u_permission'";
               </div>
             </div>
             <?php
-            session_start(); // 確保有啟用 session
+
             $link = mysqli_connect('localhost', 'root', '', 'sa');
 
             if (!$link) {

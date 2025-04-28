@@ -93,21 +93,7 @@
           <ol>
             <li><a href="index.php">首頁</a></li>
             <li><a href="propertiesdemo.php">最新專案</a></li>
-            <?php
-            $d_id = $_GET['d_id'];
-            $link = mysqli_connect('localhost', 'root', '', 'sa');
-            
-            $sql_findtag = "SELECT tag FROM demanded where d_id='$d_id'";
-            $tag = mysqli_query($link, $sql_findtag);
-
-            $content="SELECT * FROM $tag where d_id='$d_id'";
-            $content = mysqli_query($link, $content);
-            while ($row = mysqli_fetch_assoc($content)) {
-              echo "<li class='current'><a >" . $row['event_name'] . "</a></li>";
-            }
-            
            
-            ?>
           </ol>
         </div>
       </nav>
@@ -122,59 +108,67 @@
           <div class="col-lg-8" data-aos="fade-up">
 
             <div class="portfolio-description">
-              <?php
-               $d_id = $_GET['d_id'];
-               $link = mysqli_connect('localhost', 'root', '', 'sa');
-               
-               $sql_findtag = "SELECT tag FROM demanded WHERE d_id='$d_id'";
-               $tag_result = mysqli_query($link, $sql_findtag);
-               $tag_row = mysqli_fetch_assoc($tag_result);
-               $tag = $tag_row['tag']; // <-- 這才是你要用的 "tag" 值
-               
+            <?php
+$link = mysqli_connect('localhost', 'root', '', 'sa');
 
-               // 根據 tag 決定查哪張表
-switch ($tag) {
-  case 'org_donate
-':
-      $table = 'org_donate';
-      break;
-  case '招募':
-      $table = 'cor_intern';
-      break;
-  case '合作':
-      $table = 'cor_spons';
-      break;
-  default:
-      die('未知的標籤類型！');
+// 確認 d_id 有傳
+if (!isset($_GET['d_id']) || empty($_GET['d_id'])) {
+    die('錯誤：缺少 d_id！');
+}
+$d_id = $_GET['d_id'];
+
+// 找 tag
+$sql_findtag = "SELECT tag FROM demanded WHERE d_id='$d_id'";
+$tag_result = mysqli_query($link, $sql_findtag);
+$tag_row = mysqli_fetch_assoc($tag_result);
+
+if (!$tag_row) {
+    die('錯誤：找不到這個需求！');
 }
 
+$tag = $tag_row['tag'];
 
+// 測試看看拿到什麼tag
+// echo "tag: $tag"; exit;
 
-   
-               $content="SELECT * FROM $table where d_id='$d_id'";
-               $content = mysqli_query($link, $content);
-               while ($row = mysqli_fetch_assoc($content)) {
-                echo "
-                    <div class='dcard-post'>
-                      <div class='dcard-header'>
-                        <span class='dcard-tag'>#" . $row['event_name'] . "</span>
-                        <h1 class='dcard-title'></h1>
-                      </div>
-                    </div>
-                    <div class='dcard-body'>
-                      <div class='dcard-footer'>
-                        <p><strong>預期目標：</strong></p>
-                        <p><strong>具體內容：</strong>" . $row['event_description'] . "</p>
-                        <p><strong>聯絡人：</strong></p>
-                        <p><strong>電話：</strong></p>
-                        <p><strong>Email：</strong></p>
-                        <p><strong>身份類型：</strong></p>
-                        <p><strong>截止日期：</strong></p>
-                      </div>
-                    </div>
-                    <hr class='dcard-divider'>";
-              }
-              ?>
+// 根據 tag 決定查哪張表
+switch ($tag) {
+    case 'spon':
+        $table = 'org_donate';
+        break;
+    case '招募':
+        $table = 'cor_intern';
+        break;
+    case '合作':
+        $table = 'cor_spons';
+        break;
+    default:
+        die('錯誤：未知的標籤類型！');
+}
+
+// 查真正的內容
+$content_sql = "SELECT * FROM $table WHERE d_id='$d_id'";
+$content_result = mysqli_query($link, $content_sql);
+$content_row = mysqli_fetch_assoc($content_result);
+
+if ($content_row) {
+    echo "
+    <div class='dcard-post'>
+      <div class='dcard-header'>
+        <span class='dcard-tag'>#" . ($content_row['c_name'] ?? '無標題') . "</span>
+      </div>
+      <div class='dcard-body'>
+        <div class='dcard-footer'>
+          <p><strong>預期目標：</strong></p>
+          <p><strong>具體內容：</strong>" . ($content_row['c_email'] ?? '無說明') . "</p>
+        </div>
+      </div>
+      <hr class='dcard-divider'>
+    ";
+} else {
+    echo "<p>找不到相關資料</p>";
+}
+?>
 
               <!-- <div class="testimonial-item">
                 <p>
@@ -214,41 +208,7 @@ switch ($tag) {
             <div class="portfolio-info">
               <h3>基本資料</h3>
               <ul>
-                <?php
-                $link = mysqli_connect('localhost', 'root', '', 'sa');
-
-                $sql = "SELECT c.c_name FROM corporation_account c JOIN demanded d ON c.u_email = d.u_email";
-
-                $result = mysqli_query($link, $sql);
-
-                if ($row = mysqli_fetch_assoc($result)) {
-                  echo "<li><strong>發布單位:</strong> {$row['c_name']}</li>";
-                } else {
-                  echo "<li>查無公司資料</li>";
-                }
-
-                mysqli_close($link);
-                ?>
-                <?php
-                $id = $_GET['id'];
-                $link = mysqli_connect('localhost', 'root', '', 'sa');
-                $sql = "SELECT * FROM demanded where id='$id'";
-                $result = mysqli_query($link, $sql);
-
-                // echo "<h2 class='section-title'><strong>最新專案列表</strong></h2><br>";
-                while ($row = mysqli_fetch_assoc($result)) {
-                  if ($row["date"] >= date("Y-m-d")) {
-                    echo "<p><strong>狀態：</strong>招募中</p>";
-                  }else {
-                    echo "<p><strong>狀態：</strong>已關閉</p>";
-                  }
-                  echo "
-                        <p><strong>聯絡人：</strong>" . $row['name'] . "</p>
-                        <p><strong>電話：</strong>" . $row['phone'] . "</p>
-                        <p><strong>Email：</strong>" . $row['u_email'] . "</p>
-                        <p><strong>截止日期：</strong>" . $row['date'] . "</p>";
-                }
-                ?>
+                
               </ul>
             </div>
           </div>
