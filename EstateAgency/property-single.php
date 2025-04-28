@@ -169,7 +169,7 @@
               echo "
 <div class='dcard-post' style='border:1px solid #ccc; border-radius:10px; padding:20px; margin:20px 0; background:#f9f9f9;'>
   <div class='dcard-header' style='margin-bottom:20px;'>
-    <h2 style='margin:0; font-size:26px;'> " . htmlspecialchars($content_row['c_name'] ?? '無公司名稱') . "</h2>
+    <h2 style='margin:0; font-size:26px;'>✏️ " . htmlspecialchars($content_row['title'] ?? '無標題') . "</h2>
   </div>
   <div class='dcard-body' style='font-size:16px; line-height:1.8;'>
     <p></p>
@@ -210,6 +210,8 @@
                   echo "
         <p>💰 <strong>贊助方式：</strong> " . htmlspecialchars($content_row['sponsor_method'] ?? '無資料') . "</p>
         <p>💸 <strong>贊助金額：</strong> " . number_format($content_row['sponsor_amount']) . " 元</p>
+        <p>📝 <strong>宣傳詳情：</strong> " . htmlspecialchars($content_row['content'] ?? '無資料') . "</p>
+
         ";
                   break;
 

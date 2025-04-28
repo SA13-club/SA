@@ -149,7 +149,7 @@
           <!-- 搜尋區塊 -->
 <section class="search-bar py-4 bg-light">
   <div class="container">
-    <form action="你的搜尋處理頁面.php" method="GET" class="row g-2 align-items-center justify-content-center">
+    <form action="./propertiesfind.php" method="GET" class="row g-2 align-items-center justify-content-center">
 
       <!-- 第一個下拉框：選擇類型 -->
       <div class="col-md-3">
@@ -177,6 +177,12 @@
 </section>
 
 
+
+
+
+
+
+
         <section class="filter-bar py-3  bg-light">
           <div class="container ">
             <div class="d-flex flex-wrap gap-2 justify-content-center align-items-center">
@@ -184,6 +190,7 @@
               <?php
               $link = mysqli_connect('localhost', 'root', '', 'sa');
               $u_permission = $_SESSION['u_permission'];
+             
 
               $tagQuery = "SELECT DISTINCT d.tag FROM demanded d 
   LEFT JOIN org_donate od ON d.d_id = od.d_id
@@ -221,98 +228,149 @@ WHERE d.tag IS NOT NULL AND d.tag != '' AND d.u_permission != '$u_permission'";
             </div>
             <?php
 
-            $link = mysqli_connect('localhost', 'root', '', 'sa');
+$link = mysqli_connect('localhost', 'root', '', 'sa');
+if (!$link) {
+    die('連線失敗: ' . mysqli_connect_error());
+}
 
-            if (!$link) {
-              die('連線失敗: ' . mysqli_connect_error());
-            }
+$type = $_GET['type'] ?? 'all';
+$keyword = $_GET['keyword'] ?? '';
+$u_permission = $_SESSION['u_permission'] ?? '';
 
-            $u_permission = $_SESSION['u_permission'] ?? '';
+// 防止 injection：只允許合法的 type
+$valid_types = ['all', 'spon', 'intern', 'coop'];
+if (!in_array($type, $valid_types)) {
+    die('非法搜尋類型');
+}
 
-            // 根據權限組織不同的 SQL
-            if ($u_permission == '組織團體') {
-              $sql = "
-        SELECT 
-            d.*, 
-            ci.c_name AS intern_c_name, ci.c_phone AS intern_c_phone, ci.c_email AS intern_c_email,
-            cs.c_name AS spons_c_name, cs.c_phone AS spons_c_phone, cs.c_email AS spons_c_email
+// 組基本SQL
+$params = [];
+$types = '';
+
+if ($u_permission === '組織團體') {
+    $sql = "
+        SELECT d.*,
+               ci.c_name AS intern_c_name, ci.c_phone AS intern_c_phone, ci.c_email AS intern_c_email, ci.title AS intern_title, ci.content AS intern_content,
+               cs.c_name AS spons_c_name, cs.c_phone AS spons_c_phone, cs.c_email AS spons_c_email, cs.title AS spons_title, cs.content AS spons_content
         FROM demanded d
         LEFT JOIN cor_intern ci ON d.d_id = ci.d_id
         LEFT JOIN cor_spons cs ON d.d_id = cs.d_id
         WHERE d.u_permission != ?
     ";
-            } elseif ($u_permission == '企業') {
-              $sql = "
-        SELECT 
-            d.*, 
-            od.c_name AS donate_c_name, od.c_phone AS donate_c_phone, od.c_email AS donate_c_email,
-            oc.c_name AS coop_c_name, oc.c_phone AS coop_c_phone, oc.c_email AS coop_c_email
+} elseif ($u_permission === '企業') {
+    $sql = "
+        SELECT d.*,
+               od.c_name AS donate_c_name, od.c_phone AS donate_c_phone, od.c_email AS donate_c_email, od.title AS donate_title, od.content AS donate_content,
+               oc.c_name AS coop_c_name, oc.c_phone AS coop_c_phone, oc.c_email AS coop_c_email, oc.title AS coop_title, oc.content AS coop_content
         FROM demanded d
-        LEFT JOIN org_coop oc ON d.d_id = oc.d_id
         LEFT JOIN org_donate od ON d.d_id = od.d_id
+        LEFT JOIN org_coop oc ON d.d_id = oc.d_id
         WHERE d.u_permission != ?
     ";
-            } else {
-              die('權限錯誤');
-            }
+} else {
+    die('權限錯誤');
+}
 
-            // 使用 prepared statement，防止 SQL injection
-            $stmt = mysqli_prepare($link, $sql);
-            mysqli_stmt_bind_param($stmt, 's', $u_permission);
-            mysqli_stmt_execute($stmt);
-            $result = mysqli_stmt_get_result($stmt);
+// 綁第一個參數
+$params[] = &$u_permission;
+$types .= 's';
 
-            // 取出所有資料
-            while ($row = mysqli_fetch_assoc($result)) {
-              echo "
-    <div class='dcard-post' data-category='{$row['tag']}'>
-        <a href='property-single.php?id={$row['d_id']}'>
-        <div class='dcard-header'>
-            <span class='dcard-tag'>#{$row['tag']}</span>
-        </div>
-        <div class='dcard-footer'>
+// 加 type 篩選
+if ($type !== 'all') {
+    $sql .= " AND d.tag = ?";
+    $params[] = &$type;
+    $types .= 's';
+}
+
+// 加 keyword 搜尋條件
+$keyword_like = "%$keyword%";
+if (!empty($keyword)) {
+    if ($u_permission === '組織團體') {
+        $sql .= " AND (
+            (ci.title LIKE ? OR ci.content LIKE ?) OR
+            (cs.title LIKE ? OR cs.content LIKE ?)
+        )";
+    } elseif ($u_permission === '企業') {
+        $sql .= " AND (
+            (od.title LIKE ? OR od.content LIKE ?) OR
+            (oc.title LIKE ? OR oc.content LIKE ?)
+        )";
+    }
+
+    // 增加 4 個 keyword_like 參數
+    for ($i = 0; $i < 4; $i++) {
+        $params[] = &$keyword_like;
+        $types .= 's';
+    }
+}
+
+// 準備和綁定參數
+$stmt = mysqli_prepare($link, $sql);
+if (!$stmt) {
+    die('Prepare failed: ' . mysqli_error($link));
+}
+
+array_unshift($params, $types);
+call_user_func_array([$stmt, 'bind_param'], $params);
+
+// 執行
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+
+// 顯示結果
+while ($row = mysqli_fetch_assoc($result)) {
+    echo "
+    <div class='dcard-post' data-category='" . htmlspecialchars($row['tag']) . "'>
+        <a href='property-single.php?id=" . htmlspecialchars($row['d_id']) . "'>
+            <div class='dcard-header'>
+                <span class='dcard-tag'>#" . htmlspecialchars($row['tag']) . "</span>
+            </div>
+            <div class='dcard-footer'>
     ";
 
-              if ($u_permission == '組織團體') {
-                if (!empty($row['intern_c_name'])) {
-                  echo "
-                <span>聯絡人：{$row['intern_c_name']}</span>
-                <span>電話：{$row['intern_c_phone']}</span>
-                <span>Email：{$row['intern_c_email']}</span>
+    if ($u_permission === '組織團體') {
+        if (!empty($row['intern_c_name'])) {
+            echo "
+                <span>聯絡人：" . htmlspecialchars($row['intern_c_name']) . "</span>
+                <span>電話：" . htmlspecialchars($row['intern_c_phone']) . "</span>
+                <span>Email：" . htmlspecialchars($row['intern_c_email']) . "</span>
             ";
-                } elseif (!empty($row['spons_c_name'])) {
-                  echo "
-                <span>聯絡人：{$row['spons_c_name']}</span>
-                <span>電話：{$row['spons_c_phone']}</span>
-                <span>Email：{$row['spons_c_email']}</span>
+        } elseif (!empty($row['spons_c_name'])) {
+            echo "
+                <span>聯絡人：" . htmlspecialchars($row['spons_c_name']) . "</span>
+                <span>電話：" . htmlspecialchars($row['spons_c_phone']) . "</span>
+                <span>Email：" . htmlspecialchars($row['spons_c_email']) . "</span>
             ";
-                } else {
-                  echo "<span>尚無聯絡資料</span>";
-                }
-              } elseif ($u_permission == '企業') {
-                if (!empty($row['donate_c_name'])) {
-                  echo "
-                <span>聯絡人：{$row['donate_c_name']}</span>
-                <span>電話：{$row['donate_c_phone']}</span>
-                <span>Email：{$row['donate_c_email']}</span>
+        } else {
+            echo "<span>尚無聯絡資料</span>";
+        }
+    } elseif ($u_permission === '企業') {
+        if (!empty($row['donate_c_name'])) {
+            echo "
+                <span>聯絡人：" . htmlspecialchars($row['donate_c_name']) . "</span>
+                <span>電話：" . htmlspecialchars($row['donate_c_phone']) . "</span>
+                <span>Email：" . htmlspecialchars($row['donate_c_email']) . "</span>
             ";
-                } elseif (!empty($row['coop_c_name'])) {
-                  echo "
-                <span>聯絡人：{$row['coop_c_name']}</span>
-                <span>電話：{$row['coop_c_phone']}</span>
-                <span>Email：{$row['coop_c_email']}</span>
+        } elseif (!empty($row['coop_c_name'])) {
+            echo "
+                <span>聯絡人：" . htmlspecialchars($row['coop_c_name']) . "</span>
+                <span>電話：" . htmlspecialchars($row['coop_c_phone']) . "</span>
+                <span>Email：" . htmlspecialchars($row['coop_c_email']) . "</span>
             ";
-                } else {
-                  echo "<span>尚無聯絡資料</span>";
-                }
-              }
+        } else {
+            echo "<span>尚無聯絡資料</span>";
+        }
+    }
 
-              echo "
-        </div></a>
+    echo "
+            </div>
+        </a>
     </div>
     ";
-            }
-            ?>
+}
+?>
+
+
 
           </div>
         </div>
