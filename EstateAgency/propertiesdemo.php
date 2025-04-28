@@ -196,6 +196,7 @@ WHERE d.tag IS NOT NULL AND d.tag != '' AND d.u_permission != '$u_permission'";
 
               while ($row = mysqli_fetch_assoc($tagResult)) {
                 $tag = $row['tag']; // <-- 注意這裡取 'tag'
+                if($tag=='spon'){$tag='贊助';}
                 echo "<button type='button' class='btn btn-outline-primary filter-button' data-filter='{$tag}'>{$tag}</button>";
               }
               ?>
@@ -278,11 +279,13 @@ WHERE d.tag IS NOT NULL AND d.tag != '' AND d.u_permission != '$u_permission'";
 
             // 取出所有資料
             while ($row = mysqli_fetch_assoc($result)) {
+              $tag=$row['tag'];
+              if($tag=='spon'){$tag='贊助';}
               echo "
-              <div class='dcard-post' data-category='{$row['tag']}'>
+              <div class='dcard-post' data-category='{$tag}'>
                   <a href='property-single.php?id={$row['d_id']}'>
                       <div class='dcard-header'>
-                          <span class='dcard-tag'>#{$row['tag']}</span>
+                          <span class='dcard-tag'>#{$tag}</span>
                       </div>
                       <div class='dcard-body'>
               ";
