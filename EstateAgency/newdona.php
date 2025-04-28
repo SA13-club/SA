@@ -84,7 +84,7 @@
                 <div class="container" style="padding: 85px 0 0 0;">
                     <ol>
                         <li><a href="index.php">首頁</a></li>
-                        <li class="current">發布募資</li>
+                        <li class="current">發布文章</li>
                     </ol>
                 </div>
             </nav>
@@ -94,9 +94,50 @@
         <section id="starter-section" class="starter-section section contact section">
 
             <!-- Section Title -->
-            <div class="container section-title" data-aos="fade-up">
-                <h2>發布募資</h2>
-            </div><!-- End Section Title -->
+           <!-- 你的 HTML -->
+<div class="container section-title" data-aos="fade-up">
+    <h2 class="fancy-heading">發布文章</h2>
+</div>
+
+<div class="container" data-aos="fade-up" data-aos-delay="100">
+    <!-- 其他內容 -->
+</div>
+
+<!-- 直接寫在這一頁內的 CSS -->
+<style>
+.fancy-heading {
+    font-size: 40px; /* 標題字大一點有氣勢 */
+    font-weight: 600;
+    color: #2F4F4F
+; /* 你的品牌綠色 */
+    letter-spacing: 4px; /* 字距拉開，簡約高級感 */
+    position: relative;
+    display: inline-block;
+    padding-bottom: 10px;
+    overflow: hidden;
+}
+
+.fancy-heading::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%) scaleX(0); /* 讓底線從中間展開 */
+    transform-origin: center; /* 讓展開動畫從中間開始 */
+    width: 75%;
+    height: 3px;
+    background-color: #66CDAA;
+    border-radius: 2px;
+    transition: transform 0.4s ease; /* 展開動畫效果 */
+}
+
+.fancy-heading:hover::after {
+    transform: translateX(-50%) scaleX(1); /* hover 時底線從中間展開 */
+}
+
+
+</style>
+
             <div class="container" data-aos="fade-up" data-aos-delay="100">
                 <div class="col-lg-12">
                     <form action="postdb.php" method="post" class="php-email-form" data-aos="fade-up"
@@ -226,19 +267,19 @@
                                         <label>合作預期效益（可複選）</label>
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" name="benefit[]" value="提升知名度" id="awareness">
-                                            <label class="form-check-label" for="awareness">提升知名度</label>
+                                            <label class="form-check-label" for="awareness">提升知名度 🔎</label>
                                         </div>
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" name="benefit[]" value="增加資源" id="resources">
-                                            <label class="form-check-label" for="resources">增加資源</label>
+                                            <label class="form-check-label" for="resources">增加資源 📦</label>
                                         </div>
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" name="benefit[]" value="拓展關係網" id="network">
-                                            <label class="form-check-label" for="network">拓展關係網</label>
+                                            <label class="form-check-label" for="network">拓展關係網 🌎🤝</label>
                                         </div>
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" name="benefit[]" value="技術交流" id="exchange">
-                                            <label class="form-check-label" for="exchange">技術交流</label>
+                                            <label class="form-check-label" for="exchange">技術交流 </label>
                                         </div>
                                     </div>
                                     
