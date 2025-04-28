@@ -94,13 +94,19 @@
             <li><a href="index.php">首頁</a></li>
             <li><a href="propertiesdemo.php">最新專案</a></li>
             <?php
-            $id = $_GET['id'];
+            $d_id = $_GET['d_id'];
             $link = mysqli_connect('localhost', 'root', '', 'sa');
-            $sql = "SELECT * FROM demanded where id='$id'";
-            $result = mysqli_query($link, $sql);
-            while ($row = mysqli_fetch_assoc($result)) {
-              echo "<li class='current'><a >" . $row['title'] . "</a></li>";
+            
+            $sql_findtag = "SELECT tag FROM demanded where d_id='$d_id'";
+            $tag = mysqli_query($link, $sql_findtag);
+
+            $content="SELECT * FROM $tag where d_id='$d_id'";
+            $content = mysqli_query($link, $content);
+            while ($row = mysqli_fetch_assoc($content)) {
+              echo "<li class='current'><a >" . $row['event_name'] . "</a></li>";
             }
+            
+           
             ?>
           </ol>
         </div>
@@ -117,29 +123,53 @@
 
             <div class="portfolio-description">
               <?php
-              $id = $_GET['id'];
-              $link = mysqli_connect('localhost', 'root', '', 'sa');
-              $sql = "SELECT * FROM demanded where id='$id'";
-              $result = mysqli_query($link, $sql);
+               $d_id = $_GET['d_id'];
+               $link = mysqli_connect('localhost', 'root', '', 'sa');
+               
+               $sql_findtag = "SELECT tag FROM demanded WHERE d_id='$d_id'";
+               $tag_result = mysqli_query($link, $sql_findtag);
+               $tag_row = mysqli_fetch_assoc($tag_result);
+               $tag = $tag_row['tag']; // <-- 這才是你要用的 "tag" 值
+               
 
-              // echo "<h2 class='section-title'><strong>最新專案列表</strong></h2><br>";
-              while ($row = mysqli_fetch_assoc($result)) {
+               // 根據 tag 決定查哪張表
+switch ($tag) {
+  case 'org_donate
+':
+      $table = 'org_donate';
+      break;
+  case '招募':
+      $table = 'cor_intern';
+      break;
+  case '合作':
+      $table = 'cor_spons';
+      break;
+  default:
+      die('未知的標籤類型！');
+}
+
+
+
+   
+               $content="SELECT * FROM $table where d_id='$d_id'";
+               $content = mysqli_query($link, $content);
+               while ($row = mysqli_fetch_assoc($content)) {
                 echo "
                     <div class='dcard-post'>
                       <div class='dcard-header'>
-                        <span class='dcard-tag'>#" . $row['tag'] . "</span>
-                        <h1 class='dcard-title'>" . $row['title'] . "</h1>
+                        <span class='dcard-tag'>#" . $row['event_name'] . "</span>
+                        <h1 class='dcard-title'></h1>
                       </div>
                     </div>
                     <div class='dcard-body'>
                       <div class='dcard-footer'>
-                        <p><strong>預期目標：</strong>" . $row['target'] . "</p>
-                        <p><strong>具體內容：</strong>" . $row['content'] . "</p>
-                        <p><strong>聯絡人：</strong>" . $row['name'] . "</p>
-                        <p><strong>電話：</strong>" . $row['phone'] . "</p>
-                        <p><strong>Email：</strong>" . $row['u_email'] . "</p>
-                        <p><strong>身份類型：</strong>" . $row['u_permission'] . "</p>
-                        <p><strong>截止日期：</strong>" . $row['date'] . "</p>
+                        <p><strong>預期目標：</strong></p>
+                        <p><strong>具體內容：</strong>" . $row['event_description'] . "</p>
+                        <p><strong>聯絡人：</strong></p>
+                        <p><strong>電話：</strong></p>
+                        <p><strong>Email：</strong></p>
+                        <p><strong>身份類型：</strong></p>
+                        <p><strong>截止日期：</strong></p>
                       </div>
                     </div>
                     <hr class='dcard-divider'>";
