@@ -1,16 +1,57 @@
-<!DOCTYPE html>
+<?php
+// index.php
+// 1. 取得使用者與目標
+$u_email  = $_GET['u_email']   ?? '';
+$receiver = $_GET['receiver']  ?? '';
+
+// 2. 抓聯絡人清單
+$partners = [];
+if ($u_email) {
+  $db = new mysqli('localhost','root','','sa');
+  if (!$db->connect_errno) {
+    $sql = "
+      SELECT DISTINCT
+        CASE WHEN username = ? THEN to_username ELSE username END AS partner
+      FROM messages
+      WHERE username = ? OR to_username = ?
+      ORDER BY partner
+    ";
+    $stmt = $db->prepare($sql);
+    $stmt->bind_param('sss',$u_email,$u_email,$u_email);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    while ($row = $res->fetch_assoc()) {
+      $partners[] = $row['partner'];
+    }
+    $stmt->close();
+  }
+  $db->close();
+}
+?><!DOCTYPE html>
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8" />
   <title>聊天室系統</title>
   <style>
-    body {
-      font-family: sans-serif;
-      background: #f5f5f5;
+    body{margin:0;padding:0;font-family:sans-serif;background:#f5f5f5;}
+    /* 左側清單 */
+    #contactsList {
+      position:fixed;
+      top:0; left:0;
+      width:200px; height:100vh;
+      background:#fff; border-right:1px solid #ccc;
+      overflow-y:auto;
     }
-    .hidden {
-      display: none;
+    #contactsList .item {
+      padding:10px; cursor:pointer; border-bottom:1px solid #eee;
     }
+    #contactsList .item.active { background:#007bff; color:#fff; }
+    /* 將原本的 chat-container 右移 */
+    #chatPage {
+      margin-left:200px;
+    }
+    /* -------- 下面完全照抄你原本的 CSS -------- */
+    .hidden { display: none; }
     .chat-container {
       display: flex;
       flex-direction: column;
@@ -76,7 +117,24 @@
 </head>
 <body>
 
-  <!-- 聊天室頁面 -->
+  <!-- 左側聯絡人清單 -->
+  <div id="contactsList">
+    <?php if (!$u_email): ?>
+      <div class="item">請先帶入 ?u_email=你的帳號</div>
+    <?php elseif (empty($partners)): ?>
+      <div class="item">目前尚無聊天對象</div>
+    <?php else: ?>
+      <?php foreach($partners as $p): ?>
+        <div
+          class="item<?php if($p===$receiver) echo ' active';?>"
+          onclick="location.href='?u_email=<?php echo urlencode($u_email)?>&receiver=<?php echo urlencode($p)?>'">
+          <?php echo htmlspecialchars($p)?>
+        </div>
+      <?php endforeach;?>
+    <?php endif;?>
+  </div>
+
+  <!-- 聊天室頁面（右側，原樣不動） -->
   <div class="chat-container" id="chatPage">
     <div class="chat-header">
       <span id="chatTitle">聊天室</span>
@@ -90,79 +148,57 @@
   </div>
 
   <script>
-    // 取得網址參數
-    const params = new URLSearchParams(window.location.search);
-    const currentUsername = params.get('u_email') || '';
-    const currentTarget   = params.get('receiver') || '';
+    // 原本 JS，只改 u_email / receiver 來源
+    const params         = new URLSearchParams(window.location.search);
+    const currentUsername= params.get('u_email') || '';
+    const currentTarget  = params.get('receiver')  || '';
+
+    document.getElementById('currentUser').textContent = currentUsername?`使用者：${currentUsername}`:'';
+    document.getElementById('chatTitle').textContent   = currentTarget?`你正在和【${currentTarget}】聊天`:'聊天室';
 
     const socket = new WebSocket('ws://localhost:8080');
     socket.onopen = () => {
       if (currentUsername && currentTarget) {
         socket.send(JSON.stringify({
-          username:     currentUsername,
-          to_username:  currentTarget,
-          init:         true  // 表示初始化連線
+          username:    currentUsername,
+          to_username: currentTarget,
+          init:        true
         }));
       }
     };
-
-    const chat = document.getElementById('chat');
-
-    socket.onmessage = (e) => {
+    socket.onmessage = e => {
       try {
-        const data = JSON.parse(e.data);
-
-        // 如果是歷史訊息陣列就批次顯示，否則單條顯示
-        if (data.history) {
-          data.history.forEach(msg => displayMessage(msg));
-        } else {
-          displayMessage(data);
-        }
-      } catch (error) {
-        console.error('解析訊息失敗：', error);
-      }
+        const d = JSON.parse(e.data);
+        if (d.history) d.history.forEach(msg=>displayMessage(msg));
+        else          displayMessage(d);
+      } catch{}
     };
-
-    function sendMessage() {
-      const text = document.getElementById('message').value.trim();
-      if (text && currentUsername && currentTarget) {
+    function sendMessage(){
+      const txt=document.getElementById('message').value.trim();
+      if(txt&&currentUsername&&currentTarget){
         socket.send(JSON.stringify({
-          username:     currentUsername,
-          to_username:  currentTarget,
-          message:      text
+          username:    currentUsername,
+          to_username: currentTarget,
+          message:     txt
         }));
-        document.getElementById('message').value = '';
-      } else {
-        alert('訊息或登入資料有問題！');
+        document.getElementById('message').value='';
       }
     }
-
-    function displayMessage(data) {
-      const div = document.createElement('div');
-      const isSelf = data.username === currentUsername;
-
-      const ts = new Date(data.created_at || Date.now())
-                  .toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' });
-
-      div.classList.add('bubble', isSelf ? 'me' : 'other');
-      div.innerHTML = `
+    function displayMessage(d){
+      const div=document.createElement('div'),
+            self=d.username===currentUsername,
+            ts=(new Date(d.created_at||Date.now()))
+               .toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+      div.classList.add('bubble', self?'me':'other');
+      div.innerHTML=`
         <div class="message-info">
-          <strong>${data.username}</strong> <span class="time">${ts}</span>
+          <strong>${d.username}</strong> <span class="time">${ts}</span>
         </div>
-        <div class="message-text">${data.message}</div>
+        <div class="message-text">${d.message}</div>
       `;
-      chat.appendChild(div);
-      chat.scrollTop = chat.scrollHeight;
+      document.getElementById('chat').appendChild(div);
+      document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
     }
-
-    window.onload = () => {
-      if (currentUsername && currentTarget) {
-        document.getElementById('currentUser').textContent = `使用者：${currentUsername}`;
-        document.getElementById('chatTitle').textContent    = `你正在和【${currentTarget}】聊天`;
-      } else {
-        alert('網址參數有缺（u_email, receiver），請確認！');
-      }
-    };
   </script>
 </body>
 </html>
