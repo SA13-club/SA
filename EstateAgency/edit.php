@@ -175,8 +175,8 @@
 
                     if ($detail_sql) {
                         $detail_result = mysqli_query($link, $detail_sql);
-                        if ($detail_row = mysqli_fetch_assoc($detail_result)) {
-                            // 顯示細節內容
+                        $detail_row = mysqli_fetch_assoc($detail_result);
+                            // 顯示細節
                             if ($tag == 'spon') {
                                 $detail = "
                     <p>活動名稱：{$detail_row['event_name']}</p>
@@ -208,8 +208,8 @@
                     <p>薪資待遇：{$detail_row['salary']}</p>
                 ";
                             }
-                        }
-                    }
+                        
+                    
 
                     // 顯示主表 + 細節
                     echo "
@@ -236,7 +236,7 @@
             </div>
         </div>
     </div>";
-                }
+                }}
 
                 mysqli_close($link);
                 ?>

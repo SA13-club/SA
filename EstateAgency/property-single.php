@@ -265,9 +265,23 @@
               <h3>基本資料</h3>
               <ul>
                 <?php
+                
+                
                 echo "<li><p>🏢 <strong>公司名稱：</strong><a href='profile.php?d_id=$d_id'> " . htmlspecialchars($content_row['c_name'] ?? '無資料') . "</a></p></li>
                       <li><p>📧 <strong>聯絡信箱：</strong> " . htmlspecialchars($content_row['c_email'] ?? '無資料') . "</p></li>
                       <li><p>📞 <strong>聯絡電話：</strong> " . htmlspecialchars($content_row['c_phone'] ?? '無資料') . "</p></li>";
+                        
+                      
+  $receiver_query = "SELECT u_email FROM demanded WHERE d_id = $d_id";
+  $receiver_result = mysqli_query($link, $receiver_query);
+  $receiver_email = mysqli_fetch_assoc($receiver_result)['u_email'] ?? '';
+
+  $u_email = $_SESSION['u_email'] ?? '';
+  $safe_email = urlencode($u_email);
+  $safe_receiver = urlencode($receiver_email);
+
+  echo '<a href="./chat/public/index .php?u_email=' . $safe_email . '&receiver=' . $safe_receiver . '" target="_blank" class="chat-button">聊天室</a>';
+
                 ?>
               </ul>
             </div>

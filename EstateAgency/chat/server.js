@@ -1,86 +1,97 @@
+// server.js
 const WebSocket = require('ws');
-const mysql = require('mysql2');
+const mysql     = require('mysql2');
 
 // 建立 MySQL 連線
 const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',    // 請填你的MySQL帳號
-  password: '',    // 請填你的MySQL密碼
-  database: 'test' // 你的資料庫名稱
+  host:     'localhost',
+  user:     'root',
+  password: '',
+  database: 'sa'
 });
 
-db.connect((err) => {
+db.connect(err => {
   if (err) {
     console.error('無法連接到資料庫：', err);
     process.exit(1);
   }
-  console.log('成功連接到 MySQL 資料庫');
+  console.log('✅ 成功連接到 MySQL');
 });
 
-const wss = new WebSocket.Server({ port: 8080 });
+const wss     = new WebSocket.Server({ port: 8080 });
+let clients   = [];
 
-let clients = [];
-
-wss.on('connection', (ws) => {
-  console.log('有新的客戶端連接');
+wss.on('connection', ws => {
+  console.log('📡 新客戶端連線');
   clients.push(ws);
 
-  // 🔥 一連進來，把歷史訊息傳給新進來的人
-  db.query('SELECT username, to_username AS to, message FROM messages ORDER BY id ASC', (err, results) => {
-    if (err) {
-      console.error('讀取歷史訊息失敗：', err);
-    } else {
-      results.forEach(row => {
-        const payload = JSON.stringify({
-          username: row.username,
-          to: row.to,
-          message: row.message
-        });
-        ws.send(payload); // 只傳給這個連線的人
+  ws.on('message', msg => {
+    let data;
+    try {
+      data = JSON.parse(msg);
+    } catch (err) {
+      console.error('JSON 解析錯誤：', err);
+      return;
+    }
+
+    const {
+      username,
+      to_username,
+      to,
+      init,
+      message
+    } = data;
+    const partner = to_username || to;
+
+    if (!username || !partner) {
+      console.error('缺少 username 或 to_username');
+      return;
+    }
+
+    if (init) {
+      // 查歷史訊息
+      const sql = `
+        SELECT username, message 
+        FROM messages 
+        WHERE (username = ? AND to_username = ?)
+           OR (username = ? AND to_username = ?)
+        ORDER BY created_at
+      `;
+      db.query(sql, [username, partner, partner, username], (err, results) => {
+        if (err) {
+          console.error('查詢歷史訊息失敗：', err);
+          return;
+        }
+        ws.send(JSON.stringify({ history: results }));
+      });
+      return;
+    }
+
+    if (message) {
+      // 寫入新訊息
+      const insertSql = `
+        INSERT INTO messages (username, to_username, message, created_at) 
+        VALUES (?, ?, ?, NOW())
+      `;
+      db.query(insertSql, [username, partner, message], err => {
+        if (err) {
+          console.error('寫入訊息失敗：', err);
+        }
+      });
+
+      // 廣播給所有 client（對方收到訊息）
+      clients.forEach(client => {
+        if (client !== ws && client.readyState === WebSocket.OPEN) {
+          client.send(JSON.stringify({ username, message }));
+        }
       });
     }
   });
 
-  ws.on('message', (msg) => {
-    console.log('收到訊息：' + msg);
-
-    let parsed;
-    try {
-      parsed = JSON.parse(msg);
-    } catch (err) {
-      console.error('訊息格式錯誤：', err);
-      return;
-    }
-
-    const { username, to, message } = parsed;
-
-    if (!username || !to || !message) {
-      console.error('收到不完整的訊息');
-      return;
-    }
-
-    // 存到資料庫
-    const sql = 'INSERT INTO messages (username, to_username, message) VALUES (?, ?, ?)';
-    db.query(sql, [username, to, message], (err, result) => {
-      if (err) {
-        console.error('寫入資料庫失敗：', err);
-      } else {
-        console.log(`訊息儲存成功！ID: ${result.insertId}`);
-      }
-    });
-
-    // 廣播給所有連線中的人
-    clients.forEach(client => {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(msg);
-      }
-    });
-  });
-
   ws.on('close', () => {
-    console.log('一個客戶端斷線');
+    console.log('❌ 客戶端離線');
     clients = clients.filter(c => c !== ws);
   });
 });
 
-console.log('WebSocket 伺服器已啟動，網址：ws://localhost:8080');
+console.log('🚀 WebSocket 伺服器已啟動：ws://localhost:8080');

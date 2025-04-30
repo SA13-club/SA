@@ -543,8 +543,12 @@
 
   <!-- Main JS File -->
   <script src="assets/js/main.js"></script>
-  
-  <a href="/SA/EstateAgency/chat/public/index.html" target="_blank" class="chat-button">聊天室</a>
+  <?php
+  $u_email = $_SESSION['u_email'] ?? '';
+  $safe_email = urlencode($u_email); // 確保網址安全
+  echo '<a href="./chat/public/index .php?u_email=' . $safe_email . '" target="_blank" class="chat-button">聊天室</a>';
+?>
+
 </body>
 
 </html>
