@@ -18,8 +18,8 @@ db.connect(err => {
   console.log('✅ 成功連接到 MySQL');
 });
 
-const wss     = new WebSocket.Server({ port: 8080 });
-let clients   = [];
+const wss   = new WebSocket.Server({ port: 8080 });
+let clients = [];
 
 wss.on('connection', ws => {
   console.log('📡 新客戶端連線');
@@ -34,24 +34,17 @@ wss.on('connection', ws => {
       return;
     }
 
-    const {
-      username,
-      to_username,
-      to,
-      init,
-      message
-    } = data;
+    const { username, to_username, to, init, message } = data;
     const partner = to_username || to;
-
     if (!username || !partner) {
       console.error('缺少 username 或 to_username');
       return;
     }
 
     if (init) {
-      // 查歷史訊息
+      // 查歷史訊息，帶入 created_at
       const sql = `
-        SELECT username, message 
+        SELECT username, to_username, message, created_at 
         FROM messages 
         WHERE (username = ? AND to_username = ?)
            OR (username = ? AND to_username = ?)
@@ -68,22 +61,36 @@ wss.on('connection', ws => {
     }
 
     if (message) {
-      // 寫入新訊息
+      // 寫入新訊息（使用 NOW()）
       const insertSql = `
         INSERT INTO messages (username, to_username, message, created_at) 
         VALUES (?, ?, ?, NOW())
       `;
-      db.query(insertSql, [username, partner, message], err => {
+      db.query(insertSql, [username, partner, message], (err, result) => {
         if (err) {
           console.error('寫入訊息失敗：', err);
+          return;
         }
-      });
-
-      // 廣播給所有 client（對方收到訊息）
-      clients.forEach(client => {
-        if (client !== ws && client.readyState === WebSocket.OPEN) {
-          client.send(JSON.stringify({ username, message }));
-        }
+        const newId = result.insertId;
+        // 取出剛寫入的 created_at
+        db.query(
+          'SELECT created_at FROM messages WHERE id = ?', 
+          [newId],
+          (err2, rows) => {
+            if (err2 || !rows.length) {
+              console.error('查詢新訊息時間失敗：', err2);
+              return;
+            }
+            const ts = rows[0].created_at;
+            const payload = { username, message, created_at: ts };
+            // 廣播給所有 client（包含自己）
+            clients.forEach(client => {
+              if (client.readyState === WebSocket.OPEN) {
+                client.send(JSON.stringify(payload));
+              }
+            });
+          }
+        );
       });
     }
   });

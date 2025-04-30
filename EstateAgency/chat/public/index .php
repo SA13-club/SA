@@ -4,6 +4,7 @@
 $u_email  = $_GET['u_email']   ?? '';
 $receiver = $_GET['receiver']  ?? '';
 
+
 // 2. 抓聯絡人清單
 $partners = [];
 if ($u_email) {
@@ -184,21 +185,48 @@ if ($u_email) {
         document.getElementById('message').value='';
       }
     }
-    function displayMessage(d){
-      const div=document.createElement('div'),
-            self=d.username===currentUsername,
-            ts=(new Date(d.created_at||Date.now()))
-               .toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
-      div.classList.add('bubble', self?'me':'other');
-      div.innerHTML=`
-        <div class="message-info">
-          <strong>${d.username}</strong> <span class="time">${ts}</span>
-        </div>
-        <div class="message-text">${d.message}</div>
-      `;
-      document.getElementById('chat').appendChild(div);
-      document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
+    function displayMessage(d) {
+  console.log('📨 displayMessage 收到資料:', d);
+
+  // 1) 解析時間，支援各種格式
+  let dateObj = null;
+  if (d.created_at) {
+    // 如果你传过来的是 "YYYY-MM-DD HH:MM:SS" 或者 ISO 字符串，都用 new Date()
+    // 注意：对于 "2025-04-30 15:23:45"，部分浏览器可能解析失败
+    // 所以先把空格换成 'T'
+    const raw = d.created_at.replace(' ', 'T');
+    dateObj = new Date(raw);
+    if (isNaN(dateObj)) {
+      console.warn('⚠️ created_at 解析失败，raw:', raw);
+      dateObj = new Date(); 
     }
-  </script>
+  } else {
+    dateObj = new Date();
+  }
+
+  // 2) 格式化为 YYYY-MM-DD HH:MM
+  const pad = n => n.toString().padStart(2, '0');
+  const ts =  
+    `${dateObj.getFullYear()}-${pad(dateObj.getMonth()+1)}-${pad(dateObj.getDate())}` +
+    ` ${pad(dateObj.getHours())}:${pad(dateObj.getMinutes())}`;
+
+  // 3) 渲染泡泡
+  const div  = document.createElement('div');
+  const self = d.username === currentUsername;
+  div.classList.add('bubble', self ? 'me' : 'other');
+  div.innerHTML = `
+    <div class="message-info">
+      <strong>${d.username}</strong> <span class="time">${ts}</span>
+    </div>
+    <div class="message-text">${d.message}</div>
+  `;
+
+  const chat = document.getElementById('chat');
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+</script>
+
 </body>
 </html>
