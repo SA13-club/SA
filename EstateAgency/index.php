@@ -38,24 +38,23 @@
   ======================================================== -->
   <style>
     .chat-button {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background-color: #0084ff;
-  color: white;
-  padding: 12px 18px;
-  border-radius: 30px;
-  text-decoration: none;
-  font-weight: bold;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-  z-index: 999;
-  transition: background-color 0.3s;
-}
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #0084ff;
+      color: white;
+      padding: 12px 18px;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: bold;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      z-index: 999;
+      transition: background-color 0.3s;
+    }
 
-.chat-button:hover {
-  background-color: #006bbf;
-}
-
+    .chat-button:hover {
+      background-color: #006bbf;
+    }
   </style>
 
 </head>
@@ -79,14 +78,14 @@
           <li><a href="agents.php">合作單位</a></li>
           <li><a href="contact.php">聯絡我們</a></li>
           <?php
-                if ($_SESSION['u_email']) {
-                    echo "<li><a href='Logout.php'>登出</a></li>";
-                    echo "<li><a href='account.php'>帳號管理</a></li>";
-                } else {
-                    echo "<li><a href='LogIn.html'>登入</a></li>";
-                    echo "<li><a href='#' data-bs-toggle='modal' data-bs-target='#SignInPermission'>註冊</a></li>";
-                }
-                ?>
+          if ($_SESSION['u_email']) {
+            echo "<li><a href='Logout.php'>登出</a></li>";
+            echo "<li><a href='account.php'>帳號管理</a></li>";
+          } else {
+            echo "<li><a href='LogIn.html'>登入</a></li>";
+            echo "<li><a href='#' data-bs-toggle='modal' data-bs-target='#SignInPermission'>註冊</a></li>";
+          }
+          ?>
           <!-- <li><a href="LogIn.html">登入</a></li>
           <li><a href="#" data-bs-toggle="modal" data-bs-target="#SignInPermission">註冊</a></li> -->
 
@@ -96,7 +95,7 @@
 
     </div>
   </header>
-  
+
   <main class="main">
 
     <!-- Hero Section -->
@@ -367,7 +366,7 @@
           </script>
           <div class="swiper-wrapper">
 
-            
+
 
             <div class="swiper-slide">
               <div class="testimonial-item">
@@ -451,7 +450,7 @@
                   <h4>身份</h4>
                 </div>
               </div>
-            </div><!-- End testimonial item -->          
+            </div><!-- End testimonial item -->
 
           </div>
           <div class="swiper-pagination"></div>
@@ -546,8 +545,10 @@
   <?php
   $u_email = $_SESSION['u_email'] ?? '';
   $safe_email = urlencode($u_email); // 確保網址安全
-  echo '<a href="./chat/public/index .php?u_email=' . $safe_email . '" target="_blank" class="chat-button">聊天室</a>';
-?>
+  if ($_SESSION['u_permission']) {
+    echo '<a href="./chat/public/index .php?u_email=' . $safe_email . '" target="_blank" class="chat-button">聊天室</a>';
+  }
+  ?>
 
 </body>
 
