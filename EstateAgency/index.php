@@ -544,10 +544,14 @@
   <script src="assets/js/main.js"></script>
  
   <?php
-  $u_email = $_SESSION['u_email'] ?? '';
-  $safe_email = urlencode($u_email); // 確保網址安全
-  echo '<a href="./chat/public/index .php?u_email=' . $safe_email . '" target="_blank" class="chat-button">聊天室</a>';
-?>
+
+ $u_email = $_SESSION['u_email'] ?? '';
+ $safe_email = urlencode($u_email); // 確保網址安全
+ if ($_SESSION['u_permission']) {
+   echo '<a href="./chat/public/index .php?u_email=' . $safe_email . '" target="_blank" class="chat-button">聊天室</a>';
+ }
+ ?>
+
 
 </body>
 
