@@ -294,9 +294,9 @@
                 $u_email = $_SESSION['u_email'] ?? '';
                 $safe_email = urlencode($u_email);
                 $safe_receiver = urlencode($receiver_email);
-
+                if($_SESSION['u_permission']){
                 echo '<a href="./chat/public/index .php?u_email=' . $safe_email . '&receiver=' . $safe_receiver . '" target="_blank" class="chat-button">聊天室</a>';
-
+}
                 ?>
               </ul>
             </div>
