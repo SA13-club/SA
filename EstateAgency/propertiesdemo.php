@@ -252,8 +252,8 @@ WHERE d.tag IS NOT NULL AND d.tag != '' AND d.u_permission != '$u_permission'";
               $sql = "
         SELECT 
             d.*, 
-            ci.c_name AS intern_c_name, ci.c_phone AS intern_c_phone, ci.c_email AS intern_c_email,
-            cs.c_name AS spons_c_name, cs.c_phone AS spons_c_phone, cs.c_email AS spons_c_email
+            ci.c_name AS intern_c_name, ci.c_phone AS intern_c_phone, ci.c_email AS intern_c_email, ci.title AS intern_title,
+            cs.c_name AS spons_c_name, cs.c_phone AS spons_c_phone, cs.c_email AS spons_c_email, cs.title AS spons_title
         FROM demanded d
         LEFT JOIN cor_intern ci ON d.d_id = ci.d_id
         LEFT JOIN cor_spons cs ON d.d_id = cs.d_id
@@ -263,8 +263,8 @@ WHERE d.tag IS NOT NULL AND d.tag != '' AND d.u_permission != '$u_permission'";
               $sql = "
         SELECT 
             d.*, 
-            od.c_name AS donate_c_name, od.c_phone AS donate_c_phone, od.c_email AS donate_c_email,
-            oc.c_name AS coop_c_name, oc.c_phone AS coop_c_phone, oc.c_email AS coop_c_email
+            od.c_name AS donate_c_name, od.c_phone AS donate_c_phone, od.c_email AS donate_c_email, od.title AS donate_title,
+            oc.c_name AS coop_c_name, oc.c_phone AS coop_c_phone, oc.c_email AS coop_c_email, oc.title AS coop_title
         FROM demanded d
         LEFT JOIN org_coop oc ON d.d_id = oc.d_id
         LEFT JOIN org_donate od ON d.d_id = od.d_id
@@ -274,16 +274,16 @@ WHERE d.tag IS NOT NULL AND d.tag != '' AND d.u_permission != '$u_permission'";
               $sql = "
         SELECT 
             d.*, 
-            ci.c_name AS intern_c_name, ci.c_phone AS intern_c_phone, ci.c_email AS intern_c_email,
-            cs.c_name AS spons_c_name, cs.c_phone AS spons_c_phone, cs.c_email AS spons_c_email,
-            od.c_name AS donate_c_name, od.c_phone AS donate_c_phone, od.c_email AS donate_c_email,
-            oc.c_name AS coop_c_name, oc.c_phone AS coop_c_phone, oc.c_email AS coop_c_email
+            ci.c_name AS intern_c_name, ci.c_phone AS intern_c_phone, ci.c_email AS intern_c_email, ci.title AS intern_title,
+            cs.c_name AS spons_c_name, cs.c_phone AS spons_c_phone, cs.c_email AS spons_c_email, cs.title AS spons_title,
+            od.c_name AS donate_c_name, od.c_phone AS donate_c_phone, od.c_email AS donate_c_email, od.title AS donate_title,
+            oc.c_name AS coop_c_name, oc.c_phone AS coop_c_phone, oc.c_email AS coop_c_email, oc.title AS coop_title
         FROM demanded d
         LEFT JOIN org_coop oc ON d.d_id = oc.d_id
         LEFT JOIN org_donate od ON d.d_id = od.d_id
         LEFT JOIN cor_intern ci ON d.d_id = ci.d_id
         LEFT JOIN cor_spons cs ON d.d_id = cs.d_id
-        WHERE d.u_permission != ?
+        
     ";
             }
 
@@ -309,17 +309,32 @@ WHERE d.tag IS NOT NULL AND d.tag != '' AND d.u_permission != '$u_permission'";
               ";
 
               // 【新增】主標題
-              if (!empty($row['coop_name'])) {
-                echo "<p><strong>✏️ 合作標題：</strong> " . htmlspecialchars($row['coop_name']) . "</p>";
-              } elseif (!empty($row['event_name'])) {
-                echo "<p><strong>✏️ 活動標題：</strong> " . htmlspecialchars($row['event_name']) . "</p>";
-              } elseif (!empty($row['intern_title'])) {
-                echo "<p><strong>✏️ 職缺標題：</strong> " . htmlspecialchars($row['intern_title']) . "</p>";
-              } elseif (!empty($row['sponsor_method'])) {
-                echo "<p><strong>✏️ 贊助方式：</strong> " . htmlspecialchars($row['sponsor_method']) . "</p>";
-              } else {
-                echo "<p><strong>✏️ 標題：</strong> 無標題</p>";
+              switch ($row['tag']) {
+                case '合作':
+                  $title = $row['coop_title'];
+                  echo "<p><strong>✏️ 合作標題：</strong> " . (!empty($title) ? htmlspecialchars($title) : '無標題') . "</p>";
+                  break;
+
+                case '贊助':
+                  $title = $row['spons_title'];
+                  echo "<p><strong>✏️ 活動標題：</strong> " . (!empty($title) ? htmlspecialchars($title) : '無標題') . "</p>";
+                  break;
+
+                case '實習':
+                  $title = $row['intern_title'];
+                  echo "<p><strong>✏️ 職缺標題：</strong> " . (!empty($title) ? htmlspecialchars($title) : '無標題') . "</p>";
+                  break;
+
+                case 'spon':
+                  $title = $row['donate_title'];
+                  echo "<p><strong>✏️ 活動標題：</strong> " . (!empty($title) ? htmlspecialchars($title) : '無標題') . "</p>";
+                  break;
+
+                default:
+                  echo "<p><strong>✏️ 標題：</strong> " . (!empty($title) ? htmlspecialchars($title) : '無標題') . "</p>";
+                  break;
               }
+
 
               echo "<div class='dcard-footer'>";
 
@@ -342,6 +357,34 @@ WHERE d.tag IS NOT NULL AND d.tag != '' AND d.u_permission != '$u_permission'";
                 }
               } elseif ($u_permission == '企業') {
                 if (!empty($row['donate_c_name'])) {
+                  echo "
+                          <span>👤 聯絡人：{$row['donate_c_name']}</span>
+                          <span>📞 電話：{$row['donate_c_phone']}</span>
+                          <span>✉️ Email：{$row['donate_c_email']}</span>
+                      ";
+                } elseif (!empty($row['coop_c_name'])) {
+                  echo "
+                          <span>👤 聯絡人：{$row['coop_c_name']}</span>
+                          <span>📞 電話：{$row['coop_c_phone']}</span>
+                          <span>✉️ Email：{$row['coop_c_email']}</span>
+                      ";
+                } else {
+                  echo "<span>尚無聯絡資料</span>";
+                }
+              } else {
+                if (!empty($row['intern_c_name'])) {
+                  echo "
+                          <span>👤 聯絡人：{$row['intern_c_name']}</span>
+                          <span>📞 電話：{$row['intern_c_phone']}</span>
+                          <span>✉️ Email：{$row['intern_c_email']}</span>
+                      ";
+                } elseif (!empty($row['spons_c_name'])) {
+                  echo "
+                          <span>👤 聯絡人：{$row['spons_c_name']}</span>
+                          <span>📞 電話：{$row['spons_c_phone']}</span>
+                          <span>✉️ Email：{$row['spons_c_email']}</span>
+                      ";
+                } elseif (!empty($row['donate_c_name'])) {
                   echo "
                           <span>👤 聯絡人：{$row['donate_c_name']}</span>
                           <span>📞 電話：{$row['donate_c_phone']}</span>
