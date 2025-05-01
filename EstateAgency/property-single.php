@@ -75,7 +75,22 @@
   </header>
 
   <main class="main">
-
+    <div class="modal fade" id="SignInPermission" tabindex="-1" aria-labelledby="SignInPermissionLabel"
+      aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 style="color: #1b1b1b;" class="modal-title fs-5" id="SignInPermissionLabel">請問您的身分是？</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <a href="BusinessSignIn.php" class="btn-permission">企業</a>
+            <a href="OgnizationSignIn.php" class="btn-permission">組織團體</a>
+            <a href="PersonalSignIn.php" class="btn-permission">個人</a>
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- Page Title -->
     <div class="page-title" data-aos="fade">
       <div class="heading">
@@ -265,22 +280,22 @@
               <h3>基本資料</h3>
               <ul>
                 <?php
-                
-                
+
+
                 echo "<li><p>🏢 <strong>公司名稱：</strong><a href='profile.php?d_id=$d_id'> " . htmlspecialchars($content_row['c_name'] ?? '無資料') . "</a></p></li>
                       <li><p>📧 <strong>聯絡信箱：</strong> " . htmlspecialchars($content_row['c_email'] ?? '無資料') . "</p></li>
                       <li><p>📞 <strong>聯絡電話：</strong> " . htmlspecialchars($content_row['c_phone'] ?? '無資料') . "</p></li>";
-                        
-                      
-  $receiver_query = "SELECT u_email FROM demanded WHERE d_id = $d_id";
-  $receiver_result = mysqli_query($link, $receiver_query);
-  $receiver_email = mysqli_fetch_assoc($receiver_result)['u_email'] ?? '';
 
-  $u_email = $_SESSION['u_email'] ?? '';
-  $safe_email = urlencode($u_email);
-  $safe_receiver = urlencode($receiver_email);
 
-  echo '<a href="./chat/public/index .php?u_email=' . $safe_email . '&receiver=' . $safe_receiver . '" target="_blank" class="chat-button">聊天室</a>';
+                $receiver_query = "SELECT u_email FROM demanded WHERE d_id = $d_id";
+                $receiver_result = mysqli_query($link, $receiver_query);
+                $receiver_email = mysqli_fetch_assoc($receiver_result)['u_email'] ?? '';
+
+                $u_email = $_SESSION['u_email'] ?? '';
+                $safe_email = urlencode($u_email);
+                $safe_receiver = urlencode($receiver_email);
+
+                echo '<a href="./chat/public/index .php?u_email=' . $safe_email . '&receiver=' . $safe_receiver . '" target="_blank" class="chat-button">聊天室</a>';
 
                 ?>
               </ul>
