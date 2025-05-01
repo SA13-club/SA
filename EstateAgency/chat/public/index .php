@@ -17,6 +17,9 @@ if ($u_email) {
       WHERE username = ? OR to_username = ?
       ORDER BY partner
     ";
+    //$id_sql="select u_permission from demanded where d_id =partner ;"
+    //$switch(id_sql){case("組織團體"):$name_find="select o_name from organization_registrations where u_email=partner";
+    //case("企業"):$name_find="select c_name from corporation_registrations where u_email=partner";}
     $stmt = $db->prepare($sql);
     $stmt->bind_param('sss',$u_email,$u_email,$u_email);
     $stmt->execute();
@@ -26,7 +29,7 @@ if ($u_email) {
     }
     $stmt->close();
   }
-  $db->close();
+ 
 }
 ?><!DOCTYPE html>
 <html lang="zh-TW">
@@ -126,12 +129,51 @@ if ($u_email) {
       <div class="item">目前尚無聊天對象</div>
     <?php else: ?>
       <?php foreach($partners as $p): ?>
-        <div
-          class="item<?php if($p===$receiver) echo ' active';?>"
-          onclick="location.href='?u_email=<?php echo urlencode($u_email)?>&receiver=<?php echo urlencode($p)?>'">
-          <?php echo htmlspecialchars($p)?>
-        </div>
-      <?php endforeach;?>
+  <?php
+    // —— 這段不動：查 u_permission、抓對應名稱到 $displayName ——  
+    $db2 = new mysqli('localhost','root','','sa');
+    if ($db2->connect_errno) {
+      $displayName = $p;
+    } else {
+      $stmt = $db2->prepare("SELECT u_permission FROM demanded WHERE u_email=?");
+      $stmt->bind_param("s", $p);
+      $stmt->execute();
+      $stmt->bind_result($perm);
+      $stmt->fetch();
+      $stmt->close();
+
+      if ($perm === '組織團體') {
+        $stmt = $db2->prepare("SELECT o_name FROM organization_registrations WHERE u_email=?");
+      } elseif ($perm === '企業') {
+        $stmt = $db2->prepare("SELECT c_name FROM corporation_registrations WHERE u_email=?");
+      }
+
+      if (isset($stmt)) {
+        $stmt->bind_param("s", $p);
+        $stmt->execute();
+        $stmt->bind_result($tmp);
+        if ($stmt->fetch()) {
+          $displayName = $tmp;
+        } else {
+          $displayName = $p;
+        }
+        $stmt->close();
+      } else {
+        $displayName = $p;
+      }
+
+      $db2->close();
+    }
+  ?>
+  <!-- 下面這一行才是關鍵： -->
+  <div
+    class="item<?php if ($p === $receiver) echo ' active'; ?>"
+    onclick="location.href='?u_email=<?php echo urlencode($u_email) ?>&receiver=<?php echo urlencode($p) ?>'">
+    <?php echo htmlspecialchars($displayName) ?>
+  </div>
+<?php endforeach; ?>
+
+
     <?php endif;?>
   </div>
 
@@ -153,6 +195,7 @@ if ($u_email) {
     const params         = new URLSearchParams(window.location.search);
     const currentUsername= params.get('u_email') || '';
     const currentTarget  = params.get('receiver')  || '';
+    
 
     document.getElementById('currentUser').textContent = currentUsername?`使用者：${currentUsername}`:'';
     document.getElementById('chatTitle').textContent   = currentTarget?`你正在和【${currentTarget}】聊天`:'聊天室';
@@ -185,6 +228,20 @@ if ($u_email) {
         document.getElementById('message').value='';
       }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
     function displayMessage(d) {
   console.log('📨 displayMessage 收到資料:', d);
 
