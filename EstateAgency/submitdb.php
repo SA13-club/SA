@@ -1,0 +1,95 @@
+<?php
+session_start();
+require 'PHPMailer-master/src/PHPMailer.php';
+require 'PHPMailer-master/src/SMTP.php';
+require 'PHPMailer-master/src/Exception.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+$link = mysqli_connect('localhost', 'root', '', 'sa');
+
+$sender_email = $_SESSION['u_email'] ?? '';
+$d_id = $_GET['d_id'] ?? '';
+
+if (!$sender_email || !$d_id) {
+    die('資料不完整');
+}
+
+// 找 tag
+$sql_findtag = "SELECT tag FROM demanded WHERE d_id='$d_id'";
+$tag_result = mysqli_query($link, $sql_findtag);
+$tag_row = mysqli_fetch_assoc($tag_result);
+
+if (!$tag_row) {
+    die('錯誤：找不到這個需求！');
+}
+
+$tag = $tag_row['tag'];
+
+// 根據 tag 決定查哪張表
+switch ($tag) {
+    case '合作':
+        $table = 'org_coop';
+        break;
+    case 'spon':
+        $table = 'org_donate';
+        break;
+    case '招募':
+        $table = 'cor_intern';
+        break;
+    case '贊助':
+        $table = 'cor_spons';
+        break;
+    default:
+        die('錯誤：未知的標籤類型！');
+}
+
+// 查真正的內容
+$content_sql = "SELECT * FROM $table WHERE d_id='$d_id'";
+$content_result = mysqli_query($link, $content_sql);
+$content_row = mysqli_fetch_assoc($content_result);
+$receiver_email = $content_row['c_email'] ?? '';
+
+if (!$receiver_email) {
+    die('找不到合作對象');
+}
+
+// ✅ 使用 PHPMailer 發送 Email
+$mail = new PHPMailer(true);
+
+try {
+    // SMTP 設定
+    $mail->isSMTP();
+    $mail->Host       = 'smtp.gmail.com';
+    $mail->SMTPAuth   = true;
+    $mail->Username   = 'chesteras452@gmail.com'; // 替換為你的 Gmail
+    $mail->Password   = 'duos gncf cras tcdu';        // Gmail 應用程式密碼
+    $mail->SMTPSecure = 'tls';
+    $mail->Port       = 587;
+
+    $mail->CharSet = 'UTF-8';
+    $mail->Encoding = 'base64';
+    $mail->isHTML(false);
+    // 發件人與收件人
+    $mail->setFrom('chesteras458@gmail.com', 'CoLab 合作申請系統');
+    $mail->addAddress($receiver_email);
+
+    // 內容
+    $mail->isHTML(false);
+    $mail->Subject = '您收到一則新的合作申請';
+    $mail->Body    = "您好，$sender_email 向您發出合作申請。\n請登入平台查看細節。";
+
+    $mail->send();
+    echo "✅ Email 發送成功！<br>";
+} catch (Exception $e) {
+    echo "❌ Email 發送失敗，錯誤訊息：{$mail->ErrorInfo}<br>";
+}
+
+// ✅ 寫入通知資料表
+$notify_stmt = $link->prepare("INSERT INTO notifications (receiver_email, message, created_at) VALUES (?, ?, NOW())");
+$notify_msg = "您收到一則合作申請，來自 $sender_email。";
+$notify_stmt->bind_param("ss", $receiver_email, $notify_msg);
+$notify_stmt->execute();
+
+echo "<a href='index.php'>返回首頁</a>";

@@ -295,11 +295,19 @@
                 $safe_email = urlencode($u_email);
                 $safe_receiver = urlencode($receiver_email);
                 if ($_SESSION['u_permission']) {
-                  echo '<a href="./chat/public/index .php?u_email=' . $safe_email . '&receiver=' . $safe_receiver . '" target="_blank" class="chat-button">聊天室</a>';
+                  echo '<li><a class="btn" style="background-color: #28c76f; color: white;" href="./chat/public/index .php?u_email=' . $safe_email . '&receiver=' . $safe_receiver . '" target="_blank" class="chat-button">聊天室</a></li>';
                 } else {
-                  echo '<a href="#" onclick="alert(\'請先登錄再進行洽談\'); return false;" class="chat-button">聊天室</a>';
+                  echo '<li><a href="#" onclick="alert(\'請先登錄再進行洽談\'); return false;" class="chat-button">聊天室</a></li>';
                 }
                 ?>
+                <li class="my-2">
+                  <button class="btn" style="background-color: #28c76f; color: white;"
+                    onclick="if(confirm('確認是否申請合作？')) { window.location.href='submitdb.php?d_id=<?= $d_id ?>'; }">
+                    我想合作
+                  </button>
+                </li>
+
+
               </ul>
             </div>
           </div>
