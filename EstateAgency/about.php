@@ -49,21 +49,21 @@
 
       <nav id="navmenu" class="navmenu">
         <ul>
-          <li><a href="index.php" >主頁</a></li>
+          <li><a href="index.php">主頁</a></li>
           <li><a href="about.php" class="active">關於</a></li>
           <li><a href="services.php">服務</a></li>
           <li><a href="propertiesdemo.php">最新專案</a></li>
           <li><a href="agents.php">合作單位</a></li>
           <li><a href="contact.php">聯絡我們</a></li>
           <?php
-                if ($_SESSION['u_email']) {
-                    echo "<li><a href='Logout.php'>登出</a></li>";
-                    echo "<li><a href='account.php'>帳號管理</a></li>";
-                } else {
-                    echo "<li><a href='LogIn.html'>登入</a></li>";
-                    echo "<li><a href='#' data-bs-toggle='modal' data-bs-target='#SignInPermission'>註冊</a></li>";
-                }
-                ?>
+          if ($_SESSION['u_email']) {
+            echo "<li><a href='Logout.php'>登出</a></li>";
+            echo "<li><a href='account.php'>帳號管理</a></li>";
+          } else {
+            echo "<li><a href='LogIn.html'>登入</a></li>";
+            echo "<li><a href='#' data-bs-toggle='modal' data-bs-target='#SignInPermission'>註冊</a></li>";
+          }
+          ?>
           <!-- <li><a href="LogIn.html">登入</a></li>
           <li><a href="#" data-bs-toggle="modal" data-bs-target="#SignInPermission">註冊</a></li> -->
 
@@ -75,7 +75,22 @@
   </header>
 
   <main class="main">
-
+    <div class="modal fade" id="SignInPermission" tabindex="-1" aria-labelledby="SignInPermissionLabel"
+      aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 style="color: #1b1b1b;" class="modal-title fs-5" id="SignInPermissionLabel">請問您的身分是？</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <a href="BusinessSignIn.php" class="btn-permission">企業</a>
+            <a href="OgnizationSignIn.php" class="btn-permission">組織團體</a>
+            <a href="PersonalSignIn.php" class="btn-permission">個人</a>
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- Page Title -->
     <div class="page-title" data-aos="fade">
       <div class="heading">

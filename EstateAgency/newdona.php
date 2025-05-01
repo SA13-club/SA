@@ -275,14 +275,32 @@
                                         </div>
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" name="benefit[]" value="拓展關係網" id="network">
-                                            <label class="form-check-label" for="network">拓展關係網 🌎🤝</label>
+                                            <label class="form-check-label" for="network">拓展關係網 🌎</label>
                                         </div>
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" name="benefit[]" value="技術交流" id="exchange">
-                                            <label class="form-check-label" for="exchange">技術交流 </label>
+                                            <label class="form-check-label" for="exchange">技術交流 🤝</label>
                                         </div>
                                     </div>
-                                    
+                                        <div class="col-md-4">
+                                            <label>合作地點</label>
+                                            <select id="city" class="form-select" name="recruit_city">
+                                                <option selected disabled value="">選擇縣市</option>
+                                                <option value="台北市">台北市</option>
+                                                <option value="新北市">新北市</option>
+                                                <option value="桃園市">桃園市</option>
+                                                
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                    <label></label>
+                                        <select id="district" class="form-select" name="recruit_district">
+                                            <option selected disabled value="">選擇行政區</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <textarea class="form-control" name="未設定" rows="3" placeholder="詳細地址" ></textarea>
+                                    </div>
                                     <div class="col-md-12">
                                         <label>合作時間</label>
                                         <div class="row">
