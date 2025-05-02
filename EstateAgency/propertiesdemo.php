@@ -238,7 +238,8 @@ WHERE d.tag IS NOT NULL AND d.tag != '' AND d.u_permission != '$u_permission'";
               </div>
             </div>
             <?php
-
+       
+            $u_permission = $_SESSION['u_permission'];
             $link = mysqli_connect('localhost', 'root', '', 'sa');
 
             if (!$link) {
