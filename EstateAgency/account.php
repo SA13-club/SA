@@ -74,6 +74,8 @@
       display: flex;
       gap: 15px;
       flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
     }
 
     .filter-bar py-3 border-bottom bg-light {
@@ -159,8 +161,6 @@
                         echo "<li><a href='#' data-bs-toggle='modal' data-bs-target='#SignInPermission'>註冊</a></li>";
                     }
                     ?>
-                    <!-- <li><a href="LogIn.html">登入</a></li>
-                <li><a href="#" data-bs-toggle="modal" data-bs-target="#SignInPermission">註冊</a></li> -->
 
                 </ul>
                 <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
@@ -271,7 +271,7 @@
                 <div class="container" style="padding: 85px 0 0 0;">
                     <ol>
                         <li><a href="index.php">首頁</a></li>
-                        <li class="current">個人頁面</li>
+                        <li class="current">帳號管理</li>
                     </ol>
                 </div>
             </nav>
@@ -349,7 +349,6 @@
                                 }
                                 ?>
                             <div class='dcard-post'>
-                                <a href='property-single.php?d_id=<?= $row['d_id'] ?>'>
                                     <div class='dcard-header'>
                                         <span class='dcard-tag'>#<?= htmlspecialchars($row['tag']) ?></span>
                                     </div>
@@ -359,11 +358,20 @@
                                     </div>
 
                                     <div class='dcard-footer'>
-                                        <span>👤 聯絡人：<?= htmlspecialchars($contact_name) ?></span>
-                                        <span>📞 電話：<?= htmlspecialchars($contact_phone) ?></span>
-                                        <span>✉️ Email：<?= htmlspecialchars($contact_email) ?></span>
+                                        <div>
+                                            <span>👤 聯絡人：<?= htmlspecialchars($contact_name) ?></span>
+                                            <span>📞 電話：<?= htmlspecialchars($contact_phone) ?></span>
+                                            <span>✉️ Email：<?= htmlspecialchars($contact_email) ?></span>
+                                        </div>
+                                        <div>
+                                            <a href='editpost.php?id=<?= $row['d_id'] ?>' class='btn btn-sm btn-success me-2' style='background-color: #28c76f; border-color: #28c76f;'>
+                                                <i class='bi bi-pencil'></i> 修改
+                                            </a>
+                                            <a href='deletepost.php?id=<?= $row['d_id'] ?>' class='btn btn-sm btn-danger' onclick="return confirm('確定要刪除這篇文章嗎？')">
+                                                <i class='bi bi-trash'></i> 刪除
+                                            </a>
+                                        </div>
                                     </div>
-                                </a>
                             </div>
                             <?php endwhile; ?>
                         </div>
