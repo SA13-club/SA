@@ -284,7 +284,7 @@ WHERE d.tag IS NOT NULL AND d.tag != '' AND d.u_permission != '$u_permission'";
         LEFT JOIN org_donate od ON d.d_id = od.d_id
         LEFT JOIN cor_intern ci ON d.d_id = ci.d_id
         LEFT JOIN cor_spons cs ON d.d_id = cs.d_id
-        WHERE d.u_permission !=?
+        WHERE d.u_permission != ?WHERE d.u_permission !=?
     ";
             }
 
