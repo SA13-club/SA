@@ -129,7 +129,7 @@
     font-size: 14px;
     }
 
-    </style>
+</style>
 
 </head>
 
@@ -460,7 +460,8 @@
                 </div>
 
             </div>
-            <script>
+            
+            <script>   
             function showSection(section) {
             const sections = ['form', 'published', 'projects'];
             sections.forEach(id => {
@@ -485,6 +486,7 @@
             showSection('published');
             });
             </script>
+
         </section>
 
     </main>
