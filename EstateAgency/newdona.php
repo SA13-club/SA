@@ -94,49 +94,53 @@
         <section id="starter-section" class="starter-section section contact section">
 
             <!-- Section Title -->
-           <!-- 你的 HTML -->
-<div class="container section-title" data-aos="fade-up">
-    <h2 class="fancy-heading">發布文章</h2>
-</div>
+            <!-- 你的 HTML -->
+            <div class="container section-title" data-aos="fade-up">
+                <h2 class="fancy-heading">發布文章</h2>
+            </div>
 
-<div class="container" data-aos="fade-up" data-aos-delay="100">
-    <!-- 其他內容 -->
-</div>
+            <div class="container" data-aos="fade-up" data-aos-delay="100">
+                <!-- 其他內容 -->
+            </div>
 
-<!-- 直接寫在這一頁內的 CSS -->
-<style>
-.fancy-heading {
-    font-size: 40px; /* 標題字大一點有氣勢 */
-    font-weight: 600;
-    color: #2F4F4F
-; /* 你的品牌綠色 */
-    letter-spacing: 4px; /* 字距拉開，簡約高級感 */
-    position: relative;
-    display: inline-block;
-    padding-bottom: 10px;
-    overflow: hidden;
-}
+            <!-- 直接寫在這一頁內的 CSS -->
+            <style>
+                .fancy-heading {
+                    font-size: 40px;
+                    /* 標題字大一點有氣勢 */
+                    font-weight: 600;
+                    color: #2F4F4F;
+                    /* 你的品牌綠色 */
+                    letter-spacing: 4px;
+                    /* 字距拉開，簡約高級感 */
+                    position: relative;
+                    display: inline-block;
+                    padding-bottom: 10px;
+                    overflow: hidden;
+                }
 
-.fancy-heading::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    bottom: 0;
-    transform: translateX(-50%) scaleX(0); /* 讓底線從中間展開 */
-    transform-origin: center; /* 讓展開動畫從中間開始 */
-    width: 75%;
-    height: 3px;
-    background-color: #66CDAA;
-    border-radius: 2px;
-    transition: transform 0.4s ease; /* 展開動畫效果 */
-}
+                .fancy-heading::after {
+                    content: '';
+                    position: absolute;
+                    left: 50%;
+                    bottom: 0;
+                    transform: translateX(-50%) scaleX(0);
+                    /* 讓底線從中間展開 */
+                    transform-origin: center;
+                    /* 讓展開動畫從中間開始 */
+                    width: 75%;
+                    height: 3px;
+                    background-color: #66CDAA;
+                    border-radius: 2px;
+                    transition: transform 0.4s ease;
+                    /* 展開動畫效果 */
+                }
 
-.fancy-heading:hover::after {
-    transform: translateX(-50%) scaleX(1); /* hover 時底線從中間展開 */
-}
-
-
-</style>
+                .fancy-heading:hover::after {
+                    transform: translateX(-50%) scaleX(1);
+                    /* hover 時底線從中間展開 */
+                }
+            </style>
 
             <div class="container" data-aos="fade-up" data-aos-delay="100">
                 <div class="col-lg-12">
@@ -536,27 +540,27 @@
 
 
 
-                    <p>三、負責人與聯絡資訊</p>
+                            <p>三、負責人與聯絡資訊</p>
 
-                    <div class="col-md-5">
-                        <input type="text" class="form-control" name="c_name" placeholder="主要聯絡人姓名" required="">
-                    </div>
-                    <div class="col-md-5">
-                        <input type="email" class="form-control" name="c_email" placeholder="聯絡人Email"
-                            required="">
-                    </div>
-                    <div class="col-md-5">
-                        <input type="tel" class="form-control" name="c_phone" placeholder="聯絡人手機號碼" required="">
-                    </div>
-                    <p>四、需求截止日期</p>
-                    <div class="col-md-5">
-                        <input type="date" name="deadline" class="form-control">
-                    </div>
-                    <div class="col-md-12 text-center">
-                        <button type="submit">發布需求</button>
-                    </div>
-                    </div>
-                    </div>
+                            <div class="col-md-5">
+                                <input type="text" class="form-control" name="c_name" placeholder="主要聯絡人姓名" required="">
+                            </div>
+                            <div class="col-md-5">
+                                <input type="email" class="form-control" name="c_email" placeholder="聯絡人Email"
+                                    required="">
+                            </div>
+                            <div class="col-md-5">
+                                <input type="tel" class="form-control" name="c_phone" placeholder="聯絡人手機號碼" required="">
+                            </div>
+                            <p>四、需求截止日期</p>
+                            <div class="col-md-5">
+                                <input type="date" name="deadline" class="form-control">
+                            </div>
+                            <div class="col-md-12 text-center">
+                                <button type="submit">發布需求</button>
+                            </div>
+                        </div>
+                </div>
                 </form>
             </div>
 
@@ -650,103 +654,167 @@
     <script src="assets/js/main.js"></script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-        // 組織團體：需求類型切換
-        const typeSelect = document.getElementById("demandtype");
-        const sponsorSection = document.getElementById("sponsorSection");
-        const cooperationSection = document.getElementById("cooperationSection");
-        const coopTargetSection = document.getElementById("coopTargetSection");
+        document.addEventListener("DOMContentLoaded", function() {
+            // 組織團體：需求類型切換
+            const typeSelect = document.getElementById("demandtype");
+            const sponsorSection = document.getElementById("sponsorSection");
+            const cooperationSection = document.getElementById("cooperationSection");
+            const coopTargetSection = document.getElementById("coopTargetSection");
 
-        const coopTarget = document.getElementById("coop_target");
-        const groupCoopSection = document.getElementById("groupCoopSection");
-        const companyCoopSection = document.getElementById("companyCoopSection");
+            const coopTarget = document.getElementById("coop_target");
+            const groupCoopSection = document.getElementById("groupCoopSection");
+            const companyCoopSection = document.getElementById("companyCoopSection");
 
-        if (typeSelect) {
-            typeSelect.addEventListener("change", function () {
-                const value = this.value;
+            if (typeSelect) {
+                typeSelect.addEventListener("change", function() {
+                    const value = this.value;
 
-                // 隱藏所有主區塊
-                if (sponsorSection) sponsorSection.style.display = "none";
-                if (cooperationSection) cooperationSection.style.display = "none";
-                if (coopTargetSection) coopTargetSection.style.display = "none";
-                if (groupCoopSection) groupCoopSection.style.display = "none";
-                if (companyCoopSection) companyCoopSection.style.display = "none";
+                    // 隱藏所有主區塊
+                    if (sponsorSection) sponsorSection.style.display = "none";
+                    if (cooperationSection) cooperationSection.style.display = "none";
+                    if (coopTargetSection) coopTargetSection.style.display = "none";
+                    if (groupCoopSection) groupCoopSection.style.display = "none";
+                    if (companyCoopSection) companyCoopSection.style.display = "none";
 
-                // 顯示對應主區塊
-                if (value === "spon" && sponsorSection) {
-                    sponsorSection.style.display = "block";
-                } else if (value === "合作") {
-                    if (cooperationSection) cooperationSection.style.display = "block";
-                    if (coopTargetSection) coopTargetSection.style.display = "block";
-                }
-            });
-        }
+                    // 顯示對應主區塊
+                    if (value === "spon" && sponsorSection) {
+                        sponsorSection.style.display = "block";
+                    } else if (value === "合作") {
+                        if (cooperationSection) cooperationSection.style.display = "block";
+                        if (coopTargetSection) coopTargetSection.style.display = "block";
+                    }
+                });
+            }
 
-        // 合作對象切換（顯示不同細節）
-        if (coopTarget) {
-            coopTarget.addEventListener("change", function () {
-                const value = this.value;
+            // 合作對象切換（顯示不同細節）
+            if (coopTarget) {
+                coopTarget.addEventListener("change", function() {
+                    const value = this.value;
 
-                if (groupCoopSection) groupCoopSection.style.display = "none";
-                if (companyCoopSection) companyCoopSection.style.display = "none";
+                    if (groupCoopSection) groupCoopSection.style.display = "none";
+                    if (companyCoopSection) companyCoopSection.style.display = "none";
 
-                if (value === "group" && groupCoopSection) {
-                    groupCoopSection.style.display = "block";
-                } else if (value === "company" && companyCoopSection) {
-                    companyCoopSection.style.display = "block";
-                }
-            });
-        }
+                    if (value === "group" && groupCoopSection) {
+                        groupCoopSection.style.display = "block";
+                    } else if (value === "company" && companyCoopSection) {
+                        companyCoopSection.style.display = "block";
+                    }
+                });
+            }
 
-        // 贊助方式切換
-        const sponsor_method = document.getElementById("sponsor_method");
-        const sponsor_amount = document.getElementById("sponsor_amount");
-        const productdona = document.getElementById("productdona");
+            // 贊助方式切換
+            const sponsor_method = document.getElementById("sponsor_method");
+            const sponsor_amount = document.getElementById("sponsor_amount");
+            const productdona = document.getElementById("productdona");
 
-        if (sponsor_method) {
-            sponsor_method.addEventListener("change", function () {
-                const value = this.value;
+            if (sponsor_method) {
+                sponsor_method.addEventListener("change", function() {
+                    const value = this.value;
 
-                if (sponsor_amount) sponsor_amount.style.display = "none";
-                if (productdona) productdona.style.display = "none";
+                    if (sponsor_amount) sponsor_amount.style.display = "none";
+                    if (productdona) productdona.style.display = "none";
 
-                if (value === "money" && sponsor_amount) {
-                    sponsor_amount.style.display = "block";
-                } else if (value === "product" && productdona) {
-                    productdona.style.display = "block";
-                }
-            });
-        }
+                    if (value === "money" && sponsor_amount) {
+                        sponsor_amount.style.display = "block";
+                    } else if (value === "product" && productdona) {
+                        productdona.style.display = "block";
+                    }
+                });
+            }
 
-        // 行政區選單
+            const coop_type = document.getElementById("coop_type");
+            const union_club = document.getElementById("union_club");
+            const speecher_find = document.getElementById("speecher_find");
+            
+
+
+
+            if (coop_type) {
+                coop_type.addEventListener("change", function() {
+                    const value = this.value;
+
+                    // 隱藏所有區塊
+                    if (union_club) union_club.style.display = "none";
+                    if (speecher_find) speecher_find.style.display = "none";
+
+                    // 顯示對應的區塊
+                    if (value === "union_club" && union_club) {
+                        union_club.style.display = "block";
+                    } else if (value === "speecher" && speecher_find) {
+                        speecher_find.style.display = "block";
+                    }
+                });
+            }
+
+
+
+
+
+
+
+
+            // 企業相關
+            const typeSelect2 = document.getElementById("demandtype2");
+            const sponsorSection2 = document.getElementById("sponsorSection2");
+            const internsection = document.getElementById("internsection");
+
+            if (typeSelect2) {
+                typeSelect2.addEventListener("change", function() {
+                    const value = this.value;
+                    if (sponsorSection2) sponsorSection2.style.display = "none";
+                    if (internsection) internsection.style.display = "none";
+
+                    if (value === "贊助" && sponsorSection2) {
+                        sponsorSection2.style.display = "block";
+                    } else if (value === "實習" && internsection) {
+                        internsection.style.display = "block";
+                    }
+                });
+            }
+
+            const sponsor_method2 = document.getElementById("sponsor_method2");
+            const sponsor_amount2 = document.getElementById("sponsor_amount2");
+            const productdona2 = document.getElementById("productdona2");
+
+            if (sponsor_method2) {
+                sponsor_method2.addEventListener("change", function() {
+                    const value = this.value;
+                    if (sponsor_amount2) sponsor_amount2.style.display = "none";
+                    if (productdona2) productdona2.style.display = "none";
+
+                    if (value === "money" && sponsor_amount2) {
+                        sponsor_amount2.style.display = "block";
+                    } else if (value === "product" && productdona2) {
+                        productdona2.style.display = "block";
+                    }
+                });
+            }
+        });
+        //行政區
         const districtData = {
             "台北市": ["中正區", "大同區", "中山區", "松山區", "大安區", "萬華區", "信義區", "士林區", "北投區", "內湖區", "南港區", "文山區"],
             "新北市": ["板橋區", "新莊區", "中和區", "永和區", "土城區", "樹林區", "三重區", "新店區", "蘆洲區", "汐止區", "淡水區", "三峽區", "鶯歌區", "瑞芳區", "五股區", "泰山區", "林口區", "深坑區", "石碇區", "坪林區", "三芝區", "石門區", "八里區", "平溪區", "雙溪區", "貢寮區", "金山區", "萬里區", "烏來區"],
             "桃園市": ["桃園區", "中壢區", "平鎮區", "八德區", "楊梅區", "蘆竹區", "大溪區", "龍潭區", "龜山區", "大園區", "觀音區", "新屋區", "復興區"],
-            "台中市": ["中區", "東區", "南區", "西區", "北區", "北屯區", "西屯區", "南屯區", "太平區", "大里區", "霧峰區", "烏日區", "豐原區", "后里區", "石岡區", "東勢區", "和平區", "新社區", "潭子區", "大雅區", "神岡區", "大肚區", "沙鹿區", "龍井區", "梧棲區", "清水區", "大甲區", "外埔區", "大安區"]
+            "台中市": ["中區", "東區", "南區", "西區", "北區", "北屯區", "西屯區", "南屯區", "太平區", "大里區", "霧峰區", "烏日區", "豐原區", "后里區", "石岡區", "東勢區", "和平區", "新社區", "潭子區", "大雅區", "神岡區", "大肚區", "沙鹿區", "龍井區", "梧棲區", "清水區", "大甲區", "外埔區", "大安區"],
+            // 可以繼續補齊其他縣市喔
         };
 
-        const citySelect = document.getElementById("city");
-        const districtSelect = document.getElementById("district");
+        document.getElementById('city').addEventListener('change', function() {
+            const city = this.value;
+            const districtSelect = document.getElementById('district');
 
-        if (citySelect && districtSelect) {
-            citySelect.addEventListener("change", function () {
-                const city = this.value;
+            // 清空原本的行政區選項
+            districtSelect.innerHTML = '<option selected disabled value="">選擇行政區</option>';
 
-                districtSelect.innerHTML = '<option selected disabled value="">選擇行政區</option>';
-
-                if (districtData[city]) {
-                    districtData[city].forEach(function (district) {
-                        const option = document.createElement("option");
-                        option.value = district;
-                        option.textContent = district;
-                        districtSelect.appendChild(option);
-                    });
-                }
-            });
-        }
-    });
-
+            if (districtData[city]) {
+                districtData[city].forEach(function(district) {
+                    const option = document.createElement('option');
+                    option.value = district;
+                    option.textContent = district;
+                    districtSelect.appendChild(option);
+                });
+            }
+        });
     </script>
 
 
