@@ -59,37 +59,118 @@ if ($u_permission == '組織團體') {
         } else {
             die("插入 org_donate 失敗: " . mysqli_error($conn));
         }
-    } elseif ($tag === '合作') {
-        // 處理合作
-        $coop_name = isset($_POST['coopname']) ? $_POST['coopname'] : NULL;
-        $coop_description = isset($_POST['coopdesc']) ? $_POST['coopdesc'] : NULL;
-        $coop_type = isset($_POST['coop_type']) ? $_POST['coop_type'] : NULL;
-        $coop_start = isset($_POST['coopstart']) ? $_POST['coopstart'] : NULL;
-        $coop_end = isset($_POST['coopend']) ? $_POST['coopend'] : NULL;
-
-        $coop_benefit = isset($_POST['benefit']) ? json_encode($_POST['benefit'], JSON_UNESCAPED_UNICODE) : NULL;
-
-        $coop_name_sql = ($coop_name !== NULL) ? "'$coop_name'" : "NULL";
-        $coop_description_sql = ($coop_description !== NULL) ? "'$coop_description'" : "NULL";
-        $coop_type_sql = ($coop_type !== NULL) ? "'$coop_type'" : "NULL";
-        $coop_benefit_sql = ($coop_benefit !== NULL) ? "'$coop_benefit'" : "NULL";
-        $coop_start_sql = ($coop_start !== NULL) ? "'$coop_start'" : "NULL";
-        $coop_end_sql = ($coop_end !== NULL) ? "'$coop_end'" : "NULL";
-
-        $sql2 = "INSERT INTO org_coop
-        (d_id, coop_name, coop_description, coop_type, coop_benefit, coop_start, coop_end,c_email,c_phone,c_name,deadline)
-        VALUES 
-        ('$d_id', $coop_name_sql, $coop_description_sql, $coop_type_sql, $coop_benefit_sql, $coop_start_sql, $coop_end_sql,'$c_email','$c_phone','$c_name','$deadline')";
-
-        if (mysqli_query($conn, $sql2)) {
-            echo "<h1 align='center'>合作資料新增完成！</h1>";
-        } else {
-            die("插入 org_coop 失敗: " . mysqli_error($conn));
+    } 
+            elseif ($tag === '合作') {
+                // 1. 先抓出 coop_target（group 或 company）
+                $coop_target = $_POST['coop_target'] ?? '';
+        
+                // 如果是「社團」合作
+                if ($coop_target === 'group') {
+                    // 基本欄位
+                    $coop_type     = $_POST['coop_type']    ?? '';
+                    $coop_name     = $_POST['coop_name']     ?? '';
+                    $coop_desc     = $_POST['coop_desc']     ?? '';
+                    $recruit_city  = $_POST['recruit_city'] ?? '';
+                    $recruit_district = $_POST['recruit_district'] ?? '';
+                    // 前端 textarea name="未設定"，這裡要對應一下，如果你改了 name，這裡也要同步：
+                    $recruit_address = $_POST['recruit_address']     ?? '';
+        
+                    // 多選「合作預期效益」
+                    $benefits = $_POST['benefit'] ?? [];
+                    $benefits_json = !empty($benefits)
+                        ? "'" . json_encode($benefits, JSON_UNESCAPED_UNICODE) . "'"
+                        : "NULL";
+        
+                    // 合作期間
+                    $coop_start = $_POST['coop_start'] ?? '';
+                    $coop_end   = $_POST['coop_end']   ?? '';
+        
+                    // 組 SQL（請改用 Prepared Statement 會更安全，以下範例簡化版）
+                    $sql = "
+                        INSERT INTO club_coop
+                        (d_id, coop_type, coop_name, coop_desc, benefit, city, district, address, coop_start, coop_end, c_email, c_phone, c_name, deadline)
+                        VALUES
+                        (
+                          '$d_id',
+                          '$coop_type',
+                          '$coop_name',
+                          '$coop_desc',
+                          $benefits_json,
+                          '$recruit_city',
+                          '$recruit_district',
+                          '$recruit_address',
+                          '$coop_start',
+                          '$coop_end',
+                          '$c_email',
+                          '$c_phone',
+                          '$c_name',
+                          '$deadline'
+                        )
+                    ";
+        
+                    if (mysqli_query($conn, $sql)) {
+                        echo "<h1 align='center'>社團合作資料新增完成！</h1>";
+                    } else {
+                        die("插入 cor_intern 失敗: " . mysqli_error($conn));
+                    }
+        
+                }
+                // 如果是「企業」合作
+                elseif ($coop_target === 'company') {
+                    // 基本欄位
+                    $coop_type = $_POST['coop_type'] ?? '';
+                    $coop_name = $_POST['coopname']   ?? '';
+                    $coop_desc = $_POST['coopdesc']   ?? '';
+        
+                    // 多選「合作預期效益」
+                    $benefits = $_POST['benefit'] ?? [];
+                    $benefits_json = !empty($benefits)
+                        ? "'" . json_encode($benefits, JSON_UNESCAPED_UNICODE) . "'"
+                        : "NULL";
+        
+                    // 合作期間
+                    $coop_start = $_POST['coopstart'] ?? '';
+                    $coop_end   = $_POST['coopend']   ?? '';
+        
+                    // 組 SQL
+                    $sql = "
+                        INSERT INTO corp_coop
+                        (d_id, coop_type, coop_name, coop_desc, benefit, coop_start, coop_end, c_email, c_phone, c_name, deadline)
+                        VALUES
+                        (
+                          '$d_id',
+                          '$coop_type',
+                          '$coop_name',
+                          '$coop_desc',
+                          $benefits_json,
+                          '$coop_start',
+                          '$coop_end',
+                          '$c_email',
+                          '$c_phone',
+                          '$c_name',
+                          '$deadline'
+                        )
+                    ";
+        
+                    if (mysqli_query($conn, $sql)) {
+                        echo "<h1 align='center'>企業合作資料新增完成！</h1>";
+                    } else {
+                        die("插入 org_coop 失敗: " . mysqli_error($conn));
+                    }
+                }
+                // 其他 coop_target
+                else {
+                    die('未選擇合作對象');
+                }
+            }
+            else {
+                echo "<h1 align='center'>未知的提交類型</h1>";
+            }
         }
-    } else {
-        echo "<h1 align='center'>未知的提交類型</h1>";
-    }
-} elseif ($u_permission == '企業') {
+        
+        
+        
+     elseif ($u_permission == '企業') {
     // 處理企業四種：spon / 合作 / 招募 / 實習
     if ($tag === '贊助') {
         // 處理企業贊助 org_sponsorship
