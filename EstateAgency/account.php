@@ -403,8 +403,8 @@
                                 ?>
                                 <div class='dcard-post'>
                                     <div class='dcard-header'>
-                                        <?php if($row['tag']=='spon'){
-                                            $row['tag']='贊助';
+                                        <?php if ($row['tag'] == 'spon') {
+                                            $row['tag'] = '贊助';
                                         } ?>
                                         <span class='dcard-tag'>#<?= htmlspecialchars($row['tag']) ?></span>
                                     </div>
@@ -505,6 +505,7 @@
                         <div id="projects-section" class="section-content" style="display: none;">
                             <div class='dcard-post'>
                                 <a href='project-detail.php'>
+<<<<<<< HEAD
                                     
                                     <div class='dcard-body'>
                                         <?php 
@@ -633,6 +634,13 @@
 
 
                                     </div>
+=======
+                                    <div class='dcard-header'><span class='dcard-tag'>#合作專案</span></div>
+                                    <div class='dcard-body'>這是合作專案卡片</div>
+                                    <a href='.php?id=<?= $row['d_id'] ?>' class='btn btn-sm btn-success me-2' style='background-color: #28c76f; border-color: #28c76f;'>
+                                        <i class='bi bi-pencil'></i> 回饋
+                                    </a>
+>>>>>>> 7c525d56e97ecf28b9dd29fc482fbb3e33d5dd57
                                 </a>
                             </div>
                         </div>
