@@ -238,7 +238,7 @@ WHERE d.tag IS NOT NULL AND d.tag != '' AND d.u_permission != '$u_permission'";
               </div>
             </div>
             <?php
-       
+
             $u_permission = $_SESSION['u_permission'];
             $link = mysqli_connect('localhost', 'root', '', 'sa');
 
@@ -251,29 +251,37 @@ WHERE d.tag IS NOT NULL AND d.tag != '' AND d.u_permission != '$u_permission'";
             // 根據權限組織不同的 SQL
             if ($u_permission == '組織團體') {
               $sql = "
-        SELECT 
-            d.*, 
-            ci.c_name AS intern_c_name, ci.c_phone AS intern_c_phone, ci.c_email AS intern_c_email, ci.title AS intern_title,
-            cs.c_name AS spons_c_name, cs.c_phone AS spons_c_phone, cs.c_email AS spons_c_email, cs.title AS spons_title
-        FROM demanded d
-        LEFT JOIN cor_intern ci ON d.d_id = ci.d_id
-        LEFT JOIN cor_spons cs ON d.d_id = cs.d_id
-        WHERE d.u_permission != ?
-    ";
+    SELECT 
+        d.*, 
+        ci.c_name AS intern_c_name, ci.c_phone AS intern_c_phone, ci.c_email AS intern_c_email, ci.title AS intern_title,
+        cs.c_name AS spons_c_name, cs.c_phone AS spons_c_phone, cs.c_email AS spons_c_email, cs.title AS spons_title,
+        COALESCE(clc.c_name) AS coop_c_name,
+        COALESCE(clc.c_phone) AS coop_c_phone,
+        COALESCE(clc.c_email) AS coop_c_email,
+        COALESCE(clc.coop_name) AS coop_title
+    FROM demanded d
+    LEFT JOIN cor_intern ci ON d.d_id = ci.d_id
+    LEFT JOIN cor_spons cs ON d.d_id = cs.d_id
+    LEFT JOIN club_coop clc ON d.d_id = clc.d_id
+    WHERE 
+        (d.u_permission = '企業' AND (ci.d_id IS NOT NULL OR cs.d_id IS NOT NULL))
+        OR 
+        (d.u_permission = '組織團體' AND clc.d_id IS NOT NULL)
+";
+
+
             } elseif ($u_permission == '企業') {
               $sql = "
     SELECT 
         d.*, 
         od.c_name AS donate_c_name, od.c_phone AS donate_c_phone, od.c_email AS donate_c_email, od.title AS donate_title,
-        COALESCE(oc.c_name, cc.c_name, clc.c_name) AS coop_c_name,
-        COALESCE(oc.c_phone, cc.c_phone, clc.c_phone) AS coop_c_phone,
-        COALESCE(oc.c_email, cc.c_email, clc.c_email) AS coop_c_email,
-        COALESCE(oc.title, cc.coop_name, clc.coop_name) AS coop_title
+        COALESCE(cc.c_name) AS coop_c_name,
+        COALESCE(cc.c_phone) AS coop_c_phone,
+        COALESCE(cc.c_email) AS coop_c_email,
+        COALESCE(cc.coop_name) AS coop_title
     FROM demanded d
-    LEFT JOIN org_coop oc ON d.d_id = oc.d_id
     LEFT JOIN org_donate od ON d.d_id = od.d_id
     LEFT JOIN corp_coop cc ON d.d_id = cc.d_id
-    LEFT JOIN club_coop clc ON d.d_id = clc.d_id
     WHERE d.u_permission != ?
 ";
             } else {
@@ -283,12 +291,11 @@ WHERE d.tag IS NOT NULL AND d.tag != '' AND d.u_permission != '$u_permission'";
         ci.c_name AS intern_c_name, ci.c_phone AS intern_c_phone, ci.c_email AS intern_c_email, ci.title AS intern_title,
         cs.c_name AS spons_c_name, cs.c_phone AS spons_c_phone, cs.c_email AS spons_c_email, cs.title AS spons_title,
         od.c_name AS donate_c_name, od.c_phone AS donate_c_phone, od.c_email AS donate_c_email, od.title AS donate_title,
-        COALESCE(oc.c_name, cc.c_name, clc.c_name) AS coop_c_name,
-        COALESCE(oc.c_phone, cc.c_phone, clc.c_phone) AS coop_c_phone,
-        COALESCE(oc.c_email, cc.c_email, clc.c_email) AS coop_c_email,
-        COALESCE(oc.title, cc.coop_name, clc.coop_name) AS coop_title
+        COALESCE(cc.c_name, clc.c_name) AS coop_c_name,
+        COALESCE(cc.c_phone, clc.c_phone) AS coop_c_phone,
+        COALESCE(cc.c_email, clc.c_email) AS coop_c_email,
+        COALESCE(cc.coop_name, clc.coop_name) AS coop_title
     FROM demanded d
-    LEFT JOIN org_coop oc ON d.d_id = oc.d_id
     LEFT JOIN corp_coop cc ON d.d_id = cc.d_id
     LEFT JOIN club_coop clc ON d.d_id = clc.d_id
     LEFT JOIN org_donate od ON d.d_id = od.d_id
@@ -296,7 +303,6 @@ WHERE d.tag IS NOT NULL AND d.tag != '' AND d.u_permission != '$u_permission'";
     LEFT JOIN cor_spons cs ON d.d_id = cs.d_id
     WHERE d.u_permission != ?
 ";
-
             }
 
             // 使用 prepared statement，防止 SQL injection
@@ -307,10 +313,14 @@ WHERE d.tag IS NOT NULL AND d.tag != '' AND d.u_permission != '$u_permission'";
 
             // 取出所有資料
             while ($row = mysqli_fetch_assoc($result)) {
+              if ($u_permission == '企業' && $row['tag'] == '合作' && $row['coop_c_name'] == null) {
+                continue; // 這是合作文章，但不是 corp_coop 來的，就略過
+              }
               $tag = $row['tag'];
               if ($tag == 'spon') {
                 $tag = '贊助';
               }
+
               echo "
               <div class='dcard-post' data-category='{$tag}'>
                   <a href='property-single.php?id={$row['d_id']}'>
@@ -320,97 +330,44 @@ WHERE d.tag IS NOT NULL AND d.tag != '' AND d.u_permission != '$u_permission'";
                       <div class='dcard-body'>
               ";
 
-              // 【新增】主標題
+              // 主標題處理
               switch ($row['tag']) {
                 case '合作':
                   $title = $row['coop_title'];
                   echo "<p><strong>✏️ 合作標題：</strong> " . (!empty($title) ? htmlspecialchars($title) : '無標題') . "</p>";
                   break;
-
                 case '贊助':
                   $title = $row['spons_title'];
                   echo "<p><strong>✏️ 活動標題：</strong> " . (!empty($title) ? htmlspecialchars($title) : '無標題') . "</p>";
                   break;
-
                 case '實習':
                   $title = $row['intern_title'];
                   echo "<p><strong>✏️ 職缺標題：</strong> " . (!empty($title) ? htmlspecialchars($title) : '無標題') . "</p>";
                   break;
-
                 case 'spon':
                   $title = $row['donate_title'];
                   echo "<p><strong>✏️ 活動標題：</strong> " . (!empty($title) ? htmlspecialchars($title) : '無標題') . "</p>";
                   break;
-
                 default:
+                  $title = $row['coop_title'] ?? $row['spons_title'] ?? $row['intern_title'] ?? $row['donate_title'] ?? null;
                   echo "<p><strong>✏️ 標題：</strong> " . (!empty($title) ? htmlspecialchars($title) : '無標題') . "</p>";
                   break;
               }
 
+              // 聯絡人資訊顯示（先定義）
+              $contact_name = $row['intern_c_name'] ?? $row['spons_c_name'] ?? $row['donate_c_name'] ?? $row['coop_c_name'] ?? null;
+              $contact_phone = $row['intern_c_phone'] ?? $row['spons_c_phone'] ?? $row['donate_c_phone'] ?? $row['coop_c_phone'] ?? null;
+              $contact_email = $row['intern_c_email'] ?? $row['spons_c_email'] ?? $row['donate_c_email'] ?? $row['coop_c_email'] ?? null;
 
               echo "<div class='dcard-footer'>";
-
-              // 聯絡資訊
-              if ($u_permission == '組織團體') {
-                if (!empty($row['intern_c_name'])) {
-                  echo "
-                          <span>👤 聯絡人：{$row['intern_c_name']}</span>
-                          <span>📞 電話：{$row['intern_c_phone']}</span>
-                          <span>✉️ Email：{$row['intern_c_email']}</span>
-                      ";
-                } elseif (!empty($row['spons_c_name'])) {
-                  echo "
-                          <span>👤 聯絡人：{$row['spons_c_name']}</span>
-                          <span>📞 電話：{$row['spons_c_phone']}</span>
-                          <span>✉️ Email：{$row['spons_c_email']}</span>
-                      ";
-                } else {
-                  echo "<span>尚無聯絡資料</span>";
-                }
-              } elseif ($u_permission == '企業') {
-                if (!empty($row['donate_c_name'])) {
-                  echo "
-                          <span>👤 聯絡人：{$row['donate_c_name']}</span>
-                          <span>📞 電話：{$row['donate_c_phone']}</span>
-                          <span>✉️ Email：{$row['donate_c_email']}</span>
-                      ";
-                } elseif (!empty($row['coop_c_name'])) {
-                  echo "
-                          <span>👤 聯絡人：{$row['coop_c_name']}</span>
-                          <span>📞 電話：{$row['coop_c_phone']}</span>
-                          <span>✉️ Email：{$row['coop_c_email']}</span>
-                      ";
-                } else {
-                  echo "<span>尚無聯絡資料</span>";
-                }
+              if ($contact_name) {
+                echo "
+                      <span>👤 聯絡人：{$contact_name}</span>
+                      <span>📞 電話：{$contact_phone}</span>
+                      <span>✉️ Email：{$contact_email}</span>
+                  ";
               } else {
-                if (!empty($row['intern_c_name'])) {
-                  echo "
-                          <span>👤 聯絡人：{$row['intern_c_name']}</span>
-                          <span>📞 電話：{$row['intern_c_phone']}</span>
-                          <span>✉️ Email：{$row['intern_c_email']}</span>
-                      ";
-                } elseif (!empty($row['spons_c_name'])) {
-                  echo "
-                          <span>👤 聯絡人：{$row['spons_c_name']}</span>
-                          <span>📞 電話：{$row['spons_c_phone']}</span>
-                          <span>✉️ Email：{$row['spons_c_email']}</span>
-                      ";
-                } elseif (!empty($row['donate_c_name'])) {
-                  echo "
-                          <span>👤 聯絡人：{$row['donate_c_name']}</span>
-                          <span>📞 電話：{$row['donate_c_phone']}</span>
-                          <span>✉️ Email：{$row['donate_c_email']}</span>
-                      ";
-                } elseif (!empty($row['coop_c_name'])) {
-                  echo "
-                          <span>👤 聯絡人：{$row['coop_c_name']}</span>
-                          <span>📞 電話：{$row['coop_c_phone']}</span>
-                          <span>✉️ Email：{$row['coop_c_email']}</span>
-                      ";
-                } else {
-                  echo "<span>尚無聯絡資料</span>";
-                }
+                echo "<span>尚無聯絡資料</span>";
               }
 
               echo "
@@ -420,6 +377,7 @@ WHERE d.tag IS NOT NULL AND d.tag != '' AND d.u_permission != '$u_permission'";
               </div>
               ";
             }
+
 
             ?>
 

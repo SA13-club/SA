@@ -75,6 +75,7 @@
   </header>
 
   <main class="main">
+    <h1>1234568456</h1>
     <div class="modal fade" id="SignInPermission" tabindex="-1" aria-labelledby="SignInPermissionLabel"
       aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
@@ -124,6 +125,10 @@
 
             <div class="portfolio-description">
               <?php
+              ini_set('display_errors', 1);
+              ini_set('display_startup_errors', 1);
+              error_reporting(E_ALL);
+
               $link = mysqli_connect('localhost', 'root', '', 'sa');
 
               $d_id = $_GET['id'];
@@ -140,22 +145,57 @@
               $tag = $tag_row['tag'];
 
               // 根據 tag 決定查哪張表
+              // 根據 tag 和 demanded 的 u_permission 判斷 table 來源
+              $table = '';
+              $title_key = 'title'; // 預設
+
+              $sql_demand = "SELECT tag, u_permission FROM demanded WHERE d_id = '$d_id'";
+              $demand_result = mysqli_query($link, $sql_demand);
+              $demand = mysqli_fetch_assoc($demand_result);
+
+              if (!$demand) {
+                die('錯誤：無此文章');
+              }
+
+              $tag = $demand['tag'];
+              $permission = $demand['u_permission'];
+
               switch ($tag) {
                 case '合作':
-                  $table = 'org_coop';
-                  break;
+                  $title_key = 'coop_name';
+                  // 檢查 corp_coop 是否有資料
+                  $check_sql = "SELECT 1 FROM corp_coop WHERE d_id = '$d_id'";
+                  $check_result = mysqli_query($link, $check_sql);
+                  if ($check_result && mysqli_num_rows($check_result) > 0) {
+                    $table = 'corp_coop';
+                    break;
+                  }
+
+                  // 檢查 club_coop 是否有資料
+                  $check_sql = "SELECT 1 FROM club_coop WHERE d_id = '$d_id'";
+                  $check_result = mysqli_query($link, $check_sql);
+                  if ($check_result && mysqli_num_rows($check_result) > 0) {
+                    $table = 'club_coop';
+                    break;
+                  }
+
+                  die('錯誤：找不到合作內容');
                 case 'spon':
                   $table = 'org_donate';
-                  break;
-                case '招募':
-                  $table = 'cor_intern';
+                  $title_key = 'title';
                   break;
                 case '贊助':
                   $table = 'cor_spons';
+                  $title_key = 'title';
+                  break;
+                case '招募':
+                  $table = 'cor_intern';
+                  $title_key = 'intern_title';
                   break;
                 default:
                   die('錯誤：未知的標籤類型！');
               }
+
 
               // 查真正的內容
               $content_sql = "SELECT * FROM $table WHERE d_id='$d_id'";
@@ -184,7 +224,7 @@
               echo "
 <div class='dcard-post' style='border:1px solid #ccc; border-radius:10px; padding:20px; margin:20px 0; background:#f9f9f9;'>
   <div class='dcard-header' style='margin-bottom:20px;'>
-    <h2 style='margin:0; font-size:26px;'>✏️ " . htmlspecialchars($content_row['title'] ?? '無標題') . "</h2>
+    <h2 style='margin:0; font-size:26px;'>✏️ " . htmlspecialchars($content_row[$title_key] ?? '無標題') . "</h2>
   </div>
   <div class='dcard-body' style='font-size:16px; line-height:1.8;'>
     <p></p>
