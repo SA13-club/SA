@@ -505,8 +505,134 @@
                         <div id="projects-section" class="section-content" style="display: none;">
                             <div class='dcard-post'>
                                 <a href='project-detail.php'>
-                                    <div class='dcard-header'><span class='dcard-tag'>#合作專案</span></div>
-                                    <div class='dcard-body'>這是合作專案卡片</div>
+                                    
+                                    <div class='dcard-body'>
+                                        <?php 
+                                         $servername = "localhost";
+                                         $username = "root";
+                                         $password = "";
+                                         $dbname = "sa";
+                                 
+                                         $conn = new mysqli($servername, $username, $password, $dbname);
+                                 
+                                      
+                                       
+                                            // …（前面連線程式不變）…
+
+                                            $account_mail = $_SESSION['u_email'];
+
+                                         
+                                                
+
+                                                // 假設前面已經建立好 $conn 與取得 $account_mail
+
+                                                // 1. 撈出 a_u_email 或 b_u_email 等於使用者的所有紀錄
+                                                $sql  = "SELECT * FROM match_db 
+                                                        WHERE a_u_email = ? OR b_u_email = ?";
+                                                $stmt = $conn->prepare($sql);
+                                                $stmt->bind_param("ss", $account_mail, $account_mail);
+                                                $stmt->execute();
+                                                $result = $stmt->get_result();
+
+                                                // 2. 分區
+                                                $pendingAgree = [];   // agree = 0
+                                                $negotiation  = [];   // agree = 1, draft = 0
+                                                $completed    = [];   // agree = 1, draft = 1
+
+                                                while ($row = $result->fetch_assoc()) {
+                                                    // 動態決定「合作夥伴」是哪個欄位
+                                                    if ($row['a_u_email'] === $account_mail) {
+                                                        $partner = $row['b_u_email'];
+                                                    } else {
+                                                        $partner = $row['a_u_email'];
+                                                    }
+                                                    $row['partner'] = $partner;
+
+                                                    if ($row['agree'] == 0) {
+                                                        $pendingAgree[] = $row;
+                                                    }
+                                                    elseif ($row['agree'] == 1 && $row['draft'] == 0) {
+                                                        $negotiation[] = $row;
+                                                    }
+                                                    elseif ($row['agree'] == 1 && $row['draft'] == 1) {
+                                                        $completed[] = $row;
+                                                    }
+                                                }
+
+                                                // 3. 輸出「同意申請」
+                                                if (!empty($pendingAgree)) {
+                                                    echo "<h3>同意申請</h3>";
+                                                    foreach ($pendingAgree as $r) {
+                                                        echo "
+                                                        <div class='dcard-post'>
+                                                        <div class='dcard-header'>
+                                                            <span class='dcard-tag'>#合作專案</span>
+                                                        </div>
+                                                        <div class='dcard-body'>
+                                                            <p><strong>合作夥伴：</strong>{$r['partner']}</p>
+                                                            <p><strong>專案名稱：</strong></p>
+                                                            <p><strong>開始日期：</strong></p>
+                                                            <p><strong>狀態：</strong>等待同意</p>
+                                                        </div>
+                                                        </div>
+                                                        ";
+                                                    }
+                                                }
+
+                                                // 4. 輸出「洽談中」
+                                                if (!empty($negotiation)) {
+                                                    echo "<h3>洽談中</h3>";
+                                                    foreach ($negotiation as $r) {
+                                                        echo "
+                                                        <div class='dcard-post'>
+                                                        <div class='dcard-header'>
+                                                            <span class='dcard-tag'>#合作專案</span>
+                                                        </div>
+                                                        <div class='dcard-body'>
+                                                            <p><strong>合作夥伴：</strong>{$r['partner']}</p>
+                                                            <p><strong>專案名稱：</strong></p>
+                                                            <p><strong>開始日期：</strong></p>
+                                                            <p><strong>狀態：</strong>洽談中</p>
+                                                        </div>
+                                                        </div>
+                                                        ";
+                                                    }
+                                                }
+
+                                                // 5. 輸出「已完成合作」
+                                                if (!empty($completed)) {
+                                                    echo "<h3>已完成合作</h3>";
+                                                    foreach ($completed as $r) {
+                                                        echo "
+                                                        <div class='dcard-post'>
+                                                        <div class='dcard-header'>
+                                                            <span class='dcard-tag'>#合作專案</span>
+                                                        </div>
+                                                        <div class='dcard-body'>
+                                                            <p><strong>合作夥伴：</strong>{$r['partner']}</p>
+                                                            <p><strong>專案名稱：</strong></p>
+                                                            <p><strong>開始日期：</strong></p>
+                                                            <p><strong>狀態：</strong>已完成</p>
+                                                        </div>
+                                                        </div>
+                                                        ";
+                                                    }
+                                                }
+
+                                                $stmt->close();
+                                                ?>
+
+
+                                     
+                                    </div>
+                                        
+
+
+
+
+
+
+                                    </div>
                                 </a>
                             </div>
                         </div>

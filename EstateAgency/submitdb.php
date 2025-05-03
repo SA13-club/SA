@@ -17,14 +17,14 @@ if (!$sender_email || !$d_id) {
 }
 
 // 找 tag
-$sql_findtag = "SELECT tag FROM demanded WHERE d_id='$d_id'";
+$sql_findtag = "SELECT tag ,u_email FROM demanded WHERE d_id='$d_id'";
 $tag_result = mysqli_query($link, $sql_findtag);
 $tag_row = mysqli_fetch_assoc($tag_result);
 
 if (!$tag_row) {
     die('錯誤：找不到這個需求！');
 }
-
+$cop_b=$tag_row['u_email'];
 $tag = $tag_row['tag'];
 
 // 根據 tag 決定查哪張表
@@ -85,6 +85,20 @@ try {
 } catch (Exception $e) {
     echo "❌ Email 發送失敗，錯誤訊息：{$mail->ErrorInfo}<br>";
 }
+
+
+
+$corp_sql="INSERT INTO match_db(a_u_email,b_u_email,agree,draft,finish,d_id) VALUES('$sender_email','$cop_b','0','0','0','$d_id')";
+
+mysqli_query($link, $corp_sql);
+
+
+
+
+
+
+
+
 
 // ✅ 寫入通知資料表
 $notify_stmt = $link->prepare("INSERT INTO notifications (receiver_email, message, created_at) VALUES (?, ?, NOW())");

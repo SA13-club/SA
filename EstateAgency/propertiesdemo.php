@@ -265,12 +265,12 @@ WHERE d.tag IS NOT NULL AND d.tag != '' AND d.u_permission != '$u_permission'";
     SELECT 
         d.*, 
         od.c_name AS donate_c_name, od.c_phone AS donate_c_phone, od.c_email AS donate_c_email, od.title AS donate_title,
-        COALESCE(oc.c_name, cc.c_name, clc.c_name) AS coop_c_name,
-        COALESCE(oc.c_phone, cc.c_phone, clc.c_phone) AS coop_c_phone,
-        COALESCE(oc.c_email, cc.c_email, clc.c_email) AS coop_c_email,
-        COALESCE(oc.title, cc.coop_name, clc.coop_name) AS coop_title
+        COALESCE( cc.c_name, clc.c_name) AS coop_c_name,
+        COALESCE( cc.c_phone, clc.c_phone) AS coop_c_phone,
+        COALESCE( cc.c_email, clc.c_email) AS coop_c_email,
+        COALESCE( cc.coop_name, clc.coop_name) AS coop_title
     FROM demanded d
-    LEFT JOIN org_coop oc ON d.d_id = oc.d_id
+
     LEFT JOIN org_donate od ON d.d_id = od.d_id
     LEFT JOIN corp_coop cc ON d.d_id = cc.d_id
     LEFT JOIN club_coop clc ON d.d_id = clc.d_id
@@ -283,12 +283,12 @@ WHERE d.tag IS NOT NULL AND d.tag != '' AND d.u_permission != '$u_permission'";
         ci.c_name AS intern_c_name, ci.c_phone AS intern_c_phone, ci.c_email AS intern_c_email, ci.title AS intern_title,
         cs.c_name AS spons_c_name, cs.c_phone AS spons_c_phone, cs.c_email AS spons_c_email, cs.title AS spons_title,
         od.c_name AS donate_c_name, od.c_phone AS donate_c_phone, od.c_email AS donate_c_email, od.title AS donate_title,
-        COALESCE(oc.c_name, cc.c_name, clc.c_name) AS coop_c_name,
-        COALESCE(oc.c_phone, cc.c_phone, clc.c_phone) AS coop_c_phone,
-        COALESCE(oc.c_email, cc.c_email, clc.c_email) AS coop_c_email,
-        COALESCE(oc.title, cc.coop_name, clc.coop_name) AS coop_title
+        COALESCE( cc.c_name, clc.c_name) AS coop_c_name,
+        COALESCE( cc.c_phone, clc.c_phone) AS coop_c_phone,
+        COALESCE( cc.c_email, clc.c_email) AS coop_c_email,
+        COALESCE( cc.coop_name, clc.coop_name) AS coop_title
     FROM demanded d
-    LEFT JOIN org_coop oc ON d.d_id = oc.d_id
+
     LEFT JOIN corp_coop cc ON d.d_id = cc.d_id
     LEFT JOIN club_coop clc ON d.d_id = clc.d_id
     LEFT JOIN org_donate od ON d.d_id = od.d_id
