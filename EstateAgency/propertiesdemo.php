@@ -195,77 +195,79 @@
         <section class="filter-bar py-3 bg-light">
           <div class="container">
             <div class="row justify-content-center align-items-center">
-              <div class="col-md-4 mb-2">
-                <label class="form-label">依標籤篩選：</label>
-                <select id="tagSelect" class="form-select">
-                  <option value="">請選擇標籤</option>
-                  <div class="col-md-4 mb-2" id="fieldValueWrapper" style="display: none;">
-                    <label class="form-label">細項條件：</label>
-                    <select id="fieldValueSelect" class="form-select">
-                      <option value="">請選擇條件</option>
-                    </select>
-                  </div>
+              <div class="row justify-content-center align-items-center">
+                <!-- 標籤篩選 -->
+                <div class="col-md-4 mb-2">
+                  <label class="form-label">依標籤篩選：</label>
+                  <select id="tagSelect" class="form-select">
+                    <option value="">請選擇標籤</option>
 
-                  <?php
-                  $link = mysqli_connect('localhost', 'root', '', 'sa');
-                  $u_permission = $_SESSION['u_permission'];
+                    <?php
+                    $link = mysqli_connect('localhost', 'root', '', 'sa');
+                    $u_permission = $_SESSION['u_permission'];
 
-                  // 建立一個陣列存條件
-                  $tagParts = [];
+                    // 建立一個陣列存條件
+                    $tagParts = [];
 
-                  if ($u_permission == '組織團體') {
-                    // 組織團體可以看到：club_coop（合作）、cor_intern、cor_spons
-                    $tagParts[] = "EXISTS (SELECT 1 FROM club_coop cc WHERE cc.d_id = d.d_id)";
-                    $tagParts[] = "EXISTS (SELECT 1 FROM cor_intern ci WHERE ci.d_id = d.d_id)";
-                    $tagParts[] = "EXISTS (SELECT 1 FROM cor_spons cs WHERE cs.d_id = d.d_id)";
-                  } elseif ($u_permission == '企業') {
-                    // 企業可以看到：corp_coop（合作）、org_donate
-                    $tagParts[] = "EXISTS (SELECT 1 FROM corp_coop cc WHERE cc.d_id = d.d_id)";
-                    $tagParts[] = "EXISTS (SELECT 1 FROM org_donate od WHERE od.d_id = d.d_id)";
-                  }
+                    if ($u_permission == '組織團體') {
+                      // 組織團體可以看到：club_coop（合作）、cor_intern、cor_spons
+                      $tagParts[] = "EXISTS (SELECT 1 FROM club_coop cc WHERE cc.d_id = d.d_id)";
+                      $tagParts[] = "EXISTS (SELECT 1 FROM cor_intern ci WHERE ci.d_id = d.d_id)";
+                      $tagParts[] = "EXISTS (SELECT 1 FROM cor_spons cs WHERE cs.d_id = d.d_id)";
+                    } elseif ($u_permission == '企業') {
+                      // 企業可以看到：corp_coop（合作）、org_donate
+                      $tagParts[] = "EXISTS (SELECT 1 FROM corp_coop cc WHERE cc.d_id = d.d_id)";
+                      $tagParts[] = "EXISTS (SELECT 1 FROM org_donate od WHERE od.d_id = d.d_id)";
+                    }
 
-                  // 組合 SQL
-                  $tagCondition = implode(" OR ", $tagParts);
+                    // 組合 SQL
+                    $tagCondition = implode(" OR ", $tagParts);
 
-                  $tagQuery = "
+                    $tagQuery = "
                     SELECT DISTINCT d.tag FROM demanded d
                     WHERE d.tag IS NOT NULL AND d.tag != '' AND ($tagCondition)
                   ";
 
-                  $tagResult = mysqli_query($link, $tagQuery);
+                    $tagResult = mysqli_query($link, $tagQuery);
 
-                  while ($row = mysqli_fetch_assoc($tagResult)) {
-                    $tag = $row['tag'];
-                    $displayTag = $tag;
-                    if ($tag == 'spon') $displayTag = '贊助';
-                    elseif ($tag == '實習') $displayTag = '實習';
-                    elseif ($tag == '合作') $displayTag = '合作';
-                    elseif ($tag == '招募') $displayTag = '招募';
+                    while ($row = mysqli_fetch_assoc($tagResult)) {
+                      $tag = $row['tag'];
+                      $displayTag = $tag;
+                      if ($tag == 'spon') $displayTag = '贊助';
+                      elseif ($tag == '實習') $displayTag = '實習';
+                      elseif ($tag == '合作') $displayTag = '合作';
+                      elseif ($tag == '招募') $displayTag = '招募';
 
-                    echo "<option value='{$tag}'>{$displayTag}</option>";
-                  }
-                  $filterTag = $_GET['tag'] ?? '';
-                  $filterField = $_GET['field'] ?? '';
+                      echo "<option value='{$tag}'>{$displayTag}</option>";
+                    }
+                    $filterTag = $_GET['tag'] ?? '';
+                    $filterField = $_GET['field'] ?? '';
 
-                  ?>
-                </select>
-              </div>
+                    ?>
+                  </select>
+                </div>
 
-              <div class="col-md-4 mb-2">
-                <label class="form-label">對應欄位：</label>
-                <select id="fieldSelect" class="form-select" disabled>
-                  <option value="">請先選擇標籤</option>
-                </select>
-              </div>
+                <div class="col-md-4 mb-2">
+                  <label class="form-label">對應欄位：</label>
+                  <select id="fieldSelect" class="form-select" disabled>
+                    <option value="">請先選擇標籤</option>
+                  </select>
+                </div>
+                <div class="col-md-4 mb-2" id="fieldValueWrapper" style="display: none;">
+                  <label class="form-label">細項條件：</label>
+                  <select id="fieldValueSelect" class="form-select">
+                    <option value="">請選擇條件</option>
+                  </select>
+                </div>
 
-              <div class="col-md-2 mb-2">
-                <button type="button" id="clearFilters" class="btn btn-outline-secondary w-100">清除篩選</button>
-              </div>
-              <div class="col-md-2 mb-2">
-                <button type="button" id="applyFilters" class="btn btn-success w-100">確認篩選</button>
+                <div class="col-md-2 mb-2">
+                  <button type="button" id="clearFilters" class="btn btn-outline-secondary w-100">清除篩選</button>
+                </div>
+                <div class="col-md-2 mb-2">
+                  <button type="button" id="applyFilters" class="btn btn-success w-100">確認篩選</button>
+                </div>
               </div>
             </div>
-          </div>
         </section>
         <div class='row py-5'>
 
@@ -298,7 +300,7 @@
     SELECT 
         d.*, 
         ci.c_name AS intern_c_name, ci.c_phone AS intern_c_phone, ci.c_email AS intern_c_email, ci.title AS intern_title,
-        cs.c_name AS spons_c_name, cs.c_phone AS spons_c_phone, cs.c_email AS spons_c_email, cs.title AS spons_title,
+        cs.c_name AS spons_c_name, cs.c_phone AS spons_c_phone, cs.c_email AS spons_c_email, cs.title AS spons_title,cs.sponsor_amount AS sponsor_amount,
         COALESCE(clc.c_name) AS coop_c_name,
         COALESCE(clc.c_phone) AS coop_c_phone,
         COALESCE(clc.c_email) AS coop_c_email,
@@ -317,12 +319,11 @@
     SELECT 
         d.*, 
         od.c_name AS donate_c_name, od.c_phone AS donate_c_phone, od.c_email AS donate_c_email, od.title AS donate_title,
-        COALESCE(oc.c_name, cc.c_name, clc.c_name) AS coop_c_name,
-        COALESCE(oc.c_phone, cc.c_phone, clc.c_phone) AS coop_c_phone,
-        COALESCE(oc.c_email, cc.c_email, clc.c_email) AS coop_c_email,
-        COALESCE(oc.title, cc.coop_name, clc.coop_name) AS coop_title
+        COALESCE(cc.c_name) AS coop_c_name,
+        COALESCE(cc.c_phone) AS coop_c_phone,
+        COALESCE(cc.c_email) AS coop_c_email,
+        COALESCE(cc.coop_name) AS coop_title
     FROM demanded d
-    LEFT JOIN org_coop oc ON d.d_id = oc.d_id
     LEFT JOIN org_donate od ON d.d_id = od.d_id
     LEFT JOIN corp_coop cc ON d.d_id = cc.d_id
     WHERE d.u_permission != ?
@@ -334,12 +335,11 @@
         ci.c_name AS intern_c_name, ci.c_phone AS intern_c_phone, ci.c_email AS intern_c_email, ci.title AS intern_title,
         cs.c_name AS spons_c_name, cs.c_phone AS spons_c_phone, cs.c_email AS spons_c_email, cs.title AS spons_title,
         od.c_name AS donate_c_name, od.c_phone AS donate_c_phone, od.c_email AS donate_c_email, od.title AS donate_title,
-        COALESCE( cc.c_name, clc.c_name) AS coop_c_name,
-        COALESCE( cc.c_phone, clc.c_phone) AS coop_c_phone,
-        COALESCE( cc.c_email, clc.c_email) AS coop_c_email,
-        COALESCE( cc.coop_name, clc.coop_name) AS coop_title
+        COALESCE(cc.c_name, clc.c_name) AS coop_c_name,
+        COALESCE(cc.c_phone, clc.c_phone) AS coop_c_phone,
+        COALESCE(cc.c_email, clc.c_email) AS coop_c_email,
+        COALESCE(cc.coop_name, clc.coop_name) AS coop_title
     FROM demanded d
-
     LEFT JOIN corp_coop cc ON d.d_id = cc.d_id
     LEFT JOIN club_coop clc ON d.d_id = clc.d_id
     LEFT JOIN org_donate od ON d.d_id = od.d_id
@@ -356,7 +356,9 @@
             $result = mysqli_stmt_get_result($stmt);
 
             // 取出所有資料
-
+            $filterTag = $_GET['tag'] ?? '';
+            $filterField = $_GET['field'] ?? '';
+            $selectedFieldValue = $_GET['fieldValue'] ?? '';
             while ($row = mysqli_fetch_assoc($result)) {
               $displayTag = $row['tag'];
               if ($displayTag == 'spon') $displayTag = '贊助';
@@ -366,20 +368,34 @@
 
               if ($filterTag && $displayTag !== $filterTag) continue;
 
-              if ($filterField) {
+              if ($filterField && $selectedFieldValue) {
                 $fieldMatched = false;
-                $fieldValues = [
-                  $row['coop_title'],
-                  $row['spons_title'],
-                  $row['intern_title'],
-                  $row['donate_title']
-                ];
 
-                foreach ($fieldValues as $val) {
-                  if (!empty($val) && strpos($val, $filterField) !== false) {
-                    $fieldMatched = true;
+                switch ($filterField) {
+                  case '贊助方式':
+                    if (!empty($row['spons_title']) && strpos($row['spons_title'], $selectedFieldValue) !== false) {
+                      $fieldMatched = true;
+                    }
                     break;
-                  }
+                  case '合作地點':
+                    if (!empty($row['coop_title']) && strpos($row['coop_title'], $selectedFieldValue) !== false) {
+                      $fieldMatched = true;
+                    }
+                    break;
+                  case '合作方式':
+                    if (!empty($row['coop_title']) && strpos($row['coop_title'], $selectedFieldValue) !== false) {
+                      $fieldMatched = true;
+                    }
+                    break;
+                  case '贊助金額':
+                    $amount = $row['sponsor_amount'] ?? null;
+
+                    if ($amount !== null) {
+                      if ($selectedFieldValue === '1萬以下' && $amount < 10000) $fieldMatched = true;
+                      elseif ($selectedFieldValue === '1萬～5萬' && $amount >= 10000 && $amount <= 50000) $fieldMatched = true;
+                      elseif ($selectedFieldValue === '5萬以上' && $amount > 50000) $fieldMatched = true;
+                    }
+                    break;
                 }
 
                 if (!$fieldMatched) continue;
@@ -586,24 +602,47 @@
     document.getElementById('applyFilters').addEventListener('click', function() {
       const tag = document.getElementById('tagSelect').value;
       const field = document.getElementById('fieldSelect').value;
+      const detail = document.getElementById('fieldValueSelect')?.value || '';
 
       if (!tag) {
         alert('請先選擇標籤！');
         return;
       }
 
-      console.log('篩選條件:', {
-        tag,
-        field
-      });
-
-      // 這裡可以換成 AJAX 或導頁
-      // 範例：重新導向 URL 加上查詢參數
       const params = new URLSearchParams();
       params.set('tag', tag);
       if (field) params.set('field', field);
+      if (field && detail) params.set('fieldValue', detail);
 
+      // ✅ 導向含參數的新網址
       window.location.href = 'propertiesdemo.php?' + params.toString();
+    });
+    const detailFieldOptions = {
+      '贊助金額': ['1萬以下', '1萬～5萬', '5萬以上'],
+      '贊助方式': ['金錢', '產品'],
+      '合作地點': ['台北市', '新北市', '台中市', '台南市', '高雄市'],
+      '合作方式': ['活動合辦', '聯誼活動', '長期合作', '成果發表']
+    };
+
+    document.getElementById('fieldSelect').addEventListener('change', function() {
+      const field = this.value;
+      const wrapper = document.getElementById('fieldValueWrapper');
+      const select = document.getElementById('fieldValueSelect');
+
+      // 如果這個欄位有對應細項條件，就顯示
+      if (detailFieldOptions[field]) {
+        wrapper.style.display = 'block';
+        select.innerHTML = '<option value="">請選擇條件</option>';
+        detailFieldOptions[field].forEach(opt => {
+          const option = document.createElement('option');
+          option.value = opt;
+          option.textContent = opt;
+          select.appendChild(option);
+        });
+      } else {
+        wrapper.style.display = 'none';
+        select.innerHTML = '<option value="">請選擇條件</option>';
+      }
     });
   </script>
 
