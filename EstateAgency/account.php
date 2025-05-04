@@ -509,6 +509,7 @@
                                     <div class='dcard-body'>
                                     <?php
 
+
 // 1. 建立資料庫連線
 $servername = "localhost";
 $username   = "root";
@@ -533,14 +534,14 @@ $stmt = $conn->prepare($sql);
 $stmt->bind_param("ss", $account_mail, $account_mail);
 $stmt->execute();
 $result = $stmt->get_result();
+$stmt->close();
 
 // 4. 分區
-$pendingAgree = [];   // agree = 0
-$negotiation  = [];   // agree = 1, draft = 0
-$completed    = [];   // agree = 1, draft = 1
+$pendingAgree = [];
+$negotiation  = [];
+$completed    = [];
 
 while ($row = $result->fetch_assoc()) {
-    // 動態決定「合作夥伴」是哪個欄位
     $partner = ($row['a_u_email'] === $account_mail)
              ? $row['b_u_email']
              : $row['a_u_email'];
@@ -557,28 +558,64 @@ while ($row = $result->fetch_assoc()) {
     }
 }
 
-$stmt->close();
-
 // 5. 定義渲染區塊的函式
 function renderSection($header, $rows, $statusText, $account_mail, $conn) {
     if (empty($rows)) return;
     echo "<h3>{$header}</h3>";
+
     foreach ($rows as $r) {
-        // 5.1 取出 d_id 並查詢對應的 tag
-        $did     = intval($r['d_id']);
+        $did = intval($r['d_id']);
+
+        // 5.1 取出 demanded.tag
         $tagStmt = $conn->prepare("SELECT tag FROM demanded WHERE d_id = ?");
         $tagStmt->bind_param("i", $did);
         $tagStmt->execute();
-        $tagRes   = $tagStmt->get_result();
-        $tagRow   = $tagRes->fetch_assoc();
-        $tag      = htmlspecialchars($tagRow['tag'] ?? '');
+        $tagRes = $tagStmt->get_result();
+        $tagRow = $tagRes->fetch_assoc();
+        $tag = htmlspecialchars($tagRow['tag'] ?? '');
         $tagStmt->close();
 
-        // 5.2 URL 參數安全化
+        // 5.2 switch 決定要從哪張 table 拿哪個 title_key
+        switch ($tag) {
+            case '企業合作':
+                $table     = 'corp_coop';
+                $title_key = 'coop_name';
+                break;
+            case '社團合作':
+                $table     = 'club_coop';
+                $title_key = 'coop_name';
+                break;
+            case 'spon':
+                $table     = 'org_donate';
+                $title_key = 'title';
+                $tag        = '贊助';
+                break;
+            case '贊助':
+                $table     = 'cor_spons';
+                $title_key = 'title';
+                break;
+            case '實習':
+                $table     = 'cor_intern';
+                $title_key = 'intern_title';
+                break;
+            default:
+                die('錯誤：未知的標籤類型！');
+        }
+
+        // 5.3 真正去那張 $table 撈出 $title_key
+        $titleStmt = $conn->prepare("SELECT {$title_key} FROM {$table} WHERE d_id = ?");
+        $titleStmt->bind_param("i", $did);
+        $titleStmt->execute();
+        $titleRes = $titleStmt->get_result();
+        $titleRow = $titleRes->fetch_assoc();
+        $realTitle = htmlspecialchars($titleRow[$title_key] ?? '');
+        $titleStmt->close();
+
+        // 5.4 URL 參數安全化
         $safe_receiver = urlencode($r['partner']);
         $safe_email    = urlencode($account_mail);
 
-        // 5.3 輸出卡片
+        // 5.5 輸出卡片
         echo "
         <div class='dcard-post'>
           <div class='dcard-header'>
@@ -586,15 +623,14 @@ function renderSection($header, $rows, $statusText, $account_mail, $conn) {
           </div>
           <div class='dcard-body'>
             <p><strong>合作夥伴：</strong>" . htmlspecialchars($r['partner']) . "</p>
-            <p><strong>專案名稱：</strong>" . htmlspecialchars($r['project_name'] ?? '') . "</p>
-            <p><strong>開始日期：</strong>" . htmlspecialchars($r['start_date']   ?? '') . "</p>
+            <p><strong>專案名稱：</strong>{$realTitle}</p>
+            <p><strong>開始日期：</strong>" . htmlspecialchars($r['start_date'] ?? '') . "</p>
             <p><strong>狀態：</strong>{$statusText}</p>
             <a
-              class='btn'
+              class='btn chat-button'
               style='background-color: #28c76f; color: white;'
-              href='./chat/public/index.php?u_email={$safe_email}&receiver={$safe_receiver}'
+              href='./chat/public/index .php?u_email={$safe_email}&receiver={$safe_receiver}'
               target='_blank'
-              class='chat-button'
             >聊天室</a>
           </div>
         </div>
@@ -603,12 +639,13 @@ function renderSection($header, $rows, $statusText, $account_mail, $conn) {
 }
 
 // 6. 依序輸出三個區塊
-renderSection('同意申請', $pendingAgree, '等待同意', $account_mail, $conn);
-renderSection('洽談中',   $negotiation,  '洽談中',   $account_mail, $conn);
-renderSection('已完成合作', $completed,   '已完成',   $account_mail, $conn);
+renderSection('同意申請',   $pendingAgree, '等待同意', $account_mail, $conn);
+renderSection('洽談中',     $negotiation,  '洽談中',   $account_mail, $conn);
+renderSection('已完成合作', $completed,    '已完成',   $account_mail, $conn);
 
 $conn->close();
 ?>
+
 
 
 
