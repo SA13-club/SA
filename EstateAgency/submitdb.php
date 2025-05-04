@@ -90,8 +90,8 @@ try {
 
 
 $corp_sql = "INSERT INTO match_db
-    (a_u_email,b_u_email,agree_a,agree_b,complete_a,complete_b,terminate_a,terminate_b,status)
-  VALUES ('$sender_email','$cop_b', 1, 0, 0, 0, 0, 0, 'pending')";
+    (a_u_email,b_u_email,agree_a,agree_b,complete_a,complete_b,terminate_a,terminate_b,status,demanded_id)
+  VALUES ('$sender_email','$cop_b', 1, 0, 0, 0, 0, 0, 'pending','$d_id')";
 mysqli_query($link, $corp_sql);
 
 
