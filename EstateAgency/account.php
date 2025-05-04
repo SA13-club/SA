@@ -584,7 +584,7 @@ function renderBlock($title, $rows, $step, $label, $me, $conn) {
             <button class='js-action btn' data-did='{$r['d_id']}' data-step='$step'>$btnText</button>
             <a class='btn chat-button'
                style='background-color:#28c76f;color:white;'
-               href='./chat/public/index.php?u_email=".urlencode($me)."&receiver=".urlencode($partner)."' 
+               href='./chat/public/index .php?u_email=".urlencode($me)."&receiver=".urlencode($partner)."' 
                target='_blank'>聊天室</a>
           </div>
         </div>";
