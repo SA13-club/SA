@@ -369,7 +369,19 @@
 
             // 使用 prepared statement，防止 SQL injection
             $stmt = mysqli_prepare($link, $sql);
-            mysqli_stmt_bind_param($stmt, 's', $u_permission);
+            // ... 上面決定好 $sql 了之後
+$stmt = mysqli_prepare($link, $sql);
+if ($stmt === false) {
+    die('Prepare failed: ' . mysqli_error($link));
+}
+
+// 只有在「企業」和「其他」分支的 SQL 裡面，才有一個 '?' 需要綁定
+if ($u_permission !== '組織團體') {
+    mysqli_stmt_bind_param($stmt, 's', $u_permission);
+}
+
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
             mysqli_stmt_execute($stmt);
             $result = mysqli_stmt_get_result($stmt);
 
