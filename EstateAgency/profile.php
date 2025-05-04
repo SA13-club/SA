@@ -83,8 +83,27 @@ $conn->close();
     <!-- Main CSS File -->
     <link href="assets/css/main.css" rel="stylesheet">
 </head>
+<style>
+                section,
+                .container,
+                .your-other-blocks {
+                background-color: transparent !important;
+                }
+                .page-title,
+                .page-title .container,
+                .breadcrumbs {
+                background: transparent !important;
+                z-index: 1;
+                }
+                </style>
 
-<body class="starter-page-page" style="padding-top: 100px;">
+<body class="starter-page-page" style="
+  padding-top: 100px;background-image: url('/SA/EstateAgency/assets/img/bg2.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  margin: 0;">
     <header id="header" class="header d-flex align-items-center fixed-top">
         <div class="container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
             <a href="index.php" class="logo d-flex align-items-center">
