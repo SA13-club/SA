@@ -505,7 +505,6 @@
                         <div id="projects-section" class="section-content" style="display: none;">
                             <div class='dcard-post'>
                                 <a href='project-detail.php'>
-<<<<<<< HEAD
                                     
                                     <div class='dcard-body'>
                                         <?php 
@@ -560,10 +559,13 @@
                                                     }
                                                 }
 
+
                                                 // 3. 輸出「同意申請」
                                                 if (!empty($pendingAgree)) {
                                                     echo "<h3>同意申請</h3>";
                                                     foreach ($pendingAgree as $r) {
+                                                        $safe_receiver = urlencode($r['partner']);
+                                                        $safe_email    = urlencode($_SESSION['u_email']);
                                                         echo "
                                                         <div class='dcard-post'>
                                                         <div class='dcard-header'>
@@ -574,9 +576,14 @@
                                                             <p><strong>專案名稱：</strong></p>
                                                             <p><strong>開始日期：</strong></p>
                                                             <p><strong>狀態：</strong>等待同意</p>
+
+                                                            <a class='btn' style='background-color: #28c76f; color: white;' href='./chat/public/index .php?u_email={$safe_email}&receiver={$safe_receiver}''target='_blank' class='chat-button'>聊天室</a>
                                                         </div>
                                                         </div>
                                                         ";
+                                                       
+                                                        
+                                                        
                                                     }
                                                 }
 
@@ -634,13 +641,6 @@
 
 
                                     </div>
-=======
-                                    <div class='dcard-header'><span class='dcard-tag'>#合作專案</span></div>
-                                    <div class='dcard-body'>這是合作專案卡片</div>
-                                    <a href='.php?id=<?= $row['d_id'] ?>' class='btn btn-sm btn-success me-2' style='background-color: #28c76f; border-color: #28c76f;'>
-                                        <i class='bi bi-pencil'></i> 回饋
-                                    </a>
->>>>>>> 7c525d56e97ecf28b9dd29fc482fbb3e33d5dd57
                                 </a>
                             </div>
                         </div>
