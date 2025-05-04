@@ -88,8 +88,10 @@ try {
 
 
 
-$corp_sql="INSERT INTO match_db(a_u_email,b_u_email,agree,draft,finish,d_id) VALUES('$sender_email','$cop_b','0','0','0','$d_id')";
 
+$corp_sql = "INSERT INTO match_db
+    (a_u_email,b_u_email,agree_a,agree_b,complete_a,complete_b,terminate_a,terminate_b,status)
+  VALUES ('$sender_email','$cop_b', 1, 0, 0, 0, 0, 0, 'pending')";
 mysqli_query($link, $corp_sql);
 
 
@@ -99,11 +101,5 @@ mysqli_query($link, $corp_sql);
 
 
 
-
-// ✅ 寫入通知資料表
-$notify_stmt = $link->prepare("INSERT INTO notifications (receiver_email, message, created_at) VALUES (?, ?, NOW())");
-$notify_msg = "您收到一則合作申請，來自 $sender_email。";
-$notify_stmt->bind_param("ss", $receiver_email, $notify_msg);
-$notify_stmt->execute();
 
 echo "<a href='index.php'>返回首頁</a>";
