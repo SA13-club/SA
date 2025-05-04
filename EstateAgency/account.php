@@ -507,128 +507,109 @@
                                 <a href='project-detail.php'>
                                     
                                     <div class='dcard-body'>
-                                        <?php 
-                                         $servername = "localhost";
-                                         $username = "root";
-                                         $password = "";
-                                         $dbname = "sa";
-                                 
-                                         $conn = new mysqli($servername, $username, $password, $dbname);
-                                 
-                                      
-                                       
-                                            // …（前面連線程式不變）…
+                                    <?php
 
-                                            $account_mail = $_SESSION['u_email'];
+// 1. 建立資料庫連線
+$servername = "localhost";
+$username   = "root";
+$password   = "";
+$dbname     = "sa";
 
-                                         
-                                                
+$conn = new mysqli($servername, $username, $password, $dbname);
+if ($conn->connect_error) {
+    die("連線失敗: " . $conn->connect_error);
+}
 
-                                                // 假設前面已經建立好 $conn 與取得 $account_mail
+// 2. 取得目前登入者 email
+$account_mail = $_SESSION['u_email'] ?? '';
+if (empty($account_mail)) {
+    echo "<p>請先登入才能查看合作專案。</p>";
+    exit;
+}
 
-                                                // 1. 撈出 a_u_email 或 b_u_email 等於使用者的所有紀錄
-                                                $sql  = "SELECT * FROM match_db 
-                                                        WHERE a_u_email = ? OR b_u_email = ?";
-                                                $stmt = $conn->prepare($sql);
-                                                $stmt->bind_param("ss", $account_mail, $account_mail);
-                                                $stmt->execute();
-                                                $result = $stmt->get_result();
+// 3. 撈出 match_db 中 a_u_email 或 b_u_email = 使用者的所有紀錄
+$sql  = "SELECT * FROM match_db WHERE a_u_email = ? OR b_u_email = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("ss", $account_mail, $account_mail);
+$stmt->execute();
+$result = $stmt->get_result();
 
-                                                // 2. 分區
-                                                $pendingAgree = [];   // agree = 0
-                                                $negotiation  = [];   // agree = 1, draft = 0
-                                                $completed    = [];   // agree = 1, draft = 1
+// 4. 分區
+$pendingAgree = [];   // agree = 0
+$negotiation  = [];   // agree = 1, draft = 0
+$completed    = [];   // agree = 1, draft = 1
 
-                                                while ($row = $result->fetch_assoc()) {
-                                                    // 動態決定「合作夥伴」是哪個欄位
-                                                    if ($row['a_u_email'] === $account_mail) {
-                                                        $partner = $row['b_u_email'];
-                                                    } else {
-                                                        $partner = $row['a_u_email'];
-                                                    }
-                                                    $row['partner'] = $partner;
+while ($row = $result->fetch_assoc()) {
+    // 動態決定「合作夥伴」是哪個欄位
+    $partner = ($row['a_u_email'] === $account_mail)
+             ? $row['b_u_email']
+             : $row['a_u_email'];
+    $row['partner'] = $partner;
 
-                                                    if ($row['agree'] == 0) {
-                                                        $pendingAgree[] = $row;
-                                                    }
-                                                    elseif ($row['agree'] == 1 && $row['draft'] == 0) {
-                                                        $negotiation[] = $row;
-                                                    }
-                                                    elseif ($row['agree'] == 1 && $row['draft'] == 1) {
-                                                        $completed[] = $row;
-                                                    }
-                                                }
+    if ($row['agree'] == 0) {
+        $pendingAgree[] = $row;
+    }
+    elseif ($row['agree'] == 1 && $row['draft'] == 0) {
+        $negotiation[] = $row;
+    }
+    elseif ($row['agree'] == 1 && $row['draft'] == 1) {
+        $completed[] = $row;
+    }
+}
 
+$stmt->close();
 
-                                                // 3. 輸出「同意申請」
-                                                if (!empty($pendingAgree)) {
-                                                    echo "<h3>同意申請</h3>";
-                                                    foreach ($pendingAgree as $r) {
-                                                        $safe_receiver = urlencode($r['partner']);
-                                                        $safe_email    = urlencode($_SESSION['u_email']);
-                                                        echo "
-                                                        <div class='dcard-post'>
-                                                        <div class='dcard-header'>
-                                                            <span class='dcard-tag'>#合作專案</span>
-                                                        </div>
-                                                        <div class='dcard-body'>
-                                                            <p><strong>合作夥伴：</strong>{$r['partner']}</p>
-                                                            <p><strong>專案名稱：</strong></p>
-                                                            <p><strong>開始日期：</strong></p>
-                                                            <p><strong>狀態：</strong>等待同意</p>
+// 5. 定義渲染區塊的函式
+function renderSection($header, $rows, $statusText, $account_mail, $conn) {
+    if (empty($rows)) return;
+    echo "<h3>{$header}</h3>";
+    foreach ($rows as $r) {
+        // 5.1 取出 d_id 並查詢對應的 tag
+        $did     = intval($r['d_id']);
+        $tagStmt = $conn->prepare("SELECT tag FROM demanded WHERE d_id = ?");
+        $tagStmt->bind_param("i", $did);
+        $tagStmt->execute();
+        $tagRes   = $tagStmt->get_result();
+        $tagRow   = $tagRes->fetch_assoc();
+        $tag      = htmlspecialchars($tagRow['tag'] ?? '');
+        $tagStmt->close();
 
-                                                            <a class='btn' style='background-color: #28c76f; color: white;' href='./chat/public/index .php?u_email={$safe_email}&receiver={$safe_receiver}''target='_blank' class='chat-button'>聊天室</a>
-                                                        </div>
-                                                        </div>
-                                                        ";
-                                                       
-                                                        
-                                                        
-                                                    }
-                                                }
+        // 5.2 URL 參數安全化
+        $safe_receiver = urlencode($r['partner']);
+        $safe_email    = urlencode($account_mail);
 
-                                                // 4. 輸出「洽談中」
-                                                if (!empty($negotiation)) {
-                                                    echo "<h3>洽談中</h3>";
-                                                    foreach ($negotiation as $r) {
-                                                        echo "
-                                                        <div class='dcard-post'>
-                                                        <div class='dcard-header'>
-                                                            <span class='dcard-tag'>#合作專案</span>
-                                                        </div>
-                                                        <div class='dcard-body'>
-                                                            <p><strong>合作夥伴：</strong>{$r['partner']}</p>
-                                                            <p><strong>專案名稱：</strong></p>
-                                                            <p><strong>開始日期：</strong></p>
-                                                            <p><strong>狀態：</strong>洽談中</p>
-                                                        </div>
-                                                        </div>
-                                                        ";
-                                                    }
-                                                }
+        // 5.3 輸出卡片
+        echo "
+        <div class='dcard-post'>
+          <div class='dcard-header'>
+            <span class='dcard-tag'>#{$tag}</span>
+          </div>
+          <div class='dcard-body'>
+            <p><strong>合作夥伴：</strong>" . htmlspecialchars($r['partner']) . "</p>
+            <p><strong>專案名稱：</strong>" . htmlspecialchars($r['project_name'] ?? '') . "</p>
+            <p><strong>開始日期：</strong>" . htmlspecialchars($r['start_date']   ?? '') . "</p>
+            <p><strong>狀態：</strong>{$statusText}</p>
+            <a
+              class='btn'
+              style='background-color: #28c76f; color: white;'
+              href='./chat/public/index.php?u_email={$safe_email}&receiver={$safe_receiver}'
+              target='_blank'
+              class='chat-button'
+            >聊天室</a>
+          </div>
+        </div>
+        ";
+    }
+}
 
-                                                // 5. 輸出「已完成合作」
-                                                if (!empty($completed)) {
-                                                    echo "<h3>已完成合作</h3>";
-                                                    foreach ($completed as $r) {
-                                                        echo "
-                                                        <div class='dcard-post'>
-                                                        <div class='dcard-header'>
-                                                            <span class='dcard-tag'>#合作專案</span>
-                                                        </div>
-                                                        <div class='dcard-body'>
-                                                            <p><strong>合作夥伴：</strong>{$r['partner']}</p>
-                                                            <p><strong>專案名稱：</strong></p>
-                                                            <p><strong>開始日期：</strong></p>
-                                                            <p><strong>狀態：</strong>已完成</p>
-                                                        </div>
-                                                        </div>
-                                                        ";
-                                                    }
-                                                }
+// 6. 依序輸出三個區塊
+renderSection('同意申請', $pendingAgree, '等待同意', $account_mail, $conn);
+renderSection('洽談中',   $negotiation,  '洽談中',   $account_mail, $conn);
+renderSection('已完成合作', $completed,   '已完成',   $account_mail, $conn);
 
-                                                $stmt->close();
-                                                ?>
+$conn->close();
+?>
+
 
 
                                      
