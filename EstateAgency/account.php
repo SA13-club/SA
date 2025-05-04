@@ -130,6 +130,21 @@
             color: color-mix(in srgb, var(--default-color), transparent 50%);
             font-size: 14px;
         }
+
+        .star-rating {
+        display: inline-block;
+        font-size: 2em;
+        color: #ccc;
+        cursor: pointer;
+        }
+
+
+        .star-rating .star:hover,
+        .star-rating .star.hovered,
+        .star-rating .star.selected {
+        color: gold;
+        }
+
     </style>
 
 </head>
@@ -205,7 +220,7 @@
 
         $stmt = $conn->prepare("(
         SELECT d.d_id, d.tag, d.d_date,
-               o.title AS donate_title,
+               o.event_name AS donate_title,
                NULL AS spons_title,
                NULL AS intern_title,
                NULL AS coop_title,
@@ -503,116 +518,119 @@
 
                         <!-- 合作專案（示範卡片） -->
                         <div id="projects-section" class="section-content" style="display: none;">
-                            <div class='dcard-post'>
-                               
-                                    
-                                    <div class='dcard-body'>
-                                   
-<?php
+                                        <?php
 
-$me = $_SESSION['u_email'] ?? '';
-if (!$me) exit('請先登入');
+                                        $me = $_SESSION['u_email'] ?? '';
+                                        if (!$me) exit('請先登入');
 
-$conn = new mysqli("localhost","root","","sa");
-if ($conn->connect_error) die("DB 連線失敗");
+                                        $conn = new mysqli("localhost","root","","sa");
+                                        if ($conn->connect_error) die("DB 連線失敗");
 
-// 取出所有與我有關的 match
-$stmt = $conn->prepare("SELECT * FROM match_db WHERE a_u_email=? OR b_u_email=?");
-$stmt->bind_param("ss", $me, $me);
-$stmt->execute();
-$all = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-$stmt->close();
+                                        // 取出所有與我有關的 match
+                                        $stmt = $conn->prepare("SELECT * FROM match_db WHERE a_u_email=? OR b_u_email=?");
+                                        $stmt->bind_param("ss", $me, $me);
+                                        $stmt->execute();
+                                        $all = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+                                        $stmt->close();
 
-// 分三區
-$pending    = []; // pending
-$negotiating= []; // negotiating
-$completed  = []; // completed
-foreach ($all as $r) {
-    switch ($r['status']) {
-        case 'pending':     $pending[]     = $r; break;
-        case 'negotiating': $negotiating[] = $r; break;
-        case 'completed':   $completed[]   = $r; break;
-    }
-}
+                                        // 分三區
+                                        $pending    = []; // pending
+                                        $negotiating= []; // negotiating
+                                        $completed  = []; // completed
+                                        foreach ($all as $r) {
+                                            switch ($r['status']) {
+                                                case 'pending':     $pending[]     = $r; break;
+                                                case 'negotiating': $negotiating[] = $r; break;
+                                                case 'completed':   $completed[]   = $r; break;
+                                            }
+                                        }
 
-// Render Block
-function renderBlock($title, $rows, $step, $label, $me, $conn) {
-    if (empty($rows)) return;
-    echo "<h3>$title</h3>";
-    foreach ($rows as $r) {
-        // 取 partner
-        $partner = ($r['a_u_email']===$me)? $r['b_u_email']:$r['a_u_email'];
-        // 取 tag
-        $t = $conn->prepare("SELECT tag FROM demanded WHERE d_id=?");
-        $t->bind_param("i",$r['d_id']);
-        $t->execute();
-        $tag = htmlspecialchars($t->get_result()->fetch_assoc()['tag'] ?? '');
-        $t->close();
-        // 取專案標題
-        switch ($tag) {
-            case '企業合作': $tbl='corp_coop';  $key='coop_name'; break;
-            case '社團合作': $tbl='club_coop';  $key='coop_name'; break;
-            case 'spon':      $tbl='org_donate'; $key='title';    $tag='贊助'; break;
-            case '贊助':      $tbl='cor_spons';  $key='title';    break;
-            case '實習':      $tbl='cor_intern'; $key='intern_title'; break;
-            default:          $tbl=''; $key='';             break;
-        }
-        $proj = '';
-        if ($tbl) {
-            $u = $conn->prepare("SELECT $key FROM $tbl WHERE d_id=?");
-            $u->bind_param("i",$r['d_id']);
-            $u->execute();
-            $proj = htmlspecialchars($u->get_result()->fetch_assoc()[$key] ?? '');
-            $u->close();
-        }
-        // 決定按鈕文字
-        $who = ($r['a_u_email']===$me)?'a':'b';
-        $confirmed = $r["{$step}_{$who}"];
-        // 如果我已經按過，就顯示「等待對方 + 標籤」，否則「我 + 標籤」
-        $btnText = $confirmed
-                 ? "等待對方$label"
-                 : "我$label";
-        // 卡片
-        echo "
-        <div class='dcard-post'>
-          <div class='dcard-header'><span class='dcard-tag'>#$tag</span></div>
-          <div class='dcard-body'>
-            <p><strong>合作夥伴：</strong>$partner</p>
-            <p><strong>專案名稱：</strong>$proj</p>
-            <p><strong>開始日期：</strong>{$r['d_date']}</p>
-            <p><strong>狀態：</strong>$title</p>
-            <button class='js-action btn' data-did='{$r['d_id']}' data-step='$step'>$btnText</button>
-            <a class='btn chat-button'
-               style='background-color:#28c76f;color:white;'
-               href='./chat/public/index .php?u_email=".urlencode($me)."&receiver=".urlencode($partner)."' 
-               target='_blank'>聊天室</a>
-          </div>
-        </div>";
-    }
-}
+                                        // Render Block
+                                        function renderBlock($title, $rows, $step, $label, $me, $conn) {
+                                            if (empty($rows)) return;
+                                            echo "<h3>$title</h3>";
+                                            foreach ($rows as $r) {
+                                                // 取 partner
+                                                $partner = ($r['a_u_email']===$me)? $r['b_u_email']:$r['a_u_email'];
+                                                // 取 tag
+                                                $t = $conn->prepare("SELECT tag FROM demanded WHERE d_id=?");
+                                                $t->bind_param("i",$r['d_id']);
+                                                $t->execute();
+                                                $tag = htmlspecialchars($t->get_result()->fetch_assoc()['tag'] ?? '');
+                                                $t->close();
+                                                // 取專案標題
+                                                switch ($tag) {
+                                                    case '企業合作': $tbl='corp_coop';  $key='coop_name'; break;
+                                                    case '社團合作': $tbl='club_coop';  $key='coop_name'; break;
+                                                    case 'spon':      $tbl='org_donate'; $key='title';    $tag='贊助'; break;
+                                                    case '贊助':      $tbl='cor_spons';  $key='title';    break;
+                                                    case '實習':      $tbl='cor_intern'; $key='intern_title'; break;
+                                                    default:          $tbl=''; $key='';             break;
+                                                }
+                                                $proj = '';
+                                                if ($tbl) {
+                                                    $u = $conn->prepare("SELECT $key FROM $tbl WHERE d_id=?");
+                                                    $u->bind_param("i",$r['d_id']);
+                                                    $u->execute();
+                                                    $proj = htmlspecialchars($u->get_result()->fetch_assoc()[$key] ?? '');
+                                                    $u->close();
+                                                }
+                                                // 決定按鈕文字
+                                                $who = ($r['a_u_email']===$me)?'a':'b';
+                                                $confirmed = $r["{$step}_{$who}"];
+                                                // 如果我已經按過，就顯示「等待對方 + 標籤」，否則「我 + 標籤」
+                                                $btnText = $confirmed
+                                                        ? "等待對方$label"
+                                                        : "我$label";
+                                                // 卡片
+                                                // 假設 $me 是目前登入者 email，已經有：$me = $_SESSION['email'];
+                                                $feedbackScore = 0;
+                                                $isA = $me === $r['a_u_email'];
 
-// 輸出
-renderBlock('同意申請',   $pending,     'agree',    '同意',     $me, $conn);
-renderBlock('洽談中',     $negotiating, 'complete', '完成',     $me, $conn);
-renderBlock('已完成合作', $completed,   'terminate','終結合作', $me, $conn);
+                                                if ($isA) {
+                                                    $feedbackScore = $r['a_feedback'];
+                                                } elseif ($me === $r['b_u_email']) {
+                                                    $feedbackScore = $r['b_feedback'];
+                                                }
 
-$conn->close();
-?>
+                                                echo "
+                                                <div class='dcard-post'>
+                                                    <div class='dcard-header'><span class='dcard-tag'>#$tag</span></div>
+                                                    <div class='dcard-body'>
+                                                        <p><strong>合作夥伴：</strong>$partner</p>
+                                                        <p><strong>專案名稱：</strong>$proj</p>
+                                                        <p><strong>開始日期：</strong>{$r['d_date']}</p>
+                                                        <p><strong>狀態：</strong>$title</p>
+                                                    </div>
+                                                    <div class='dcard-footer'>
+                                                        <div>
+                                                            <button class='js-action btn' style='background-color:#28c76f;color:white; data-did='{$r['d_id']}' data-step='$step'>$btnText</button>
+                                                        </div>
+                                                        <div>
+                                                            <div class='star-rating' data-rating='$feedbackScore' data-match-id='{$r['d_id']}'>";
+                                                                for ($i = 1; $i <= 5; $i++) {
+                                                                    $selected = ($i <= $feedbackScore) ? "selected" : "";
+                                                                    echo "<span class='star $selected' data-value='$i'>★</span>";
+                                                                }
+                                                echo "
+                                                            </div>
+                                                            <a class='btn chat-button' style='background-color:#28c76f;color:white; margin-left: 10px; border-radius: 100%;'
+                                                            href='./chat/public/index.php?u_email=".urlencode($me)."&receiver=".urlencode($partner)."' 
+                                                            target='_blank'><i class='bi bi-chat-dots-fill'></i></a>
+                                                        </div>
+                                                    </div>
+                                                </div>";
 
+                                            }
+                                        }
 
+                                        // 輸出
+                                        renderBlock('同意申請',   $pending,     'agree',    '同意',     $me, $conn);
+                                        renderBlock('洽談中',     $negotiating, 'complete', '完成',     $me, $conn);
+                                        renderBlock('已完成合作', $completed,   'terminate','終結合作', $me, $conn);
 
-
-                                     
-                                    </div>
-                                        
-
-
-
-
-
-
-                                    </div>
-                                </a>
+                                        $conn->close();
+                                        ?>
                             </div>
                         </div>
                     </div>
@@ -646,6 +664,35 @@ $conn->close();
                 window.addEventListener('DOMContentLoaded', () => {
                     showSection('published');
                 });
+                
+                document.querySelectorAll('.star-rating').forEach(rating => {
+                const stars = rating.querySelectorAll('.star');
+                const matchId = rating.dataset.matchId;
+
+                stars.forEach(star => {
+                    star.addEventListener('click', () => {
+                    const selectedRating = parseInt(star.dataset.value);
+                    console.log("你點了星星：" + selectedRating); // ← 檢查是否有觸發
+
+
+                        // 更新前端星星顏色
+                        stars.forEach(s => {
+                            s.classList.toggle('selected', parseInt(s.dataset.value) <= selectedRating);
+                        });
+
+                        // 發送 AJAX 到 feedback.php
+                        fetch('feedback.php', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: `d_id=${matchId}&rating=${selectedRating}`
+                        })
+                        .then(res => res.text())
+                        .then(data => {
+                            console.log("評分結果：" + data);
+                        });
+                    });
+                });
+            });
             </script>
 
         </section>
@@ -746,6 +793,33 @@ document.querySelectorAll('.js-action').forEach(btn=>{
     if (j.status) location.reload();
     else alert('更新失敗');
   };
+});
+document.querySelectorAll('.star-rating').forEach(rating => {
+    const stars = rating.querySelectorAll('.star');
+    let selectedRating = 0;
+
+    stars.forEach(star => {
+        star.addEventListener('mouseover', () => {
+            const val = parseInt(star.dataset.value);
+            stars.forEach(s => {
+                s.classList.toggle('hovered', parseInt(s.dataset.value) <= val);
+            });
+        });
+
+        star.addEventListener('mouseout', () => {
+            stars.forEach(s => s.classList.remove('hovered'));
+        });
+
+        star.addEventListener('click', () => {
+            selectedRating = parseInt(star.dataset.value);
+            rating.dataset.rating = selectedRating;
+            stars.forEach(s => {
+                s.classList.toggle('selected', parseInt(s.dataset.value) <= selectedRating);
+            });
+            // 你可以在這裡做後端 AJAX 提交、console.log，或其他處理
+            console.log("使用者評分為：" + selectedRating);
+        });
+    });
 });
 </script>
 

@@ -184,7 +184,7 @@ session_start();
                   die('錯誤：找不到合作內容');
                 case 'spon':
                   $table = 'org_donate';
-                  $title_key = 'title';
+                  $title_key = 'event_name';
                   break;
                 case '贊助':
                   $table = 'cor_spons';
@@ -267,7 +267,7 @@ session_start();
                 case 'spon': // org_donate
                   echo "
                   <p>🎈 <strong>活動名稱：</strong> " . htmlspecialchars($content_row['event_name'] ?? '無資料') . "</p>
-                  <p>🙋‍♂️ <strong>參與方式：</strong> " . htmlspecialchars($content_row['event_participate'] ?? '無資料') . "</p>
+                  <p>🙋‍♂️ <strong>參與人數：</strong> " . htmlspecialchars($content_row['event_participate'] ?? '無資料') . "<strong>人</strong></p>
                   <p>📝 <strong>活動描述：</strong> " . htmlspecialchars($content_row['event_description'] ?? '無資料') . "</p>
                   <p>💰 <strong>贊助方式：</strong> " . htmlspecialchars($content_row['sponsor_method'] ?? '無資料') . "</p>
                   <p>💸 <strong>贊助金額：</strong> " . (isset($content_row['sponsor_amount']) ? number_format((float)$content_row['sponsor_amount']) : '0') . " 元</p>
