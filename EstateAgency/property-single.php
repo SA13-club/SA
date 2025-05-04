@@ -1,3 +1,7 @@
+<?php
+// 在文件開頭啟動會話
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -56,7 +60,8 @@
           <li><a href="agents.php">合作單位</a></li>
           <li><a href="contact.php">聯絡我們</a></li>
           <?php
-          if ($_SESSION['u_email']) {
+          // 檢查用戶是否已登錄
+          if (isset($_SESSION['u_email']) && $_SESSION['u_email']) {
             echo "<li><a href='Logout.php'>登出</a></li>";
             echo "<li><a href='account.php'>帳號管理</a></li>";
           } else {
@@ -64,9 +69,6 @@
             echo "<li><a href='#' data-bs-toggle='modal' data-bs-target='#SignInPermission'>註冊</a></li>";
           }
           ?>
-          <!-- <li><a href="LogIn.html">登入</a></li>
-          <li><a href="#" data-bs-toggle="modal" data-bs-target="#SignInPermission">註冊</a></li> -->
-
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
@@ -75,7 +77,7 @@
   </header>
 
   <main class="main">
-    <h1>1234568456</h1>
+    <!-- 註冊選擇權限的模態框 -->
     <div class="modal fade" id="SignInPermission" tabindex="-1" aria-labelledby="SignInPermissionLabel"
       aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
@@ -92,6 +94,7 @@
         </div>
       </div>
     </div>
+
     <!-- Page Title -->
     <div class="page-title" data-aos="fade">
       <div class="heading">
@@ -109,7 +112,6 @@
           <ol>
             <li><a href="index.php">首頁</a></li>
             <li><a href="propertiesdemo.php">最新專案</a></li>
-
           </ol>
         </div>
       </nav>
@@ -117,48 +119,48 @@
 
     <!-- Real Estate 2 Section -->
     <section id="real-estate-2" class="real-estate-2 section">
-
       <div class="container" data-aos="fade-up">
         <div class="row justify-content-between gy-4 mt-4">
 
           <div class="col-lg-8" data-aos="fade-up">
-
             <div class="portfolio-description">
               <?php
+              // 顯示錯誤報告（開發時使用，生產環境可關閉）
               ini_set('display_errors', 1);
               ini_set('display_startup_errors', 1);
               error_reporting(E_ALL);
 
+              // 建立資料庫連接
               $link = mysqli_connect('localhost', 'root', '', 'sa');
-
-              $d_id = $_GET['id'];
-
-              // 找 tag
-              $sql_findtag = "SELECT tag FROM demanded WHERE d_id='$d_id'";
-              $tag_result = mysqli_query($link, $sql_findtag);
-              $tag_row = mysqli_fetch_assoc($tag_result);
-
-              if (!$tag_row) {
-                die('錯誤：找不到這個需求！');
+              if (!$link) {
+                die('資料庫連接失敗: ' . mysqli_connect_error());
               }
 
-              $tag = $tag_row['tag'];
+              // 安全處理 GET 參數
+              $d_id = isset($_GET['id']) ? mysqli_real_escape_string($link, $_GET['id']) : 0;
+              if (!$d_id) {
+                die('錯誤：無效的專案ID！');
+              }
 
-              // 根據 tag 決定查哪張表
-              // 根據 tag 和 demanded 的 u_permission 判斷 table 來源
-              $table = '';
-              $title_key = 'title'; // 預設
-
+              // 尋找標籤和權限
               $sql_demand = "SELECT tag, u_permission FROM demanded WHERE d_id = '$d_id'";
               $demand_result = mysqli_query($link, $sql_demand);
-              $demand = mysqli_fetch_assoc($demand_result);
 
+              if (!$demand_result) {
+                die('資料庫查詢錯誤: ' . mysqli_error($link));
+              }
+
+              $demand = mysqli_fetch_assoc($demand_result);
               if (!$demand) {
-                die('錯誤：無此文章');
+                die('錯誤：找不到這個需求！');
               }
 
               $tag = $demand['tag'];
               $permission = $demand['u_permission'];
+
+              // 根據標籤決定查詢哪個表格
+              $table = '';
+              $title_key = 'title'; // 預設
 
               switch ($tag) {
                 case '合作':
@@ -196,12 +198,15 @@
                   die('錯誤：未知的標籤類型！');
               }
 
-
-              // 查真正的內容
+              // 查詢內容
               $content_sql = "SELECT * FROM $table WHERE d_id='$d_id'";
               $content_result = mysqli_query($link, $content_sql);
-              $content_row = mysqli_fetch_assoc($content_result);
 
+              if (!$content_result) {
+                die('資料庫查詢錯誤: ' . mysqli_error($link));
+              }
+
+              $content_row = mysqli_fetch_assoc($content_result);
               if (!$content_row) {
                 echo "<p>找不到相關資料</p>";
                 exit;
@@ -210,36 +215,44 @@
               // 解析 JSON 欄位
               $money_exposure = [];
               if (!empty($content_row['money_exposure'])) {
-                $money_exposure = json_decode($content_row['money_exposure'], true);
+                $money_exposure = json_decode($content_row['money_exposure'], true) ?: [];
               }
 
               $product_methods = [];
               if (!empty($content_row['product_methods'])) {
-                $product_methods = json_decode($content_row['product_methods'], true);
+                $product_methods = json_decode($content_row['product_methods'], true) ?: [];
               }
 
-              $deadline = ($content_row['deadline'] === '0000-00-00') ? '無截止日期' : htmlspecialchars($content_row['deadline']);
+              $deadline = isset($content_row['deadline']) && $content_row['deadline'] !== '0000-00-00' 
+                  ? htmlspecialchars($content_row['deadline']) 
+                  : '無截止日期';
 
-              // 開始顯示
+              // 顯示內容
               echo "
-<div class='dcard-post' style='border:1px solid #ccc; border-radius:10px; padding:20px; margin:20px 0; background:#f9f9f9;'>
-  <div class='dcard-header' style='margin-bottom:20px;'>
-    <h2 style='margin:0; font-size:26px;'>✏️ " . htmlspecialchars($content_row[$title_key] ?? '無標題') . "</h2>
-  </div>
-  <div class='dcard-body' style='font-size:16px; line-height:1.8;'>
-    <p></p>
-    <hr style='margin:15px 0;'>
-";
+              <div class='dcard-post' style='border:1px solid #ccc; border-radius:10px; padding:20px; margin:20px 0; background:#f9f9f9;'>
+                <div class='dcard-header' style='margin-bottom:20px;'>
+                  <h2 style='margin:0; font-size:26px;'>✏️ " . htmlspecialchars($content_row[$title_key] ?? '無標題') . "</h2>
+                </div>
+                <div class='dcard-body' style='font-size:16px; line-height:1.8;'>
+                  <p></p>
+                  <hr style='margin:15px 0;'>
+              ";
 
               switch ($tag) {
                 case '合作':
                   echo "
-        <p>🤝 <strong>合作名稱：</strong> " . htmlspecialchars($content_row['coop_name'] ?? '無資料') . "</p>
-        <p>📝 <strong>合作說明：</strong> " . htmlspecialchars($content_row['coop_description'] ?? '無資料') . "</p>
-        <p>📂 <strong>合作類型：</strong> " . htmlspecialchars($content_row['coop_type'] ?? '無資料') . "</p>";
+                  <p>🤝 <strong>合作名稱：</strong> " . htmlspecialchars($content_row['coop_name'] ?? '無資料') . "</p>
+                  <p>📝 <strong>合作說明：</strong> " . htmlspecialchars($content_row['coop_desc'] ?? '無資料') . "</p>
+                  <p>📂 <strong>合作類型：</strong> " . htmlspecialchars($content_row['coop_type'] ?? '無資料') . "</p>
+                  <p>📝 <strong>預期效益：</strong> " . htmlspecialchars($content_row['benefit'] ?? '無資料') . "</p>
+                  <p>📂 <strong>活動地址：</strong> " . 
+                  ((!empty($content_row['city']) ? htmlspecialchars($content_row['city']) : '無資料') . 
+                  (!empty($content_row['district']) ? " " . htmlspecialchars($content_row['district']) : '') . 
+                  (!empty($content_row['address']) ? " " . htmlspecialchars($content_row['address']) : '')) . 
+                  "</p>";
 
                   if (!empty($content_row['coop_benefit'])) {
-                    $coop_benefit = json_decode($content_row['coop_benefit'], true);
+                    $coop_benefit = json_decode($content_row['coop_benefit'], true) ?: [];
                     echo "<p>🎯 <strong>合作效益：</strong></p><ul style='margin-left:20px;'>";
                     foreach ($coop_benefit as $benefit) {
                       echo "<li>" . htmlspecialchars($benefit) . "</li>";
@@ -247,40 +260,39 @@
                     echo "</ul>";
                   }
                   echo "
-        <p>🗓️ <strong>合作期間：</strong> " . htmlspecialchars($content_row['coop_start']) . " ～ " . htmlspecialchars($content_row['coop_end']) . "</p>
-        ";
+                  <p>🗓️ <strong>合作期間：</strong> " . htmlspecialchars($content_row['coop_start'] ?? '') . " ～ " . htmlspecialchars($content_row['coop_end'] ?? '') . "</p>
+                  ";
                   break;
 
                 case 'spon': // org_donate
                   echo "
-        <p>🎈 <strong>活動名稱：</strong> " . htmlspecialchars($content_row['event_name'] ?? '無資料') . "</p>
-        <p>🙋‍♂️ <strong>參與方式：</strong> " . htmlspecialchars($content_row['event_participate'] ?? '無資料') . "</p>
-        <p>📝 <strong>活動描述：</strong> " . htmlspecialchars($content_row['event_description'] ?? '無資料') . "</p>
-        <p>💰 <strong>贊助方式：</strong> " . htmlspecialchars($content_row['sponsor_method'] ?? '無資料') . "</p>
-        <p>💸 <strong>贊助金額：</strong> " . number_format($content_row['sponsor_amount']) . " 元</p>
-        ";
+                  <p>🎈 <strong>活動名稱：</strong> " . htmlspecialchars($content_row['event_name'] ?? '無資料') . "</p>
+                  <p>🙋‍♂️ <strong>參與方式：</strong> " . htmlspecialchars($content_row['event_participate'] ?? '無資料') . "</p>
+                  <p>📝 <strong>活動描述：</strong> " . htmlspecialchars($content_row['event_description'] ?? '無資料') . "</p>
+                  <p>💰 <strong>贊助方式：</strong> " . htmlspecialchars($content_row['sponsor_method'] ?? '無資料') . "</p>
+                  <p>💸 <strong>贊助金額：</strong> " . (isset($content_row['sponsor_amount']) ? number_format((float)$content_row['sponsor_amount']) : '0') . " 元</p>
+                  ";
                   break;
 
                 case '贊助': // cor_spons
                   echo "
-        <p>💰 <strong>贊助方式：</strong> " . htmlspecialchars($content_row['sponsor_method'] ?? '無資料') . "</p>
-        <p>💸 <strong>贊助金額：</strong> " . number_format($content_row['sponsor_amount']) . " 元</p>
-        <p>📝 <strong>宣傳詳情：</strong> " . htmlspecialchars($content_row['content'] ?? '無資料') . "</p>
-
-        ";
+                  <p>💰 <strong>贊助方式：</strong> " . htmlspecialchars($content_row['sponsor_method'] ?? '無資料') . "</p>
+                  <p>💸 <strong>贊助金額：</strong> " . (isset($content_row['sponsor_amount']) ? number_format((float)$content_row['sponsor_amount']) : '0') . " 元</p>
+                  <p>📝 <strong>宣傳詳情：</strong> " . htmlspecialchars($content_row['content'] ?? '無資料') . "</p>
+                  ";
                   break;
 
                 case '招募': // cor_intern
                   echo "
-        <p>🧑‍💼 <strong>職缺名稱：</strong> " . htmlspecialchars($content_row['intern_title'] ?? '無資料') . "</p>
-        <p>👥 <strong>招募人數：</strong> " . htmlspecialchars($content_row['intern_number'] ?? '無資料') . " 人</p>
-        <p>💵 <strong>薪資：</strong> " . htmlspecialchars($content_row['salary'] ?? '無資料') . "</p>
-        <p>📍 <strong>地區：</strong> " . htmlspecialchars($content_row['intern_city'] . ' ' . $content_row['intern_district']) . "</p>
-        <p>🕰️ <strong>工作時間：</strong> " . htmlspecialchars($content_row['worktime'] ?? '無資料') . "</p>
-        <p>🛠️ <strong>技能要求：</strong> " . htmlspecialchars($content_row['jobskill'] ?? '無資料') . "</p>
-        <p>📋 <strong>實習內容：</strong> " . htmlspecialchars($content_row['intern_detail'] ?? '無資料') . "</p>
-        <p>📜 <strong>其他需求：</strong> " . htmlspecialchars($content_row['requirements'] ?? '無資料') . "</p>
-        ";
+                  <p>🧑‍💼 <strong>職缺名稱：</strong> " . htmlspecialchars($content_row['intern_title'] ?? '無資料') . "</p>
+                  <p>👥 <strong>招募人數：</strong> " . htmlspecialchars($content_row['intern_number'] ?? '無資料') . " 人</p>
+                  <p>💵 <strong>薪資：</strong> " . htmlspecialchars($content_row['salary'] ?? '無資料') . "</p>
+                  <p>📍 <strong>地區：</strong> " . htmlspecialchars(($content_row['intern_city'] ?? '') . ' ' . ($content_row['intern_district'] ?? '')) . "</p>
+                  <p>🕰️ <strong>工作時間：</strong> " . htmlspecialchars($content_row['worktime'] ?? '無資料') . "</p>
+                  <p>🛠️ <strong>技能要求：</strong> " . htmlspecialchars($content_row['jobskill'] ?? '無資料') . "</p>
+                  <p>📋 <strong>實習內容：</strong> " . htmlspecialchars($content_row['intern_detail'] ?? '無資料') . "</p>
+                  <p>📜 <strong>其他需求：</strong> " . htmlspecialchars($content_row['requirements'] ?? '無資料') . "</p>
+                  ";
                   break;
               }
 
@@ -301,18 +313,17 @@
                 echo "</ul>";
               }
 
-              // 最後是建立時間跟截止
+              // 顯示建立時間和截止日期
               echo "
-    <p>🕓 <strong>建立時間：</strong> " . htmlspecialchars($content_row['created_at']) . "</p>
-    <p>⏳ <strong>截止日期：</strong> $deadline</p>
-  </div>
-</div>
-";
+                  <p>🕓 <strong>建立時間：</strong> " . htmlspecialchars($content_row['created_at'] ?? '') . "</p>
+                  <p>⏳ <strong>截止日期：</strong> $deadline</p>
+                </div>
+              </div>
+              ";
               ?>
               <div class="tab-pane fade" id="real-estate-2-tab3">
               </div>
             </div>
-
           </div>
 
           <div class="col-lg-3" data-aos="fade-up" data-aos-delay="100">
@@ -320,48 +331,57 @@
               <h3>基本資料</h3>
               <ul>
                 <?php
+                // 顯示公司資訊
+                echo "<li><p>🏢 <strong>公司名稱：</strong><a href='profile.php?d_id=" . htmlspecialchars($d_id) . "'> " . 
+                  htmlspecialchars($content_row['c_name'] ?? '無資料') . "</a></p></li>
+                  <li><p>📧 <strong>聯絡信箱：</strong> " . 
+                  htmlspecialchars($content_row['c_email'] ?? '無資料') . "</p></li>
+                  <li><p>📞 <strong>聯絡電話：</strong> " . 
+                  htmlspecialchars($content_row['c_phone'] ?? '無資料') . "</p></li>";
 
-
-                echo "<li><p>🏢 <strong>公司名稱：</strong><a href='profile.php?d_id=$d_id'> " . htmlspecialchars($content_row['c_name'] ?? '無資料') . "</a></p></li>
-                      <li><p>📧 <strong>聯絡信箱：</strong> " . htmlspecialchars($content_row['c_email'] ?? '無資料') . "</p></li>
-                      <li><p>📞 <strong>聯絡電話：</strong> " . htmlspecialchars($content_row['c_phone'] ?? '無資料') . "</p></li>";
-
-
-                $receiver_query = "SELECT u_email FROM demanded WHERE d_id = $d_id";
+                // 聊天功能
+                $receiver_query = "SELECT u_email FROM demanded WHERE d_id = '" . mysqli_real_escape_string($link, $d_id) . "'";
                 $receiver_result = mysqli_query($link, $receiver_query);
-                $receiver_email = mysqli_fetch_assoc($receiver_result)['u_email'] ?? '';
-
-                $u_email = $_SESSION['u_email'] ?? '';
-                $safe_email = urlencode($u_email);
-                $safe_receiver = urlencode($receiver_email);
-                if ($_SESSION['u_permission']) {
-                  echo '<li><a class="btn" style="background-color: #28c76f; color: white;" href="./chat/public/index .php?u_email=' . $safe_email . '&receiver=' . $safe_receiver . '" target="_blank" class="chat-button">聊天室</a></li>';
+                
+                if ($receiver_result) {
+                  $receiver_row = mysqli_fetch_assoc($receiver_result);
+                  $receiver_email = $receiver_row['u_email'] ?? '';
+                  
+                  // 獲取當前用戶的電子郵件（如果已登錄）
+                  $u_email = isset($_SESSION['u_email']) ? $_SESSION['u_email'] : '';
+                  
+                  // 安全編碼 URL 參數
+                  $safe_email = urlencode($u_email);
+                  $safe_receiver = urlencode($receiver_email);
+                  
+                  // 根據登錄狀態顯示適當的聊天按鈕
+                  if (isset($_SESSION['u_permission']) && $_SESSION['u_permission']) {
+                    echo '<li><a class="btn" style="background-color: #28c76f; color: white;" href="./chat/public/index.php?u_email=' . 
+                      $safe_email . '&receiver=' . $safe_receiver . '" target="_blank">聊天室</a></li>';
+                  } else {
+                    echo '<li><a href="#" onclick="alert(\'請先登錄再進行洽談\'); return false;" class="btn">聊天室</a></li>';
+                  }
                 } else {
-                  echo '<li><a href="#" onclick="alert(\'請先登錄再進行洽談\'); return false;" class="chat-button">聊天室</a></li>';
+                  echo '<li>無法獲取聯絡資訊</li>';
                 }
                 ?>
                 <li class="my-2">
                   <button class="btn" style="background-color: #28c76f; color: white;"
-                    onclick="if(confirm('確認是否申請合作？')) { window.location.href='submitdb.php?d_id=<?= $d_id ?>'; }">
+                    onclick="if(confirm('確認是否申請合作？')) { window.location.href='submitdb.php?d_id=<?= htmlspecialchars($d_id) ?>'; }">
                     我想合作
                   </button>
                 </li>
-
-
               </ul>
             </div>
           </div>
 
         </div>
-
       </div>
-
     </section><!-- /Real Estate 2 Section -->
 
   </main>
 
   <footer id="footer" class="footer light-background">
-
     <div class="container">
       <div class="row gy-3">
         <div class="col-lg-3 col-md-6 d-flex">
@@ -372,7 +392,6 @@
             <p>New York, NY 535022</p>
             <p></p>
           </div>
-
         </div>
 
         <div class="col-lg-3 col-md-6 d-flex">
@@ -406,7 +425,6 @@
             <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
           </div>
         </div>
-
       </div>
     </div>
 
@@ -420,7 +438,6 @@
         Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
       </div>
     </div>
-
   </footer>
 
   <!-- Scroll Top -->
