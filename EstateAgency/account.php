@@ -504,144 +504,97 @@
                         <!-- 合作專案（示範卡片） -->
                         <div id="projects-section" class="section-content" style="display: none;">
                             <div class='dcard-post'>
-                                <a href='project-detail.php'>
+                               
                                     
                                     <div class='dcard-body'>
-                                    <?php
+                                   
+<?php
 
+$me = $_SESSION['u_email'] ?? '';
+if (!$me) exit('請先登入');
 
-// 1. 建立資料庫連線
-$servername = "localhost";
-$username   = "root";
-$password   = "";
-$dbname     = "sa";
+$conn = new mysqli("localhost","root","","sa");
+if ($conn->connect_error) die("DB 連線失敗");
 
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-    die("連線失敗: " . $conn->connect_error);
-}
-
-// 2. 取得目前登入者 email
-$account_mail = $_SESSION['u_email'] ?? '';
-if (empty($account_mail)) {
-    echo "<p>請先登入才能查看合作專案。</p>";
-    exit;
-}
-
-// 3. 撈出 match_db 中 a_u_email 或 b_u_email = 使用者的所有紀錄
-$sql  = "SELECT * FROM match_db WHERE a_u_email = ? OR b_u_email = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("ss", $account_mail, $account_mail);
+// 取出所有與我有關的 match
+$stmt = $conn->prepare("SELECT * FROM match_db WHERE a_u_email=? OR b_u_email=?");
+$stmt->bind_param("ss", $me, $me);
 $stmt->execute();
-$result = $stmt->get_result();
+$all = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
 
-// 4. 分區
-$pendingAgree = [];
-$negotiation  = [];
-$completed    = [];
-
-while ($row = $result->fetch_assoc()) {
-    $partner = ($row['a_u_email'] === $account_mail)
-             ? $row['b_u_email']
-             : $row['a_u_email'];
-    $row['partner'] = $partner;
-
-    if ($row['agree'] == 0) {
-        $pendingAgree[] = $row;
-    }
-    elseif ($row['agree'] == 1 && $row['draft'] == 0) {
-        $negotiation[] = $row;
-    }
-    elseif ($row['agree'] == 1 && $row['draft'] == 1) {
-        $completed[] = $row;
+// 分三區
+$pending    = []; // pending
+$negotiating= []; // negotiating
+$completed  = []; // completed
+foreach ($all as $r) {
+    switch ($r['status']) {
+        case 'pending':     $pending[]     = $r; break;
+        case 'negotiating': $negotiating[] = $r; break;
+        case 'completed':   $completed[]   = $r; break;
     }
 }
 
-// 5. 定義渲染區塊的函式
-function renderSection($header, $rows, $statusText, $account_mail, $conn) {
+// Render Block
+function renderBlock($title, $rows, $step, $label, $me, $conn) {
     if (empty($rows)) return;
-    echo "<h3>{$header}</h3>";
-
+    echo "<h3>$title</h3>";
     foreach ($rows as $r) {
-        $did = intval($r['d_id']);
-
-        // 5.1 取出 demanded.tag
-        $tagStmt = $conn->prepare("SELECT tag FROM demanded WHERE d_id = ?");
-        $tagStmt->bind_param("i", $did);
-        $tagStmt->execute();
-        $tagRes = $tagStmt->get_result();
-        $tagRow = $tagRes->fetch_assoc();
-        $tag = htmlspecialchars($tagRow['tag'] ?? '');
-        $tagStmt->close();
-
-        // 5.2 switch 決定要從哪張 table 拿哪個 title_key
+        // 取 partner
+        $partner = ($r['a_u_email']===$me)? $r['b_u_email']:$r['a_u_email'];
+        // 取 tag
+        $t = $conn->prepare("SELECT tag FROM demanded WHERE d_id=?");
+        $t->bind_param("i",$r['d_id']);
+        $t->execute();
+        $tag = htmlspecialchars($t->get_result()->fetch_assoc()['tag'] ?? '');
+        $t->close();
+        // 取專案標題
         switch ($tag) {
-            case '企業合作':
-                $table     = 'corp_coop';
-                $title_key = 'coop_name';
-                break;
-            case '社團合作':
-                $table     = 'club_coop';
-                $title_key = 'coop_name';
-                break;
-            case 'spon':
-                $table     = 'org_donate';
-                $title_key = 'title';
-                $tag        = '贊助';
-                break;
-            case '贊助':
-                $table     = 'cor_spons';
-                $title_key = 'title';
-                break;
-            case '實習':
-                $table     = 'cor_intern';
-                $title_key = 'intern_title';
-                break;
-            default:
-                die('錯誤：未知的標籤類型！');
+            case '企業合作': $tbl='corp_coop';  $key='coop_name'; break;
+            case '社團合作': $tbl='club_coop';  $key='coop_name'; break;
+            case 'spon':      $tbl='org_donate'; $key='title';    $tag='贊助'; break;
+            case '贊助':      $tbl='cor_spons';  $key='title';    break;
+            case '實習':      $tbl='cor_intern'; $key='intern_title'; break;
+            default:          $tbl=''; $key='';             break;
         }
-
-        // 5.3 真正去那張 $table 撈出 $title_key
-        $titleStmt = $conn->prepare("SELECT {$title_key} FROM {$table} WHERE d_id = ?");
-        $titleStmt->bind_param("i", $did);
-        $titleStmt->execute();
-        $titleRes = $titleStmt->get_result();
-        $titleRow = $titleRes->fetch_assoc();
-        $realTitle = htmlspecialchars($titleRow[$title_key] ?? '');
-        $titleStmt->close();
-
-        // 5.4 URL 參數安全化
-        $safe_receiver = urlencode($r['partner']);
-        $safe_email    = urlencode($account_mail);
-
-        // 5.5 輸出卡片
+        $proj = '';
+        if ($tbl) {
+            $u = $conn->prepare("SELECT $key FROM $tbl WHERE d_id=?");
+            $u->bind_param("i",$r['d_id']);
+            $u->execute();
+            $proj = htmlspecialchars($u->get_result()->fetch_assoc()[$key] ?? '');
+            $u->close();
+        }
+        // 決定按鈕文字
+        $who = ($r['a_u_email']===$me)?'a':'b';
+        $confirmed = $r["{$step}_{$who}"];
+        // 如果我已經按過，就顯示「等待對方 + 標籤」，否則「我 + 標籤」
+        $btnText = $confirmed
+                 ? "等待對方$label"
+                 : "我$label";
+        // 卡片
         echo "
         <div class='dcard-post'>
-          <div class='dcard-header'>
-            <span class='dcard-tag'>#{$tag}</span>
-          </div>
+          <div class='dcard-header'><span class='dcard-tag'>#$tag</span></div>
           <div class='dcard-body'>
-            <p><strong>合作夥伴：</strong>" . htmlspecialchars($r['partner']) . "</p>
-            <p><strong>專案名稱：</strong>{$realTitle}</p>
-            <p><strong>開始日期：</strong>" . htmlspecialchars($r['start_date'] ?? '') . "</p>
-            <p><strong>狀態：</strong>{$statusText}</p>
-            <a
-              class='btn chat-button'
-              style='background-color: #28c76f; color: white;'
-              href='./chat/public/index .php?u_email={$safe_email}&receiver={$safe_receiver}'
-              target='_blank'
-            >聊天室</a>
+            <p><strong>合作夥伴：</strong>$partner</p>
+            <p><strong>專案名稱：</strong>$proj</p>
+            <p><strong>開始日期：</strong>{$r['d_date']}</p>
+            <p><strong>狀態：</strong>$title</p>
+            <button class='js-action btn' data-did='{$r['d_id']}' data-step='$step'>$btnText</button>
+            <a class='btn chat-button'
+               style='background-color:#28c76f;color:white;'
+               href='./chat/public/index.php?u_email=".urlencode($me)."&receiver=".urlencode($partner)."' 
+               target='_blank'>聊天室</a>
           </div>
-        </div>
-        ";
+        </div>";
     }
 }
 
-// 6. 依序輸出三個區塊
-renderSection('同意申請',   $pendingAgree, '等待同意', $account_mail, $conn);
-renderSection('洽談中',     $negotiation,  '洽談中',   $account_mail, $conn);
-renderSection('已完成合作', $completed,    '已完成',   $account_mail, $conn);
+// 輸出
+renderBlock('同意申請',   $pending,     'agree',    '同意',     $me, $conn);
+renderBlock('洽談中',     $negotiating, 'complete', '完成',     $me, $conn);
+renderBlock('已完成合作', $completed,   'terminate','終結合作', $me, $conn);
 
 $conn->close();
 ?>
@@ -777,7 +730,80 @@ $conn->close();
 
     <!-- Main JS File -->
     <script src="assets/js/main.js"></script>
+    
+<script>
+// AJAX 呼叫 update_status.php
+document.querySelectorAll('.js-action').forEach(btn=>{
+  btn.onclick = async ()=>{
+    const did  = btn.dataset.did;
+    const step = btn.dataset.step;
+    const res = await fetch('update_status.php', {
+      method:'POST',
+      headers:{'Content-Type':'application/x-www-form-urlencoded'},
+      body:`d_id=${did}&step=${step}`
+    });
+    const j = await res.json();
+    if (j.status) location.reload();
+    else alert('更新失敗');
+  };
+});
+</script>
+
 
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
