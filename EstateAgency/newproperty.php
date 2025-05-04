@@ -37,9 +37,28 @@
   * License: https://bootstrapmade.com/license/
   ======================================================== -->
 </head>
+<style>
+                section,
+                .container,
+                .your-other-blocks {
+                background-color: transparent !important;
+                }
+                .page-title,
+                .page-title .container,
+                .breadcrumbs {
+                background: transparent !important;
+                z-index: 1;
+                }
+                </style>
 
-<body class="starter-page-page">
-
+<body class="starter-page-page" style="
+  background-image: url('/SA/EstateAgency/assets/img/bg2.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  margin: 0;
+">
     <header id="header" class="header d-flex align-items-center fixed-top">
         <div class="container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
 
