@@ -93,8 +93,27 @@
         <?php
         $link = mysqli_connect('localhost', 'root', '', 'sa');
         mysqli_set_charset($link, "utf8mb4");
+
         $d_id = $_GET['id'];
+
+        $sql = "
+        SELECT *
+        FROM demanded d
+        LEFT JOIN club_coop cc ON d.d_id = cc.d_id
+        LEFT JOIN corp_coop cp ON d.d_id = cp.d_id
+        LEFT JOIN cor_intern ci ON d.d_id = ci.d_id
+        LEFT JOIN cor_spons cs ON d.d_id = cs.d_id
+        LEFT JOIN org_donate od ON d.d_id = od.d_id
+        WHERE d.d_id = ?
+        ";
+
+        $stmt = mysqli_prepare($link, $sql);
+        mysqli_stmt_bind_param($stmt, "i", $d_id);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+        $row = mysqli_fetch_assoc($result); // $row 中就包含所有欄位
         ?>
+
         <!-- Starter Section Section -->
         <section id="starter-section" class="starter-section section contact section">
 
@@ -104,303 +123,318 @@
             </div><!-- End Section Title -->
             <div class="container" data-aos="fade-up" data-aos-delay="100">
                 <div class="col-lg-12">
+                <?php var_dump($row); ?>
                     <form action="changepostdb.php?id=<?php echo $d_id; ?>" method="post" class="php-email-form" data-aos="fade-up" data-aos-delay="200">
                         <div class="row gy-4">
-                            <!-- <p>一、需求標題</p>
-                            <div class="col-md-6">
-                                <input type="text" class="form-control" name="title" placeholder="請輸入簡要說明" required>
-                            </div>
-
-                            <p>二、需求詳細描述</p>
-                            <div class="col-md-12">
-                                <textarea class="form-control" name="content" rows="3" placeholder="請詳細說明需求和期望"
-                                    required></textarea>
-                            </div> -->
                             <?php
                             $u_permission = $_SESSION['u_permission'];
 
                             if ($u_permission == '組織團體') {
+                                $money_exposure = isset($row['money_exposure']) ? explode(',', $row['money_exposure']) : [];
+                                $product_exposure = isset($row['product_methods']) ? explode(',', $row['product_methods']) : [];
                                 echo '
                             <p>一、請選擇需求類型</p>
                             <div class="col-md-6">
-                            <select class="form-select" id="demandtype" name="tag" required>
-                                <option selected disabled value="_">需求類型</option>
-                                <option value="spon">贊助</option>
-                                <option value="合作">合作</option>
-                            </select>
+                                <select class="form-select" id="demandtype" name="tag" required>
+                                    <option selected disabled value="_" ' . (($row['tag'] ?? '') === '_' ? ' selected' : '') . '>需求類型</option>
+                                    <option value="spon" ' . (($row['tag'] ?? '') === 'spon' ? ' selected' : '') . '>贊助</option>
+                                    <option value="合作" ' . (($row['tag'] ?? '') === '合作' ? ' selected' : '') . '>合作</option>
+                                </select>
                             </div>
                             
                             <!-- 贊助細節區塊 -->
                             <div class="row gy-4">
-                              <div id="sponsorSection" style="display: none;">
-                                <p>二、贊助細節</p>
-                                
-                                <div class="row gy-3">
+                                <div id="sponsorSection" style="display: none;">
+                                    <p>二、贊助細節</p>
+                                    <div class="row gy-3">
+                                        <div class="col-md-4">
+                                            <input type="text" class="form-control" name="eventname" placeholder="活動名稱" value="' . htmlspecialchars($row['event_name'] ?? '') . '">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <input type="text" class="form-control" name="eventparticipate" placeholder="預計活動人數" value="' . htmlspecialchars($row['event_participate'] ?? '') . '">
+                                        </div>
+                                        <div class="col-md-12">
+                                            <textarea class="form-control" name="target" rows="3" placeholder="活動描述">' . htmlspecialchars($row['event_description'] ?? '') . '</textarea>
+                                        </div>
                                     <div class="col-md-4">
-                                        <input type="text" class="form-control" name="eventname" placeholder="活動名稱" >
-                                    </div>
-                                    <div class="col-md-4">
-                                        <input type="text" class="form-control" name="eventparticipate" placeholder="預計活動人數" >
-                                    </div>
-                            
-                                <div class="col-md-12">
-                                    <textarea class="form-control" name="target" rows="3" placeholder="活動描述" ></textarea>
-                                </div>
-                            
-                                <div class="col-md-4">
-                                    <select class="form-select" id="sponsor_method" name="sponsor_method" >
-                                      <option selected disabled value="_" >贊助方式</option>
-                                      <option value="money">金錢</option>
-                                      <option value="product">產品</option>
-                                    </select>
-                                </div>
-                                <div id="sponsor_amount"  style="display: none;">               
-                                    <div class="col-md-4">
-                                        <select class="form-select" name="sponsor_amount"  >
-                                        <option selected disabled value="_">贊助金額</option>
-                                        <option value="10000">10000以內</option>
-                                        <option value="20000">10000~20000</option>
-                                        <option value="30000">20000~30000</option>
-                                        <option value="40000">30000~40000</option>
-                                        <option value="50000">40000~50000</option>
-                                        <option value="other">金額詳談</option>
+                                        <select class="form-select" id="sponsor_method" name="sponsor_method">
+                                        <option disabled value="_">贊助方式</option>
+                                        <option value="money"' . (($row['sponsor_method'] ?? '') === 'money' ? ' selected' : '') . '>金錢</option>
+                                        <option value="product"' . (($row['sponsor_method'] ?? '') === 'product' ? ' selected' : '') . '>產品</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-6" id="money_options" >
-                                    <label>金錢贊助曝光方式（可複選）</label>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="postbrand" value="海報商標" id="posterLogo">
-                                        <label class="form-check-label" for="posterLogo">海報商標</label>
+
+                                    <div id="sponsor_amount" style="display: none;">
+                                        <div class="col-md-4">
+                                        <select class="form-select" name="sponsor_amount">
+                                            <option disabled value="_">贊助金額</option>
+                                            <option value="10000"' . (($row['sponsor_amount'] ?? '') === '10000' ? ' selected' : '') . '>10000以內</option>
+                                            <option value="20000"' . (($row['sponsor_amount'] ?? '') === '20000' ? ' selected' : '') . '>10000~20000</option>
+                                            <option value="30000"' . (($row['sponsor_amount'] ?? '') === '30000' ? ' selected' : '') . '>20000~30000</option>
+                                            <option value="40000"' . (($row['sponsor_amount'] ?? '') === '40000' ? ' selected' : '') . '>30000~40000</option>
+                                            <option value="50000"' . (($row['sponsor_amount'] ?? '') === '50000' ? ' selected' : '') . '>40000~50000</option>
+                                            <option value="other"' . (($row['sponsor_amount'] ?? '') === 'other' ? ' selected' : '') . '>金額詳談</option>
+                                        </select>
+                                        </div>
+
+                                        <div class="col-md-6" id="money_options">
+                                            <label>金錢贊助曝光方式（可複選）</label>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="postbrand" value="海報商標" id="posterLogo"' .
+                                                (in_array('海報商標', $money_exposure) ? ' checked' : '') . '>
+                                                <label class="form-check-label" for="posterLogo">海報商標</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="postad" value="海報置入" id="posterInsert"' .
+                                                (in_array('海報置入', $money_exposure) ? ' checked' : '') . '>
+                                                <label class="form-check-label" for="posterInsert">海報置入</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="promotesignage" value="宣傳立牌" id="standee"' .
+                                                (in_array('宣傳立牌', $money_exposure) ? ' checked' : '') . '>
+                                                <label class="form-check-label" for="standee">宣傳立牌</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="socialpromote" value="社群宣傳" id="social"' .
+                                                (in_array('社群宣傳', $money_exposure) ? ' checked' : '') . '>
+                                                <label class="form-check-label" for="social">社群宣傳</label>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="postad" value="海報置入" id="posterInsert">
-                                        <label class="form-check-label" for="posterInsert">海報置入</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="promotesignage" value="宣傳立牌" id="standee">
-                                        <label class="form-check-label" for="standee">宣傳立牌</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="socialpromote" value="社群宣傳" id="social">
-                                        <label class="form-check-label" for="social">社群宣傳</label>
+
+                                    <div id="productdona" style="display: none;">
+                                        <div class="col-md-6" id="product_options">
+                                            <label>商品贊助方式（可複選）</label>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="product[]" value="公關品發放" id="gift"' .
+                                                (in_array('公關品發放', $product_methods) ? ' checked' : '') . '>
+                                                <label class="form-check-label" for="gift">公關品發放</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="product[]" value="現場設攤位" id="booth"' .
+                                                (in_array('現場設攤位', $product_methods) ? ' checked' : '') . '>
+                                                <label class="form-check-label" for="booth">現場設攤位</label>
+                                            </div>
+                                        </div>
                                     </div>
                                     </div>
                                 </div>
-                            
-                                <div id="productdona" style="display: none;">               
-                                    <div class="col-md-6" id="product_options" >
-                                    <label>商品贊助方式（可複選）</label>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="product[]" value="公關品發放" id="gift">
-                                        <label class="form-check-label" for="gift">公關品發放</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="product[]" value="現場設攤位" id="booth">
-                                        <label class="form-check-label" for="booth">現場設攤位</label>
-                                    </div>
-                                    </div>
-                                </div>
-                                </div>
-                              </div>
                               
-                              <!-- 合作細節區塊 -->
-                              <div id="cooperationSection" style="display: none;">
-                                <p>二、合作細節</p>
-                                
-                                <div class="row gy-3">
-                                    <div class="col-md-4">
-                                        <input type="text" class="form-control" name="coopname" placeholder="合作項目名稱" >
-                                    </div>
-                                    
-                                    <div class="col-md-12">
-                                        <textarea class="form-control" name="coopdesc" rows="3" placeholder="合作內容描述" ></textarea>
-                                    </div>
-                                    
-                                    <div class="col-md-4">
-                                        <select class="form-select" id="coop_type" name="coop_type" >
-                                            <option selected disabled value="_">合作類型</option>
-                                            <option value="活動合辦">活動合辦</option>
-                                            <option value="資源共享">資源共享</option>
-                                            <option value="長期合作">長期合作</option>
-                                            <option value="其他">其他</option>
-                                        </select>
-                                    </div>
-                                    
-                                    <div class="col-md-6">
-                                        <label>合作預期效益（可複選）</label>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="benefit[]" value="提升知名度" id="awareness">
-                                            <label class="form-check-label" for="awareness">提升知名度</label>
+                                <!-- 合作細節區塊 -->
+                                <div id="cooperationSection" style="display: none;">
+                                    <p>二、合作細節</p>
+                                    <div class="row gy-3">
+                                        <div class="col-md-4">
+                                            <input type="text" class="form-control" name="coopname" placeholder="合作項目名稱" value="' . htmlspecialchars($row['coop_name'] ?? '') . '">
                                         </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="benefit[]" value="增加資源" id="resources">
-                                            <label class="form-check-label" for="resources">增加資源</label>
+
+                                        <div class="col-md-12">
+                                            <textarea class="form-control" name="coopdesc" rows="3" placeholder="合作內容描述">' . htmlspecialchars($row['coop_desc'] ?? '') . '</textarea>
                                         </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="benefit[]" value="拓展關係網" id="network">
-                                            <label class="form-check-label" for="network">拓展關係網</label>
+
+                                        <div class="col-md-4">
+                                            <select class="form-select" id="coop_type" name="coop_type">
+                                                <option disabled value="_">合作類型</option>
+                                                <option value="活動合辦"' . (($row['coop_type'] ?? '') === '活動合辦' ? ' selected' : '') . '>活動合辦</option>
+                                                <option value="資源共享"' . (($row['coop_type'] ?? '') === '資源共享' ? ' selected' : '') . '>資源共享</option>
+                                                <option value="長期合作"' . (($row['coop_type'] ?? '') === '長期合作' ? ' selected' : '') . '>長期合作</option>
+                                                <option value="其他"' . (($row['coop_type'] ?? '') === '其他' ? ' selected' : '') . '>其他</option>
+                                            </select>
                                         </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="benefit[]" value="技術交流" id="exchange">
-                                            <label class="form-check-label" for="exchange">技術交流</label>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="col-md-12">
-                                        <label>合作時間</label>
-                                        <div class="row">
-                                            <div class="col-md-4">
-                                                <input type="date" class="form-control" name="coopstart" placeholder="開始日期" >
+
+                                        <div class="col-md-6">
+                                            <label>合作預期效益（可複選）</label>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="benefit[]" value="提升知名度" id="awareness"' . 
+                                                ((isset($row['benefit']) && strpos($row['benefit'], '提升知名度') !== false) ? ' checked' : '') . '>
+                                                <label class="form-check-label" for="awareness">提升知名度</label>
                                             </div>
-                                            <div class="col-md-4">
-                                                <input type="date" class="form-control" name="coopend" placeholder="結束日期" >
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="benefit[]" value="增加資源" id="resources"' . 
+                                                ((isset($row['benefit']) && strpos($row['benefit'], '增加資源') !== false) ? ' checked' : '') . '>
+                                                <label class="form-check-label" for="resources">增加資源</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="benefit[]" value="拓展關係網" id="network"' . 
+                                                ((isset($row['benefit']) && strpos($row['benefit'], '拓展關係網') !== false) ? ' checked' : '') . '>
+                                                <label class="form-check-label" for="network">拓展關係網</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="benefit[]" value="技術交流" id="exchange"' . 
+                                                ((isset($row['benefit']) && strpos($row['benefit'], '技術交流') !== false) ? ' checked' : '') . '>
+                                                <label class="form-check-label" for="exchange">技術交流</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-12">
+                                            <label>合作時間</label>
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <input type="date" class="form-control" name="coopstart" placeholder="開始日期" value="' . htmlspecialchars($row['coop_start'] ?? '') . '">
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <input type="date" class="form-control" name="coopend" placeholder="結束日期" value="' . htmlspecialchars($row['coop_end'] ?? '') . '">
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                              </div>
                             </div>
                             ';
                             } elseif ($u_permission == '企業') {
+                                $money_exposure = isset($row['money_exposure']) ? explode(',', $row['money_exposure']) : [];
+                                $product_methods = isset($row['product']) ? explode(',', $row['product']) : [];
+                                $intern_req = isset($row['intern_requirement']) ? explode(',', $row['intern_requirement']) : [];
                                 echo '
-    <p>一、請選擇需求類型</p>
-    <div class="col-md-6">
-        <select class="form-select" id="demandtype2" name="tag" >
-            <option selected disabled value="_">需求類型</option>
-            <option value="贊助">贊助</option>
-            <option value="合作">合作</option>
-            <option value="招募">招募</option>
-            <option value="實習">實習</option>
-        </select>
-    </div>
+                                <p>一、請選擇需求類型</p>
+                                <div class="col-md-6">
+                                    <select class="form-select" id="demandtype2" name="tag" >
+                                        <option selected disabled value="_" ' . (($row['tag'] ?? '') === '_' ? ' selected' : '') . '>需求類型</option>
+                                        <option value="贊助" ' . (($row['tag'] ?? '') === '贊助' ? ' selected' : '') . '>贊助</option>
+                                        <option value="合作" ' . (($row['tag'] ?? '') === '合作' ? ' selected' : '') . '>合作</option>
+                                        <option value="招募" ' . (($row['tag'] ?? '') === '招募' ? ' selected' : '') . '>招募</option>
+                                        <option value="實習" ' . (($row['tag'] ?? '') === '實習' ? ' selected' : '') . '>實習</option>
+                                    </select>
+                                </div>
 
-    <div class="row gy-4">
-        <!-- 贊助細節區塊 -->
-        <div id="sponsorSection2" style="display: none;">
-            <p>二、贊助細節</p>
-            <div class="row gy-3">
-                <div class="col-md-4">
-                    <select class="form-select" id="sponsor_method2" name="sponsor_method" >
-                        <option selected disabled value="_">贊助方式</option>
-                        <option value="money">金錢</option>
-                        <option value="product">產品</option>
-                    </select>
-                </div>
+                                <div class="row gy-4">
+                                    <!-- 贊助細節區塊 -->
+                                    <div id="sponsorSection2" style="display: none;">
+                                        <p>二、贊助細節</p>
+                                        <div class="row gy-3">
+                                            <div class="col-md-4">
+                                                <select class="form-select" id="sponsor_method2" name="sponsor_method" >
+                                                    <option selected disabled value="_" ' . (($row['sponsor_method'] ?? '') === '_' ? ' selected' : '') . '>贊助方式</option>
+                                                    <option value="money" ' . (($row['sponsor_method'] ?? '') === 'money' ? ' selected' : '') . '>金錢</option>
+                                                    <option value="product" ' . (($row['sponsor_method'] ?? '') === 'product' ? ' selected' : '') . '>產品</option>
+                                                </select>
+                                            </div>
 
-                <!-- 金錢贊助細節 -->
-                <div id="sponsor_amount2" style="display: none;">
-                    <div class="col-md-4">
-                        <select class="form-select" id="sponsor_amount_select" name="sponsor_amount" >
-                            <option selected disabled value="_">贊助金額</option>
-                            <option value="10000">10000以內</option>
-                            <option value="20000">10000~20000</option>
-                            <option value="30000">20000~30000</option>
-                            <option value="40000">30000~40000</option>
-                            <option value="50000">40000~50000</option>
-                            <option value="other">金額詳談</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6" id="money_options2">
-                        <label>需要社團宣傳手段</label>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="postbrand" value="海報商標" id="posterLogo">
-                            <label class="form-check-label" for="posterLogo">海報商標</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="postad" value="海報置入" id="posterInsert">
-                            <label class="form-check-label" for="posterInsert">海報置入</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="promotesignage" value="宣傳立牌" id="standee">
-                            <label class="form-check-label" for="standee">宣傳立牌</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="socialpromote" value="社群宣傳" id="social">
-                            <label class="form-check-label" for="social">社群宣傳</label>
-                        </div>
-                    </div>
-                </div>
+                                            <!-- 金錢贊助細節 -->
+                                            <div id="sponsor_amount2" style="display: none;">
+                                                <div class="col-md-4">
+                                                    <select class="form-select" id="sponsor_amount_select" name="sponsor_amount" >
+                                                        <option value="10000"' . (($row['sponsor_amount'] ?? '') === '10000' ? ' selected' : '') . '>10000以內</option>
+                                                        <option value="20000"' . (($row['sponsor_amount'] ?? '') === '20000' ? ' selected' : '') . '>10000~20000</option>
+                                                        <option value="30000"' . (($row['sponsor_amount'] ?? '') === '30000' ? ' selected' : '') . '>20000~30000</option>
+                                                        <option value="40000"' . (($row['sponsor_amount'] ?? '') === '40000' ? ' selected' : '') . '>30000~40000</option>
+                                                        <option value="50000"' . (($row['sponsor_amount'] ?? '') === '50000' ? ' selected' : '') . '>40000~50000</option>
+                                                        <option value="other"' . (($row['sponsor_amount'] ?? '') === 'other' ? ' selected' : '') . '>金額詳談</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6" id="money_options2">
+                                                    <label>需要社團宣傳手段</label>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="postbrand" value="海報商標" id="posterLogo"'
+                                                        . (in_array('海報商標', $money_exposure) ? ' checked' : '') . '>
+                                                        <label class="form-check-label" for="posterLogo">海報商標</label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="postad" value="海報置入" id="posterInsert"'
+                                                        . (in_array('海報置入', $money_exposure) ? ' checked' : '') . '>
+                                                        <label class="form-check-label" for="posterInsert">海報置入</label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="promotesignage" value="宣傳立牌" id="standee"'
+                                                        . (in_array('宣傳立牌', $money_exposure) ? ' checked' : '') . '>
+                                                        <label class="form-check-label" for="standee">宣傳立牌</label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="socialpromote" value="社群宣傳" id="social"'
+                                                        . (in_array('社群宣傳', $money_exposure) ? ' checked' : '') . '>
+                                                        <label class="form-check-label" for="social">社群宣傳</label>
+                                                    </div>
+                                                </div>
+                                            </div>
 
-                <!-- 產品贊助細節 -->
-                <div id="productdona2" style="display: none;">
-                    <div class="col-md-6" id="product_options">
-                        <label>需要社團宣傳手段</label>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="product[]" value="公關品發放" id="gift">
-                            <label class="form-check-label" for="gift">公關品發放</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="product[]" value="現場設攤位" id="booth">
-                            <label class="form-check-label" for="booth">現場設攤位</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                                            <!-- 產品贊助細節 -->
+                                            <div id="productdona2" style="display: none;">
+                                                <div class="col-md-6" id="product_options">
+                                                    <label>需要社團宣傳手段</label>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="product[]" value="公關品發放" id="gift"' .
+                                                        (in_array('公關品發放', $product_methods) ? ' checked' : '') . '>
+                                                        <label class="form-check-label" for="gift">公關品發放</label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="product[]" value="現場設攤位" id="booth"' .
+                                                        (in_array('現場設攤位', $product_methods) ? ' checked' : '') . '>
+                                                        <label class="form-check-label" for="booth">現場設攤位</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
-        <!-- 實習細節區塊 -->
-        <div id="internsection" style="display: none;">
-            <p>二、實習職缺資訊</p>
-            <div class="row gy-3">
-                <div class="col-md-4">
-                    <label>職缺名稱</label>
-                    <input type="text" class="form-control" name="recruit_title" placeholder="招募職缺名稱">
-                </div>
-                <div class="col-md-4">
-                    <label>人數</label>
-                    <input type="number" class="form-control" name="recruit_number" placeholder="招募人數">
-                </div>
-                <div class="col-md-4">
-                    <label>薪資</label>
-                    <input type="text" class="form-control" name="salary" placeholder="薪資">
-                </div>
-                <div class="col-md-4">
-                    <label>地點</label>
-                    <select id="city" class="form-select" name="recruit_city">
-                        <option selected disabled value="">選擇縣市</option>
-                        <option value="台北市">台北市</option>
-                        <option value="新北市">新北市</option>
-                        <option value="桃園市">桃園市</option>
-                        
-                    </select>
-                </div>
-                <div class="col-md-4">
-                <label></label>
-                    <select id="district" class="form-select" name="recruit_district">
-                        <option selected disabled value="">選擇行政區</option>
-                    </select>
-                </div>
-                  <div class="col-md-4">
-                    <label>上班時段</label>
-                    <input type="text" class="form-control" name="worktime" placeholder="上班時段">
-                </div>
-                <br>
-                 <div class="col-md-4">
-                    <label>工作技能</label>
-                    <input type="text" class="form-control" name="jobskill" placeholder="工作技能">
-                </div>
-                <div class="col-md-12">
-                    <textarea class="form-control" name="recruit_detail" rows="3" placeholder="職缺說明與條件"></textarea>
-                </div>
+                                    <!-- 實習細節區塊 -->
+                                    <div id="internsection" style="display: none;">
+                                        <p>二、實習職缺資訊</p>
+                                        <div class="row gy-3">
+                                            <div class="col-md-4">
+                                            <label>職缺名稱</label>
+                                            <input type="text" class="form-control" name="intern_title" placeholder="招募職缺名稱"
+                                                    value="' . htmlspecialchars($row['intern_title'] ?? '') . '">
+                                            </div>
+                                            <div class="col-md-4">
+                                            <label>人數</label>
+                                            <input type="number" class="form-control" name="intern_number" placeholder="招募人數"
+                                                    value="' . htmlspecialchars($row['intern_number'] ?? '') . '">
+                                            </div>
+                                            <div class="col-md-4">
+                                            <label>薪資</label>
+                                            <input type="text" class="form-control" name="intern_salary" placeholder="薪資"
+                                                    value="' . htmlspecialchars($row['intern_salary'] ?? '') . '">
+                                            </div>
+                                            <div class="col-md-4">
+                                            <label>地點</label>
+                                            <select id="city" class="form-select" name="intern_city">
+                                                <option disabled value="">選擇縣市</option>
+                                                <option value="台北市"' . (($row['intern_city'] ?? '') === '台北市' ? ' selected' : '') . '>台北市</option>
+                                                <option value="新北市"' . (($row['intern_city'] ?? '') === '新北市' ? ' selected' : '') . '>新北市</option>
+                                                <option value="桃園市"' . (($row['intern_city'] ?? '') === '桃園市' ? ' selected' : '') . '>桃園市</option>
+                                            </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                            <label></label>
+                                            <select id="district" class="form-select" name="intern_district">
+                                                <option selected value="' . htmlspecialchars($row['intern_district'] ?? '') . '">' . htmlspecialchars($row['intern_district'] ?? '選擇行政區') . '</option>
+                                            </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                            <label>上班時段</label>
+                                            <input type="text" class="form-control" name="intern_worktime" placeholder="上班時段"
+                                                    value="' . htmlspecialchars($row['intern_worktime'] ?? '') . '">
+                                            </div>
+                                            <div class="col-md-4">
+                                            <label>工作技能</label>
+                                            <input type="text" class="form-control" name="intern_skill" placeholder="工作技能"
+                                                    value="' . htmlspecialchars($row['intern_skill'] ?? '') . '">
+                                            </div>
+                                            <div class="col-md-12">
+                                            <textarea class="form-control" name="intern_detail" rows="3" placeholder="職缺說明與條件">'
+                                            . htmlspecialchars($row['intern_detail'] ?? '') . '</textarea>
+                                            </div>
 
-                <div class="col-md-6">
-                    <label>應徵條件</label>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="ex" value="具備相關經驗" id="experience">
-                        <label class="form-check-label" for="experience">具備相關經驗</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="language" value="語言能力" id="language">
-                        <label class="form-check-label" for="language">語言能力</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="subject" value="相關科系" id="subject">
-                        <label class="form-check-label" for="subject">相關科系</label>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>';
+                                            <div class="col-md-6">
+                                            <label>應徵條件</label>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="intern_requirement[]" value="具備相關經驗" id="experience"'
+                                                . (in_array('具備相關經驗', $intern_req) ? ' checked' : '') . '>
+                                                <label class="form-check-label" for="experience">具備相關經驗</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="intern_requirement[]" value="語言能力" id="language"'
+                                                . (in_array('語言能力', $intern_req) ? ' checked' : '') . '>
+                                                <label class="form-check-label" for="language">語言能力</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="intern_requirement[]" value="相關科系" id="subject"'
+                                                . (in_array('相關科系', $intern_req) ? ' checked' : '') . '>
+                                                <label class="form-check-label" for="subject">相關科系</label>
+                                            </div>
+                                            </div>
+                                        </div>
+                                </div>';
                             }
                             ?>
 
@@ -409,21 +443,20 @@
                             <p>三、負責人與聯絡資訊</p>
 
                             <div class="col-md-5">
-                                <input type="text" class="form-control" name="c_name" placeholder="主要聯絡人姓名" required="">
+                            <input type="text" class="form-control" name="c_name" placeholder="主要聯絡人姓名" required value="<?php echo htmlspecialchars($row['c_name'] ?? ''); ?>">
                             </div>
+
                             <div class="col-md-5">
-                                <input type="email" class="form-control" name="c_email" placeholder="聯絡人Email"
-                                    required="">
+                            <input type="email" class="form-control" name="c_email" placeholder="聯絡人Email" required value="<?php echo htmlspecialchars($row['c_email'] ?? ''); ?>">
                             </div>
+
                             <div class="col-md-5">
-                                <input type="tel" class="form-control" name="c_phone" placeholder="聯絡人手機號碼" required="">
+                            <input type="tel" class="form-control" name="c_phone" placeholder="聯絡人手機號碼" required value="<?php echo htmlspecialchars($row['c_phone'] ?? ''); ?>">
                             </div>
+
                             <p>四、需求截止日期</p>
                             <div class="col-md-5">
-                                <input type="date" name="deadline" class="form-control">
-                            </div>
-                            <div class="col-md-12 text-center">
-                                <button type="submit">發布需求</button>
+                            <input type="date" name="deadline" class="form-control" value="<?php echo htmlspecialchars($row['deadline'] ?? ''); ?>">
                             </div>
                         </div>
                 </div>
@@ -435,30 +468,6 @@
         </section><!-- /Starter Section Section -->
 
     </main>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     <footer id="footer" class="footer light-background">
@@ -542,117 +551,114 @@
     <!-- Main JS File -->
     <script src="assets/js/main.js"></script>
 
-
-
-
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // 組織團體相關
-            const typeSelect = document.getElementById("demandtype");
-            const sponsorSection = document.getElementById("sponsorSection");
-            const cooperationSection = document.getElementById("cooperationSection");
+    document.addEventListener("DOMContentLoaded", function () {
+    // ====== 區塊選擇邏輯（組織） ======
+    const demandType = document.getElementById("demandtype");
+    const sponsorSection = document.getElementById("sponsorSection");
+    const coopSection = document.getElementById("cooperationSection");
+    const sponsorMethod = document.getElementById("sponsor_method");
+    const sponsorAmount = document.getElementById("sponsor_amount");
+    const productDona = document.getElementById("productdona");
 
-            if (typeSelect) {
-                typeSelect.addEventListener("change", function() {
-                    const value = this.value;
+    function toggleOrgSections(type) {
+        sponsorSection.style.display = "none";
+        coopSection.style.display = "none";
+        if (type === "spon") sponsorSection.style.display = "block";
+        if (type === "合作") coopSection.style.display = "block";
+    }
 
-                    // 隱藏所有區塊
-                    if (sponsorSection) sponsorSection.style.display = "none";
-                    if (cooperationSection) cooperationSection.style.display = "none";
+    function toggleSponsorDetails(method) {
+        sponsorAmount.style.display = "none";
+        productDona.style.display = "none";
+        if (method === "money") sponsorAmount.style.display = "block";
+        if (method === "product") productDona.style.display = "block";
+    }
 
-                    // 顯示對應的區塊
-                    if (value === "spon" && sponsorSection) {
-                        sponsorSection.style.display = "block";
-                    } else if (value === "合作" && cooperationSection) {
-                        cooperationSection.style.display = "block";
-                    }
-                });
-            }
-
-            const sponsor_method = document.getElementById("sponsor_method");
-            const sponsor_amount = document.getElementById("sponsor_amount");
-            const productdona = document.getElementById("productdona");
-
-            if (sponsor_method) {
-                sponsor_method.addEventListener("change", function() {
-                    const value = this.value;
-
-                    // 隱藏所有區塊
-                    if (sponsor_amount) sponsor_amount.style.display = "none";
-                    if (productdona) productdona.style.display = "none";
-
-                    // 顯示對應的區塊
-                    if (value === "money" && sponsor_amount) {
-                        sponsor_amount.style.display = "block";
-                    } else if (value === "product" && productdona) {
-                        productdona.style.display = "block";
-                    }
-                });
-            }
-
-            // 企業相關
-            const typeSelect2 = document.getElementById("demandtype2");
-            const sponsorSection2 = document.getElementById("sponsorSection2");
-            const internsection = document.getElementById("internsection");
-
-            if (typeSelect2) {
-                typeSelect2.addEventListener("change", function() {
-                    const value = this.value;
-                    if (sponsorSection2) sponsorSection2.style.display = "none";
-                    if (internsection) internsection.style.display = "none";
-
-                    if (value === "贊助" && sponsorSection2) {
-                        sponsorSection2.style.display = "block";
-                    } else if (value === "實習" && internsection) {
-                        internsection.style.display = "block";
-                    }
-                });
-            }
-
-            const sponsor_method2 = document.getElementById("sponsor_method2");
-            const sponsor_amount2 = document.getElementById("sponsor_amount2");
-            const productdona2 = document.getElementById("productdona2");
-
-            if (sponsor_method2) {
-                sponsor_method2.addEventListener("change", function() {
-                    const value = this.value;
-                    if (sponsor_amount2) sponsor_amount2.style.display = "none";
-                    if (productdona2) productdona2.style.display = "none";
-
-                    if (value === "money" && sponsor_amount2) {
-                        sponsor_amount2.style.display = "block";
-                    } else if (value === "product" && productdona2) {
-                        productdona2.style.display = "block";
-                    }
-                });
-            }
+    if (demandType) {
+        toggleOrgSections(demandType.value);
+        demandType.addEventListener("change", function () {
+            toggleOrgSections(this.value);
         });
-        //行政區
-        const districtData = {
-            "台北市": ["中正區", "大同區", "中山區", "松山區", "大安區", "萬華區", "信義區", "士林區", "北投區", "內湖區", "南港區", "文山區"],
-            "新北市": ["板橋區", "新莊區", "中和區", "永和區", "土城區", "樹林區", "三重區", "新店區", "蘆洲區", "汐止區", "淡水區", "三峽區", "鶯歌區", "瑞芳區", "五股區", "泰山區", "林口區", "深坑區", "石碇區", "坪林區", "三芝區", "石門區", "八里區", "平溪區", "雙溪區", "貢寮區", "金山區", "萬里區", "烏來區"],
-            "桃園市": ["桃園區", "中壢區", "平鎮區", "八德區", "楊梅區", "蘆竹區", "大溪區", "龍潭區", "龜山區", "大園區", "觀音區", "新屋區", "復興區"],
-            "台中市": ["中區", "東區", "南區", "西區", "北區", "北屯區", "西屯區", "南屯區", "太平區", "大里區", "霧峰區", "烏日區", "豐原區", "后里區", "石岡區", "東勢區", "和平區", "新社區", "潭子區", "大雅區", "神岡區", "大肚區", "沙鹿區", "龍井區", "梧棲區", "清水區", "大甲區", "外埔區", "大安區"],
-            // 可以繼續補齊其他縣市喔
-        };
+    }
 
-        document.getElementById('city').addEventListener('change', function() {
+    if (sponsorMethod) {
+        toggleSponsorDetails(sponsorMethod.value);
+        sponsorMethod.addEventListener("change", function () {
+            toggleSponsorDetails(this.value);
+        });
+    }
+
+    // ====== 區塊選擇邏輯（企業） ======
+    const demandType2 = document.getElementById("demandtype2");
+    const sponsorSection2 = document.getElementById("sponsorSection2");
+    const internSection = document.getElementById("internsection");
+    const sponsorMethod2 = document.getElementById("sponsor_method2");
+    const sponsorAmount2 = document.getElementById("sponsor_amount2");
+    const productDona2 = document.getElementById("productdona2");
+
+    function toggleCorpSections(type) {
+        sponsorSection2.style.display = "none";
+        internSection.style.display = "none";
+        if (type === "贊助") sponsorSection2.style.display = "block";
+        if (type === "實習") internSection.style.display = "block";
+    }
+
+    function toggleSponsorDetails2(method) {
+        sponsorAmount2.style.display = "none";
+        productDona2.style.display = "none";
+        if (method === "money") sponsorAmount2.style.display = "block";
+        if (method === "product") productDona2.style.display = "block";
+    }
+
+    if (demandType2) {
+        toggleCorpSections(demandType2.value);
+        demandType2.addEventListener("change", function () {
+            toggleCorpSections(this.value);
+        });
+    }
+
+    if (sponsorMethod2) {
+        toggleSponsorDetails2(sponsorMethod2.value);
+        sponsorMethod2.addEventListener("change", function () {
+            toggleSponsorDetails2(this.value);
+        });
+    }
+
+    // ====== 行政區邏輯 ======
+    const districtData = {
+        "台北市": ["中正區", "大同區", "中山區", "松山區", "大安區", "萬華區", "信義區", "士林區", "北投區", "內湖區", "南港區", "文山區"],
+        "新北市": ["板橋區", "新莊區", "中和區", "永和區", "土城區", "樹林區", "三重區", "新店區", "蘆洲區", "汐止區", "淡水區", "三峽區", "鶯歌區", "瑞芳區", "五股區", "泰山區", "林口區", "深坑區", "石碇區", "坪林區", "三芝區", "石門區", "八里區", "平溪區", "雙溪區", "貢寮區", "金山區", "萬里區", "烏來區"],
+        "桃園市": ["桃園區", "中壢區", "平鎮區", "八德區", "楊梅區", "蘆竹區", "大溪區", "龍潭區", "龜山區", "大園區", "觀音區", "新屋區", "復興區"]
+        // 可擴充其他縣市
+    };
+
+    const citySelect = document.getElementById("city");
+    const districtSelect = document.getElementById("district");
+
+    if (citySelect && districtSelect) {
+        citySelect.addEventListener("change", function () {
             const city = this.value;
-            const districtSelect = document.getElementById('district');
-
-            // 清空原本的行政區選項
             districtSelect.innerHTML = '<option selected disabled value="">選擇行政區</option>';
-
             if (districtData[city]) {
-                districtData[city].forEach(function(district) {
-                    const option = document.createElement('option');
+                districtData[city].forEach(function (district) {
+                    const option = document.createElement("option");
                     option.value = district;
                     option.textContent = district;
                     districtSelect.appendChild(option);
                 });
             }
         });
+
+        // 若預設 city 已有值，觸發更新區域選單
+        if (citySelect.value) {
+            const event = new Event("change");
+            citySelect.dispatchEvent(event);
+        }
+    }
+});
     </script>
+
 
 
 
