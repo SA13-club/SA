@@ -356,7 +356,7 @@ session_start();
                   
                   // 根據登錄狀態顯示適當的聊天按鈕
                   if (isset($_SESSION['u_permission']) && $_SESSION['u_permission']) {
-                    echo '<li><a class="btn" style="background-color: #28c76f; color: white;" href="./chat/public/index.php?u_email=' . 
+                    echo '<li><a class="btn" style="background-color: #28c76f; color: white;" href="./chat/public/index .php?u_email=' . 
                       $safe_email . '&receiver=' . $safe_receiver . '" target="_blank">聊天室</a></li>';
                   } else {
                     echo '<li><a href="#" onclick="alert(\'請先登錄再進行洽談\'); return false;" class="btn">聊天室</a></li>';

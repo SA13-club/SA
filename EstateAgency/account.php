@@ -604,7 +604,13 @@
                                                     </div>
                                                     <div class='dcard-footer'>
                                                         <div>
-                                                            <button class='js-action btn' style='background-color:#28c76f;color:white; data-did='{$r['d_id']}' data-step='$step'>$btnText</button>
+                                                            <button class='js-action btn' 
+        style='background-color:#28c76f;color:white;' 
+        data-did='{$r['d_id']}' 
+        data-step='$step'>
+    $btnText
+</button>
+
                                                         </div>
                                                         <div>
                                                             <div class='star-rating' data-rating='$feedbackScore' data-match-id='{$r['d_id']}'>";
@@ -615,7 +621,7 @@
                                                 echo "
                                                             </div>
                                                             <a class='btn chat-button' style='background-color:#28c76f;color:white; margin-left: 10px; border-radius: 100%;'
-                                                            href='./chat/public/index.php?u_email=".urlencode($me)."&receiver=".urlencode($partner)."' 
+                                                            href='./chat/public/index .php?u_email=".urlencode($me)."&receiver=".urlencode($partner)."' 
                                                             target='_blank'><i class='bi bi-chat-dots-fill'></i></a>
                                                         </div>
                                                     </div>

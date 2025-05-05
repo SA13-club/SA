@@ -200,8 +200,106 @@ $conn->close();
                             <?= nl2br(htmlspecialchars($account_info['u_content'])) ?>
                         </div>
                     </div>
+                    
 
                 </div>
+                <br>
+                    <br>
+                    
+                <?php
+
+
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "sa";
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+if (!isset($_SESSION['u_email'])) {
+    die("請先登入");
+}
+
+$me = isset($_GET['d_id']) ? intval($_GET['d_id']) : 0;
+
+$sql = "
+    SELECT d_id, b_u_email AS other_email, b_feedback AS feedback, status, d_date AS cooperation_time
+    FROM match_db
+    WHERE status = 'completed'
+      AND a_u_email = ?
+      AND b_feedback <> 0
+    UNION
+    SELECT d_id, a_u_email AS other_email, a_feedback AS feedback, status, d_date AS cooperation_time
+    FROM match_db
+    WHERE status = 'completed'
+      AND b_u_email = ?
+      AND a_feedback <> 0
+";
+
+if ($stmt = $conn->prepare($sql)) {
+    $stmt->bind_param('ss', $me, $me);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $totalScore = 0;
+    $count = 0;
+
+    while ($r = $result->fetch_assoc()) {
+        $partner = htmlspecialchars($r['other_email']);
+        $feedbackScore = intval($r['feedback']);
+        $title = htmlspecialchars($r['status']); // 狀態當作合作類型
+        $proj = "專案合作"; // ⚠️ 可改成實際的合作標題
+        $tag = "合作";       // 若資料有 tag 欄可取代
+        $step = "done";
+        $btnText = "回顧";
+        $matchId = $r['d_id'];
+
+        $totalScore += $feedbackScore;
+        $count++;
+
+        echo "
+        <div class='dcard-post'>
+            <div class='dcard-header'><span class='dcard-tag'>#$tag</span></div>
+            <div class='dcard-body'>
+                <p><strong>合作夥伴：</strong>$partner</p>
+                <p><strong>專案名稱：</strong>$proj</p>
+                <p><strong>開始日期：</strong>{$r['cooperation_time']}</p>
+                <p><strong>合作類型：</strong>$title</p>
+            </div>
+            <div class='dcard-footer'>
+                <div>
+                    <button class='js-action btn' style='background-color:#28c76f;color:white;' 
+                            data-did='$matchId' data-step='$step'>$btnText</button>
+                </div>
+                <div>
+                    <div class='star-rating' data-rating='$feedbackScore' data-match-id='$matchId'>";
+                        for ($i = 1; $i <= 5; $i++) {
+                            $selected = ($i <= $feedbackScore) ? "selected" : "";
+                            echo "<span class='star $selected' data-value='$i'>★</span>";
+                        }
+        echo "      </div>
+                    <a class='btn chat-button' style='background-color:#28c76f;color:white; margin-left: 10px; border-radius: 100%;'
+                       href='./chat/public/index.php?u_email=" . urlencode($me) . "&receiver=" . urlencode($partner) . "' 
+                       target='_blank'><i class='bi bi-chat-dots-fill'></i></a>
+                </div>
+            </div>
+        </div>
+        ";
+    }
+
+    // 顯示平均分數
+    if ($count > 0) {
+        $avg = round($totalScore / $count, 2);
+        echo "<div class='alert alert-info'><strong>平均評分：</strong> $avg / 5，共 $count 筆評價</div>";
+    } else {
+        echo "<div class='alert alert-secondary'>尚無收到評價紀錄。</div>";
+    }
+
+    $stmt->close();
+} else {
+    echo "查詢失敗：" . $conn->error;
+}
+?>
+
 
             <?php
                 ob_end_flush();
