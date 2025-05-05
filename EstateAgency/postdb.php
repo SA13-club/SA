@@ -20,6 +20,10 @@ $c_name = $_POST['c_name'];
 $deadline = $_POST['deadline'];
 
 
+
+
+
+
 // 1. 先插入 demanded
 $sql1 = "INSERT INTO demanded (u_email,u_permission,tag) VALUES ('$u_email','$u_permission','$tag')";
 if (!mysqli_query($conn, $sql1)) {

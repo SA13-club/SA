@@ -554,7 +554,9 @@
                                                 $partner = ($r['a_u_email']===$me)? $r['b_u_email']:$r['a_u_email'];
                                                 // 取 tag
                                                 $t = $conn->prepare("SELECT tag FROM demanded WHERE d_id=?");
-                                                $t->bind_param("i",$r['d_id']);
+                                                $t->bind_param("s",$r['demanded_id']
+                                            );
+                                                
                                                 $t->execute();
                                                 $tag = htmlspecialchars($t->get_result()->fetch_assoc()['tag'] ?? '');
                                                 $t->close();
@@ -562,7 +564,7 @@
                                                 switch ($tag) {
                                                     case '企業合作': $tbl='corp_coop';  $key='coop_name'; break;
                                                     case '社團合作': $tbl='club_coop';  $key='coop_name'; break;
-                                                    case 'spon':      $tbl='org_donate'; $key='title';    $tag='贊助'; break;
+                                                    case 'spon':      $tbl='org_donate'; $key='event_name';    $tag='贊助'; break;
                                                     case '贊助':      $tbl='cor_spons';  $key='title';    break;
                                                     case '實習':      $tbl='cor_intern'; $key='intern_title'; break;
                                                     default:          $tbl=''; $key='';             break;
@@ -570,7 +572,7 @@
                                                 $proj = '';
                                                 if ($tbl) {
                                                     $u = $conn->prepare("SELECT $key FROM $tbl WHERE d_id=?");
-                                                    $u->bind_param("i",$r['d_id']);
+                                                    $u->bind_param("s",$r['demanded_id']);
                                                     $u->execute();
                                                     $proj = htmlspecialchars($u->get_result()->fetch_assoc()[$key] ?? '');
                                                     $u->close();
@@ -579,6 +581,7 @@
                                                 $who = ($r['a_u_email']===$me)?'a':'b';
                                                 $confirmed = $r["{$step}_{$who}"];
                                                 // 如果我已經按過，就顯示「等待對方 + 標籤」，否則「我 + 標籤」
+                                                
                                                 $btnText = $confirmed
                                                         ? "等待對方$label"
                                                         : "我$label";
@@ -598,21 +601,26 @@
                                                     <div class='dcard-header'><span class='dcard-tag'>#$tag</span></div>
                                                     <div class='dcard-body'>
                                                         <p><strong>合作夥伴：</strong>$partner</p>
-                                                        <p><strong>專案名稱：</strong>$proj</p>
+                                                       <p><strong>專案名稱：</strong><a href='./property-single.php?id={$r['demanded_id']}'>$proj</a></p>
+
                                                         <p><strong>開始日期：</strong>{$r['d_date']}</p>
                                                         <p><strong>狀態：</strong>$title</p>
                                                     </div>
                                                     <div class='dcard-footer'>
                                                         <div>
                                                             <button class='js-action btn' 
-        style='background-color:#28c76f;color:white;' 
-        data-did='{$r['d_id']}' 
-        data-step='$step'>
-    $btnText
-</button>
+                                                                    style='background-color:#28c76f;color:white;' 
+                                                                    data-did='{$r['d_id']}' 
+                                                                    data-step='$step'>
+                                                                $btnText
+                                                            </button>
+                                                            
+
+
 
                                                         </div>
                                                         <div>
+                                                            
                                                             <div class='star-rating' data-rating='$feedbackScore' data-match-id='{$r['d_id']}'>";
                                                                 for ($i = 1; $i <= 5; $i++) {
                                                                     $selected = ($i <= $feedbackScore) ? "selected" : "";
@@ -632,8 +640,8 @@
 
                                         // 輸出
                                         renderBlock('同意申請',   $pending,     'agree',    '同意',     $me, $conn);
-                                        renderBlock('洽談中',     $negotiating, 'complete', '完成',     $me, $conn);
-                                        renderBlock('已完成合作', $completed,   'terminate','終結合作', $me, $conn);
+                                        renderBlock('洽談中',     $negotiating, 'complete', '同意完成',     $me, $conn);
+                                        renderBlock('已完成合作', $completed,   'terminate','已完成合作', $me, $conn);
 
                                         $conn->close();
                                         ?>
@@ -800,6 +808,8 @@ document.querySelectorAll('.js-action').forEach(btn=>{
     else alert('更新失敗');
   };
 });
+
+
 document.querySelectorAll('.star-rating').forEach(rating => {
     const stars = rating.querySelectorAll('.star');
     let selectedRating = 0;

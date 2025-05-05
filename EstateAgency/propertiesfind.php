@@ -153,12 +153,27 @@
 
       <!-- 第一個下拉框：選擇類型 -->
       <div class="col-md-3">
-        <select class="form-select form-select-lg" name="type">
-          <option value="all" selected>全部</option>
-          <option value="spon">贊助</option>
-          <option value="intern">實習</option>
-        </select>
-      </div>
+  <select class="form-select form-select-lg" name="type">
+    <option value="all" selected>全部</option>
+    <?php
+    $link = mysqli_connect('localhost', 'root', '', 'sa');
+    if (!$link) {
+        die('連線失敗: ' . mysqli_connect_error());
+    }
+
+    $tag_sql = "SELECT DISTINCT tag FROM demanded WHERE tag IS NOT NULL AND tag != ''";
+    $tag_result = mysqli_query($link, $tag_sql);
+
+    while ($row = mysqli_fetch_assoc($tag_result)) {
+        $tag_value = htmlspecialchars($row['tag']);
+        $tag_display = $tag_value === 'spon' ? '贊助' :
+                       ($tag_value === 'intern' ? '實習' : $tag_value);
+        echo "<option value=\"$tag_value\">$tag_display</option>";
+    }
+    ?>
+  </select>
+</div>
+
 
       <!-- 第二個輸入框：關鍵字搜尋 -->
       <div class="col-md-5">
@@ -186,29 +201,33 @@
         <section class="filter-bar py-3  bg-light">
           <div class="container ">
             <div class="d-flex flex-wrap gap-2 justify-content-center align-items-center">
-              <label class="form-label me-2 mb-0">依標籤篩選：</label>
+              <!-- <label class="form-label me-2 mb-0">依標籤篩選：</label> -->
               <?php
               $link = mysqli_connect('localhost', 'root', '', 'sa');
               $u_permission = $_SESSION['u_permission'];
-             
+              $type = $_GET['type'] ?? 'all';
+              $keyword = $_GET['keyword'] ?? '';
+              
 
               $tagQuery = "SELECT DISTINCT d.tag FROM demanded d 
   LEFT JOIN org_donate od ON d.d_id = od.d_id
   LEFT JOIN cor_intern ci ON d.d_id = ci.d_id
   LEFT JOIN cor_spons cs ON d.d_id = cs.d_id 
+  LEFT JOIN corp_coop co ON d.d_id = co.d_id
+  LEFT JOIN club_coop cl ON d.d_id = cl.d_id 
 WHERE d.tag IS NOT NULL AND d.tag != '' AND d.u_permission != '$u_permission'";
 
               $tagResult = mysqli_query($link, $tagQuery);
 
               while ($row = mysqli_fetch_assoc($tagResult)) {
                 $tag = $row['tag']; // <-- 注意這裡取 'tag'
-                if($tag=='spon'){$tag='贊助';}
-                echo "<button type='button' class='btn btn-outline-primary filter-button' data-filter='{$tag}'>{$tag}</button>";
+              
+                // echo "<button type='button' class='btn btn-outline-primary filter-button' data-filter='{$tag}'>{$tag}</button>";
               }
               ?>
 
 
-              <button type="button" id="clearFilters" class="btn btn-outline-secondary">清除篩選</button>
+              <!-- <button type="button" id="clearFilters" class="btn btn-outline-secondary">清除篩選</button> -->
 
             </div>
           </div>
@@ -238,11 +257,6 @@ $type = $_GET['type'] ?? 'all';
 $keyword = $_GET['keyword'] ?? '';
 $u_permission = $_SESSION['u_permission'] ?? '';
 
-// 防止 injection：只允許合法的 type
-$valid_types = ['all', 'spon', 'intern', 'coop'];
-if (!in_array($type, $valid_types)) {
-    die('非法搜尋類型');
-}
 
 // 組基本SQL
 $params = [];
@@ -252,22 +266,37 @@ if ($u_permission === '組織團體') {
     $sql = "
         SELECT d.*,
                ci.c_name AS intern_c_name, ci.c_phone AS intern_c_phone, ci.c_email AS intern_c_email, ci.title AS intern_title, ci.content AS intern_content,
-               cs.c_name AS spons_c_name, cs.c_phone AS spons_c_phone, cs.c_email AS spons_c_email, cs.title AS spons_title, cs.content AS spons_content
+               cs.c_name AS spons_c_name, cs.c_phone AS spons_c_phone, cs.c_email AS spons_c_email, cs.title AS spons_title, cs.content AS spons_content,
+                clc.c_name AS club_c_name,
+                clc.c_phone AS club_c_phone,
+                clc.c_email AS club_c_email,
+                clc.coop_name AS club_title, COALESCE(clc.coop_desc) AS club_content
         FROM demanded d
         LEFT JOIN cor_intern ci ON d.d_id = ci.d_id
         LEFT JOIN cor_spons cs ON d.d_id = cs.d_id
+        LEFT JOIN club_coop clc ON d.d_id = clc.d_id 
         WHERE d.u_permission != ?
     ";
 } elseif ($u_permission === '企業') {
-    $sql = "
-        SELECT d.*,
-               od.c_name AS donate_c_name, od.c_phone AS donate_c_phone, od.c_email AS donate_c_email, od.title AS donate_title, od.content AS donate_content,
-               oc.c_name AS coop_c_name, oc.c_phone AS coop_c_phone, oc.c_email AS coop_c_email, oc.title AS coop_title, oc.content AS coop_content
-        FROM demanded d
-        LEFT JOIN org_donate od ON d.d_id = od.d_id
-        LEFT JOIN org_coop oc ON d.d_id = oc.d_id
-        WHERE d.u_permission != ?
-    ";
+  $sql = "
+  SELECT d.*,
+         od.c_name AS donate_c_name,
+         od.c_phone AS donate_c_phone,
+         od.c_email AS donate_c_email,
+         od.event_name AS donate_title,
+         od.event_description AS donate_content,
+         cc.c_name AS coop_c_name,
+         cc.c_phone AS coop_c_phone,
+         cc.c_email AS coop_c_email,
+         cc.coop_type AS coop_type,
+         cc.coop_name AS coop_title,
+         cc.coop_desc AS content
+  FROM demanded d
+  LEFT JOIN org_donate od ON d.d_id = od.d_id
+  LEFT JOIN corp_coop cc ON d.d_id = cc.d_id
+  WHERE d.u_permission != ?
+";
+
 } else {
     die('權限錯誤');
 }
@@ -290,11 +319,14 @@ if (!empty($keyword)) {
         $sql .= " AND (
             (ci.title LIKE ? OR ci.content LIKE ?) OR
             (cs.title LIKE ? OR cs.content LIKE ?)
+            OR
+            (clc.coop_name LIKE ? OR clc.coop_desc LIKE ?)
         )";
     } elseif ($u_permission === '企業') {
         $sql .= " AND (
-            (od.title LIKE ? OR od.content LIKE ?) OR
-            (oc.title LIKE ? OR oc.content LIKE ?)
+            (od.event_name LIKE ? OR od.event_description LIKE ?) OR
+            (cc.coop_name LIKE ? OR cc.coop_desc LIKE ?)
+         
         )";
     }
 
@@ -344,7 +376,14 @@ while ($row = mysqli_fetch_assoc($result)) {
                 <span>電話：" . htmlspecialchars($row['spons_c_phone']) . "</span>
                 <span>Email：" . htmlspecialchars($row['spons_c_email']) . "</span>
             ";
-        } else {
+        } 
+        elseif (!empty($row['club_c_name'])) {
+          echo "
+              <span>聯絡人：" . htmlspecialchars($row['club_c_name']) . "</span>
+              <span>電話：" . htmlspecialchars($row['club_c_phone']) . "</span>
+              <span>Email：" . htmlspecialchars($row['club_c_email']) . "</span>
+          ";
+      }else {
             echo "<span>尚無聯絡資料</span>";
         }
     } elseif ($u_permission === '企業') {
