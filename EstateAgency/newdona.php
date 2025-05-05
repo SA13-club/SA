@@ -376,10 +376,6 @@
                                                         <label class="form-check-label" for="awareness">提升產業認知 🔎</label>
                                                     </div>
                                                     <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" name="benefit[]" value="增加資源" id="resources">
-                                                        <label class="form-check-label" for="resources">增加資源 📦</label>
-                                                    </div>
-                                                    <div class="form-check">
                                                         <input class="form-check-input" type="checkbox" name="benefit[]" value="拓展關係網" id="network">
                                                         <label class="form-check-label" for="network">拓展關係網 🌎</label>
                                                     </div>
