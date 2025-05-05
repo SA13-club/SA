@@ -407,152 +407,157 @@
                             ';
                             } elseif ($u_permission == '企業') {
                                 echo '
-    <p>一、請選擇需求類型</p>
-    <div class="col-md-6">
-        
-        <select class="form-select" id="demandtype2" name="tag" >
-            <option selected disabled value="_">需求類型</option>
-            <option value="贊助">贊助</option>
-            <option value="合作">合作</option>
-            <option value="招募">招募</option>
-            <option value="實習">實習</option>
-        </select>
-    </div>
+                            <p>一、請選擇需求類型</p>
+                            <div class="col-md-6">
+                                <select class="form-select" id="demandtype2" name="tag" >
+                                    <option selected disabled value="_">需求類型</option>
+                                    <option value="贊助">贊助</option>
+                                    <option value="合作">合作</option>
+                                    <option value="招募">招募</option>
+                                    <option value="實習">實習</option>
+                                </select>
+                            </div>
 
-    <div class="row gy-4">
-        <!-- 贊助細節區塊 -->
-        <div id="sponsorSection2" style="display: none;">
-            <p>二、贊助細節</p>
-            <div class="col-md-5 mb-3 ">
-                <input type="text" class="form-control" id="title" name="title" placeholder="請輸入贊助標題" required="">
-            </div>
-            <div class="row gy-3">
-                
-                <div class="col-md-5">
-                    <select class="form-select" id="sponsor_method2" name="sponsor_method" >
-                        <option selected disabled value="_">贊助方式</option>
-                        <option value="money">金錢</option>
-                        <option value="product">產品</option>
-                    </select>
-                </div>
-                <div class="col-md-6 mb-3">
-                </div> 
-                <!-- 金錢贊助細節 -->
-                <div id="sponsor_amount2" style="display: none;">
-                    <div class="col-md-4">
-                        <select class="form-select" id="sponsor_amount_select" name="sponsor_amount" >
-                            <option selected disabled value="_">贊助金額</option>
-                            <option value="10000">10000以內</option>
-                            <option value="20000">10000~20000</option>
-                            <option value="30000">20000~30000</option>
-                            <option value="40000">30000~40000</option>
-                            <option value="50000">40000~50000</option>
-                            <option value="other">金額詳談</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6" id="money_options2">
-                        <label>需要社團宣傳手段</label>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="postbrand" value="海報商標" id="posterLogo">
-                            <label class="form-check-label" for="posterLogo">海報商標</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="postad" value="海報置入" id="posterInsert">
-                            <label class="form-check-label" for="posterInsert">海報置入</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="promotesignage" value="宣傳立牌" id="standee">
-                            <label class="form-check-label" for="standee">宣傳立牌</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="socialpromote" value="社群宣傳" id="social">
-                            <label class="form-check-label" for="social">社群宣傳</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-5 mb-3">
-                    <textarea class="form-control" id="content" name="content" placeholder="請輸入宣傳詳細內容" required=""></textarea>
-                </div> 
-                <!-- 產品贊助細節 -->
-                <div id="productdona2" style="display: none;">
-                    <div class="col-md-6" id="product_options">
-                        <label>需要社團宣傳手段</label>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="product[]" value="公關品發放" id="gift">
-                            <label class="form-check-label" for="gift">公關品發放</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="product[]" value="現場設攤位" id="booth">
-                            <label class="form-check-label" for="booth">現場設攤位</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                            <div class="row gy-4">
 
-        <!-- 實習細節區塊 -->
-        <div id="internsection" style="display: none;">
-            <p>二、實習職缺資訊</p>
-            <div class="row gy-3">
-                <div class="col-md-4">
-                    <label>職缺名稱</label>
-                    <input type="text" class="form-control" name="recruit_title" placeholder="招募職缺名稱">
-                </div>
-                <div class="col-md-4">
-                    <label>人數</label>
-                    <input type="number" class="form-control" name="recruit_number" placeholder="招募人數">
-                </div>
-                <div class="col-md-4">
-                    <label>薪資</label>
-                    <input type="text" class="form-control" name="salary" placeholder="薪資">
-                </div>
-                <div class="col-md-4">
-                    <label>地點</label>
-                    <select id="city" class="form-select" name="recruit_city">
-                        <option selected disabled value="">選擇縣市</option>
-                        <option value="台北市">台北市</option>
-                        <option value="新北市">新北市</option>
-                        <option value="桃園市">桃園市</option>
-                        
-                    </select>
-                </div>
-                <div class="col-md-4">
-                <label></label>
-                    <select id="district" class="form-select" name="recruit_district">
-                        <option selected disabled value="">選擇行政區</option>
-                    </select>
-                </div>
-                  <div class="col-md-4">
-                    <label>上班時段</label>
-                    <input type="text" class="form-control" name="worktime" placeholder="上班時段">
-                </div>
-                <br>
-                 <div class="col-md-4">
-                    <label>工作技能</label>
-                    <input type="text" class="form-control" name="jobskill" placeholder="工作技能">
-                </div>
-                <div class="col-md-12">
-                    <textarea class="form-control" name="recruit_detail" rows="3" placeholder="職缺說明與條件"></textarea>
-                </div>
+                                <!-- 贊助細節區塊 -->
+                                <div id="sponsorSection2" style="display: none;">
+                                    <p>二、贊助細節</p>
+                                    <div class="col-md-6 mb-3">
+                                        <input type="text" class="form-control" id="title" name="title" placeholder="請輸入贊助標題" required="">
+                                    </div>
 
-                <div class="col-md-6">
-                    <label>應徵條件</label>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="ex" value="具備相關經驗" id="experience">
-                        <label class="form-check-label" for="experience">具備相關經驗</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="language" value="語言能力" id="language">
-                        <label class="form-check-label" for="language">語言能力</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="subject" value="相關科系" id="subject">
-                        <label class="form-check-label" for="subject">相關科系</label>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>';
+                                    <div class="row gy-3">
+                                        <div class="col-md-5">
+                                            <select class="form-select" id="sponsor_method2" name="sponsor_method" >
+                                                <option selected disabled value="_">贊助方式</option>
+                                                <option value="money">金錢</option>
+                                                <option value="product">產品</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="col-md-6 mb-3">
+                                        </div> 
+
+                                        <!-- 金錢贊助細節 -->
+                                        <div id="sponsor_amount2" style="display: none;">
+                                            <div class="col-md-4">
+                                                <select class="form-select" id="sponsor_amount_select" name="sponsor_amount" >
+                                                    <option selected disabled value="_">贊助金額</option>
+                                                    <option value="10000">10000以內</option>
+                                                    <option value="20000">10000~20000</option>
+                                                    <option value="30000">20000~30000</option>
+                                                    <option value="40000">30000~40000</option>
+                                                    <option value="50000">40000~50000</option>
+                                                    <option value="other">金額詳談</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-md-6" id="money_options2">
+                                                <label>需要社團宣傳手段</label>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="postbrand" value="海報商標" id="posterLogo">
+                                                    <label class="form-check-label" for="posterLogo">海報商標</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="postad" value="海報置入" id="posterInsert">
+                                                    <label class="form-check-label" for="posterInsert">海報置入</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="promotesignage" value="宣傳立牌" id="standee">
+                                                    <label class="form-check-label" for="standee">宣傳立牌</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="socialpromote" value="社群宣傳" id="social">
+                                                    <label class="form-check-label" for="social">社群宣傳</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-5 mb-3">
+                                            <textarea class="form-control" id="content" name="content" placeholder="請輸入宣傳詳細內容" required=""></textarea>
+                                        </div> 
+
+                                        <!-- 產品贊助細節 -->
+                                        <div id="productdona2" style="display: none;">
+                                            <div class="col-md-6" id="product_options">
+                                                <label>需要社團宣傳手段</label>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="product[]" value="公關品發放" id="gift">
+                                                    <label class="form-check-label" for="gift">公關品發放</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="product[]" value="現場設攤位" id="booth">
+                                                    <label class="form-check-label" for="booth">現場設攤位</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <!-- 實習細節區塊 -->
+                                <div id="internsection" style="display: none;">
+                                    <p>二、實習職缺資訊</p>
+                                    <div class="row gy-3">
+                                        <div class="col-md-4">
+                                            <label>職缺名稱</label>
+                                            <input type="text" class="form-control" name="recruit_title" placeholder="招募職缺名稱">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label>人數</label>
+                                            <input type="number" class="form-control" name="recruit_number" placeholder="招募人數">
+                                        </div>                                       
+                                        <div class="col-md-4">
+                                            <label>薪資</label>
+                                            <input type="text" class="form-control" name="salary" placeholder="薪資">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label>地點</label>
+                                            <select id="city" class="form-select" name="recruit_city">
+                                                <option selected disabled value="">選擇縣市</option>
+                                                <option value="台北市">台北市</option>
+                                                <option value="新北市">新北市</option>
+                                                <option value="桃園市">桃園市</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                        <label></label>
+                                            <select id="district" class="form-select" name="recruit_district">
+                                                <option selected disabled value="">選擇行政區</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label>上班時段</label>
+                                            <input type="text" class="form-control" name="worktime" placeholder="上班時段">
+                                        </div>
+                                        <br>
+                                        <div class="col-md-4">
+                                            <label>工作技能</label>
+                                            <input type="text" class="form-control" name="jobskill" placeholder="工作技能">
+                                        </div>
+                                        <div class="col-md-12">
+                                            <textarea class="form-control" name="recruit_detail" rows="3" placeholder="職缺說明與條件"></textarea>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label>應徵條件</label>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="ex" value="具備相關經驗" id="experience">
+                                                <label class="form-check-label" for="experience">具備相關經驗</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="language" value="語言能力" id="language">
+                                                <label class="form-check-label" for="language">語言能力</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="subject" value="相關科系" id="subject">
+                                                <label class="form-check-label" for="subject">相關科系</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>';
                             }
                             ?>
 
@@ -578,9 +583,8 @@
                                 <button type="submit">發布需求</button>
                             </div>
                         </div>
+                    </form>
                 </div>
-                </form>
-            </div>
 
             </div>
 
