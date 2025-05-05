@@ -1,3 +1,116 @@
+<style>
+        .dcard-post {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: 0.3s;
+        }
+
+        .dcard-post:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .dcard-header {
+            display: flex;
+            gap: 10px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: #222;
+        }
+
+        .dcard-tag {
+            color: #2eca6a;
+            ;
+        }
+
+        .dcard-body {
+            font-size: 0.95rem;
+            color: #444;
+            margin-bottom: 10px;
+        }
+
+        .dcard-footer {
+            font-size: 0.85rem;
+            color: #666;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .filter-bar py-3 border-bottom bg-light {
+            background-color: white;
+        }
+
+        /* 綠線動畫效果 */
+        .hover-underline {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .hover-underline::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 3px;
+            left: 0;
+            bottom: -3px;
+            background-color: var(--accent-color);
+            transition: width 0.3s ease-in-out;
+        }
+
+        .hover-underline:hover::after {
+            width: 100%;
+        }
+
+        .hover-underline.active-underline::after {
+            width: 100%;
+        }
+
+        .collapsible ul {
+            list-style: none;
+            padding: 0;
+            font-size: 15px;
+        }
+
+        .collapsible ul li {
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 15px;
+        }
+
+        .collapsible ul strong {
+            text-transform: uppercase;
+            font-weight: 400;
+            color: color-mix(in srgb, var(--default-color), transparent 50%);
+            font-size: 14px;
+        }
+
+        .star-rating {
+        display: inline-block;
+        font-size: 2em;
+        color: #ccc;
+        cursor: pointer;
+        }
+
+
+        .star-rating .star:hover,
+        .star-rating .star.hovered,
+        .star-rating .star.selected {
+        color: gold;
+        }
+
+    </style>
+
 <?php
 // 資料庫連線資訊
 $servername = "localhost";
@@ -206,8 +319,9 @@ $conn->close();
                 <br>
                     <br>
                     
-                <?php
-
+                    <?php
+// 預設輸出容器
+echo "<div class='container'><h3>合作評價紀錄</h3>";
 
 $servername = "localhost";
 $username = "root";
@@ -215,90 +329,65 @@ $password = "";
 $dbname = "sa";
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-if (!isset($_SESSION['u_email'])) {
-    die("請先登入");
-}
+if ($conn->connect_error) die("連線失敗: " . $conn->connect_error);
 
-$me = isset($_GET['d_id']) ? intval($_GET['d_id']) : 0;
+if (isset($_GET['d_id'])) {
+    $d_id = intval($_GET['d_id']);
 
-$sql = "
-    SELECT d_id, b_u_email AS other_email, b_feedback AS feedback, status, d_date AS cooperation_time
-    FROM match_db
-    WHERE status = 'completed'
-      AND a_u_email = ?
-      AND b_feedback <> 0
-    UNION
-    SELECT d_id, a_u_email AS other_email, a_feedback AS feedback, status, d_date AS cooperation_time
-    FROM match_db
-    WHERE status = 'completed'
-      AND b_u_email = ?
-      AND a_feedback <> 0
-";
-
-if ($stmt = $conn->prepare($sql)) {
-    $stmt->bind_param('ss', $me, $me);
+    // 查詢目標 email
+    $stmt = $conn->prepare("SELECT u_email FROM demanded WHERE d_id = ?");
+    $stmt->bind_param("i", $d_id);
     $stmt->execute();
-    $result = $stmt->get_result();
-
-    $totalScore = 0;
-    $count = 0;
-
-    while ($r = $result->fetch_assoc()) {
-        $partner = htmlspecialchars($r['other_email']);
-        $feedbackScore = intval($r['feedback']);
-        $title = htmlspecialchars($r['status']); // 狀態當作合作類型
-        $proj = "專案合作"; // ⚠️ 可改成實際的合作標題
-        $tag = "合作";       // 若資料有 tag 欄可取代
-        $step = "done";
-        $btnText = "回顧";
-        $matchId = $r['d_id'];
-
-        $totalScore += $feedbackScore;
-        $count++;
-
-        echo "
-        <div class='dcard-post'>
-            <div class='dcard-header'><span class='dcard-tag'>#$tag</span></div>
-            <div class='dcard-body'>
-                <p><strong>合作夥伴：</strong>$partner</p>
-                <p><strong>專案名稱：</strong>$proj</p>
-                <p><strong>開始日期：</strong>{$r['cooperation_time']}</p>
-                <p><strong>合作類型：</strong>$title</p>
-            </div>
-            <div class='dcard-footer'>
-                <div>
-                    <button class='js-action btn' style='background-color:#28c76f;color:white;' 
-                            data-did='$matchId' data-step='$step'>$btnText</button>
-                </div>
-                <div>
-                    <div class='star-rating' data-rating='$feedbackScore' data-match-id='$matchId'>";
-                        for ($i = 1; $i <= 5; $i++) {
-                            $selected = ($i <= $feedbackScore) ? "selected" : "";
-                            echo "<span class='star $selected' data-value='$i'>★</span>";
-                        }
-        echo "      </div>
-                    <a class='btn chat-button' style='background-color:#28c76f;color:white; margin-left: 10px; border-radius: 100%;'
-                       href='./chat/public/index.php?u_email=" . urlencode($me) . "&receiver=" . urlencode($partner) . "' 
-                       target='_blank'><i class='bi bi-chat-dots-fill'></i></a>
-                </div>
-            </div>
-        </div>
-        ";
-    }
-
-    // 顯示平均分數
-    if ($count > 0) {
-        $avg = round($totalScore / $count, 2);
-        echo "<div class='alert alert-info'><strong>平均評分：</strong> $avg / 5，共 $count 筆評價</div>";
-    } else {
-        echo "<div class='alert alert-secondary'>尚無收到評價紀錄。</div>";
-    }
-
+    $res = $stmt->get_result();
+    $email = ($row = $res->fetch_assoc()) ? $row['u_email'] : null;
     $stmt->close();
-} else {
-    echo "查詢失敗：" . $conn->error;
+
+    if ($email) {
+        $sql = "
+            SELECT b_u_email AS other_email, b_feedback AS feedback, status, d_date AS cooperation_time
+            FROM match_db
+            WHERE status = 'completed' AND a_u_email = ? AND b_feedback <> 0
+            UNION
+            SELECT a_u_email AS other_email, a_feedback AS feedback, status, d_date AS cooperation_time
+            FROM match_db
+            WHERE status = 'completed' AND b_u_email = ? AND a_feedback <> 0
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ss", $email, $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $count = 0;
+        $total = 0;
+
+        while ($r = $result->fetch_assoc()) {
+            $count++;
+            $total += $r['feedback'];
+            echo "<div class='dcard-post'>
+                    <div class='dcard-body'>
+                        <p><strong>合作夥伴：</strong> {$r['other_email']}</p>
+                        <p><strong>合作時間：</strong> {$r['cooperation_time']}</p>
+                        <p><strong>狀態：</strong> {$r['status']}</p>
+                        <p><strong>評分：</strong> {$r['feedback']} ★</p>
+                    </div>
+                  </div>";
+        }
+
+        if ($count === 0) {
+            echo "<div class='alert alert-secondary'>尚無收到評價紀錄。</div>";
+        } else {
+            $avg = round($total / $count, 2);
+            echo "<div class='alert alert-info'>平均評分：<strong>{$avg}</strong> / 5，共 {$count} 筆</div>";
+        }
+        $stmt->close();
+    } else {
+        echo "<div class='alert alert-warning'>查無使用者 email。</div>";
+    }
 }
+
+echo "</div>";
 ?>
+
 
 
             <?php
