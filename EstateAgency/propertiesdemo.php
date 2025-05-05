@@ -38,16 +38,18 @@
   ======================================================== -->
   <style>
     section,
-                .container,
-                .your-other-blocks {
-                background-color: transparent !important;
-                }
-                .page-title,
-                .page-title .container,
-                .breadcrumbs {
-                background: transparent !important;
-                z-index: 1;
-                }
+    .container,
+    .your-other-blocks {
+      background-color: transparent !important;
+    }
+
+    .page-title,
+    .page-title .container,
+    .breadcrumbs {
+      background: transparent !important;
+      z-index: 1;
+    }
+
     .dcard-post {
       border: 1px solid #ddd;
       border-radius: 10px;
@@ -95,7 +97,7 @@
   </style>
 </head>
 
-<body class="properties-page"style="
+<body class="properties-page" style="
   background-image: url('/SA/EstateAgency/assets/img/bg2.png');
   background-size: cover;
   background-position: center;
@@ -255,6 +257,7 @@
                       elseif ($tag == '實習') $displayTag = '實習';
                       elseif ($tag == '合作') $displayTag = '合作';
                       elseif ($tag == '招募') $displayTag = '招募';
+                      elseif ($tag == '贊助') $displayTag = '贊助';
 
                       echo "<option value='{$tag}'>{$displayTag}</option>";
                     }
@@ -318,11 +321,14 @@
     SELECT 
         d.*, 
         ci.c_name AS intern_c_name, ci.c_phone AS intern_c_phone, ci.c_email AS intern_c_email, ci.title AS intern_title,
-        cs.c_name AS spons_c_name, cs.c_phone AS spons_c_phone, cs.c_email AS spons_c_email, cs.title AS spons_title,cs.sponsor_amount AS sponsor_amount,
+        cs.c_name AS spons_c_name, cs.c_phone AS spons_c_phone, cs.c_email AS spons_c_email, cs.title AS spons_title,cs.sponsor_amount AS sponsor_amount,cs.sponsor_method AS spons_method,
         COALESCE(clc.c_name) AS coop_c_name,
         COALESCE(clc.c_phone) AS coop_c_phone,
         COALESCE(clc.c_email) AS coop_c_email,
-        COALESCE(clc.coop_name) AS coop_title
+        COALESCE(clc.coop_name) AS coop_title,
+        COALESCE(clc.city) AS coop_city,
+        COALESCE(clc.coop_type) AS coop_type,
+        COALESCE(clc.benefit) AS benefit
     FROM demanded d
     LEFT JOIN cor_intern ci ON d.d_id = ci.d_id
     LEFT JOIN cor_spons cs ON d.d_id = cs.d_id
@@ -336,11 +342,13 @@
               $sql = "
     SELECT 
         d.*, 
-        od.c_name AS donate_c_name, od.c_phone AS donate_c_phone, od.c_email AS donate_c_email, od.title AS donate_title,
+        od.c_name AS donate_c_name, od.c_phone AS donate_c_phone, od.c_email AS donate_c_email, od.event_name AS donate_title,od.sponsor_method AS donate_method,
         COALESCE(cc.c_name) AS coop_c_name,
         COALESCE(cc.c_phone) AS coop_c_phone,
         COALESCE(cc.c_email) AS coop_c_email,
-        COALESCE(cc.coop_name) AS coop_title
+        COALESCE(cc.coop_type) AS coop_type,
+        COALESCE(cc.coop_name) AS coop_title,
+        COALESCE(cc.benefit) AS benefit
     FROM demanded d
     LEFT JOIN org_donate od ON d.d_id = od.d_id
     LEFT JOIN corp_coop cc ON d.d_id = cc.d_id
@@ -356,7 +364,8 @@
         COALESCE(cc.c_name, clc.c_name) AS coop_c_name,
         COALESCE(cc.c_phone, clc.c_phone) AS coop_c_phone,
         COALESCE(cc.c_email, clc.c_email) AS coop_c_email,
-        COALESCE(cc.coop_name, clc.coop_name) AS coop_title
+        COALESCE(cc.coop_name, clc.coop_name) AS coop_title,
+        COALESCE(clc.city) AS coop_city
     FROM demanded d
     LEFT JOIN corp_coop cc ON d.d_id = cc.d_id
     LEFT JOIN club_coop clc ON d.d_id = clc.d_id
@@ -370,18 +379,18 @@
             // 使用 prepared statement，防止 SQL injection
             $stmt = mysqli_prepare($link, $sql);
             // ... 上面決定好 $sql 了之後
-$stmt = mysqli_prepare($link, $sql);
-if ($stmt === false) {
-    die('Prepare failed: ' . mysqli_error($link));
-}
+            $stmt = mysqli_prepare($link, $sql);
+            if ($stmt === false) {
+              die('Prepare failed: ' . mysqli_error($link));
+            }
 
-// 只有在「企業」和「其他」分支的 SQL 裡面，才有一個 '?' 需要綁定
-if ($u_permission !== '組織團體') {
-    mysqli_stmt_bind_param($stmt, 's', $u_permission);
-}
+            // 只有在「企業」和「其他」分支的 SQL 裡面，才有一個 '?' 需要綁定
+            if ($u_permission !== '組織團體') {
+              mysqli_stmt_bind_param($stmt, 's', $u_permission);
+            }
 
-mysqli_stmt_execute($stmt);
-$result = mysqli_stmt_get_result($stmt);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
             mysqli_stmt_execute($stmt);
             $result = mysqli_stmt_get_result($stmt);
 
@@ -389,31 +398,56 @@ $result = mysqli_stmt_get_result($stmt);
             $filterTag = $_GET['tag'] ?? '';
             $filterField = $_GET['field'] ?? '';
             $selectedFieldValue = $_GET['fieldValue'] ?? '';
+            function normalizeTag($tag)
+            {
+              switch ($tag) {
+                case 'spon':
+                  return '贊助';
+                case '實習':
+                  return '實習';
+                case '合作':
+                  return '合作';
+                case '招募':
+                  return '招募';
+                default:
+                  return $tag;
+              }
+            }
             while ($row = mysqli_fetch_assoc($result)) {
-              $displayTag = $row['tag'];
+              $displayTag = normalizeTag($row['tag']);
               if ($displayTag == 'spon') $displayTag = '贊助';
               elseif ($displayTag == '實習') $displayTag = '實習';
               elseif ($displayTag == '合作') $displayTag = '合作';
               elseif ($displayTag == '招募') $displayTag = '招募';
 
-              if ($filterTag && $displayTag !== $filterTag) continue;
+              if ($filterTag && $displayTag !== normalizeTag($filterTag)) continue;
 
               if ($filterField && $selectedFieldValue) {
                 $fieldMatched = false;
 
                 switch ($filterField) {
                   case '贊助方式':
-                    if (!empty($row['spons_title']) && strpos($row['spons_title'], $selectedFieldValue) !== false) {
+                    // cor_spons 用 spons_method，org_donate 用 donate_method
+                    if (
+                      (!empty($row['donate_method']) && strpos($row['donate_method'], $selectedFieldValue) !== false) ||
+                      (!empty($row['spons_method']) && strpos($row['spons_method'], $selectedFieldValue) !== false)
+                    ) {
                       $fieldMatched = true;
                     }
                     break;
+
                   case '合作地點':
-                    if (!empty($row['coop_title']) && strpos($row['coop_title'], $selectedFieldValue) !== false) {
+                    if (!empty($row['coop_city']) && strpos($row['coop_city'], $selectedFieldValue) !== false) {
                       $fieldMatched = true;
                     }
                     break;
                   case '合作方式':
-                    if (!empty($row['coop_title']) && strpos($row['coop_title'], $selectedFieldValue) !== false) {
+                    if (!empty($row['coop_type']) && strpos($row['coop_type'], $selectedFieldValue) !== false) {
+                      $fieldMatched = true;
+                    }
+                    break;
+                  case '合作效益':
+                    if (!empty($row['benefit']) && strpos($row['benefit'], $selectedFieldValue) !== false) {
                       $fieldMatched = true;
                     }
                     break;
@@ -586,12 +620,15 @@ $result = mysqli_stmt_get_result($stmt);
   </script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
+    const userPermission = <?= json_encode($_SESSION['u_permission'] ?? '訪客') ?>;
+  </script>
+  <script>
     const fieldOptions = {
-      '合作': ['合作名稱', '合作類型', '合作效益'],
+      '合作': ['合作方式', '合作地點', '合作效益'],
       '贊助': ['贊助方式', '贊助金額'],
-      '實習': ['職缺名稱', '地點', '薪資', '技能要求'],
-      '招募': ['招募類型', '條件'],
-      'spon': ['活動名稱', '贊助方式']
+      '實習': ['職缺名稱', '地點', '薪資', '技能要求', '實習期間'],
+      '招募': ['招募類型', '條件', '活動時間'],
+      'spon': ['贊助方式', '贊助金額'] // 若有用原始 tag
     };
 
     document.getElementById('tagSelect').addEventListener('change', function() {
@@ -625,10 +662,23 @@ $result = mysqli_stmt_get_result($stmt);
         'spon': '贊助',
         '實習': '實習',
         '合作': '合作',
+        '贊助': '贊助',
         '招募': '招募'
       };
       return map[tag] || tag;
     }
+    const valueMapping = {
+      '贊助方式': {
+        '金錢': 'money',
+        '產品': 'product'
+      },
+      '合作方式': {
+        '活動合辦': '活動合辦',
+        '聯誼活動': '聯誼活動',
+        '長期合作': '長期合作',
+        '成果發表': '成果發表'
+      }
+    };
     document.getElementById('applyFilters').addEventListener('click', function() {
       const tag = document.getElementById('tagSelect').value;
       const field = document.getElementById('fieldSelect').value;
@@ -642,28 +692,59 @@ $result = mysqli_stmt_get_result($stmt);
       const params = new URLSearchParams();
       params.set('tag', tag);
       if (field) params.set('field', field);
-      if (field && detail) params.set('fieldValue', detail);
+      if (field && detail) {
+        const mappedValue = valueMapping[field]?.[detail] || detail;
+        params.set('fieldValue', mappedValue);
+      }
 
       // ✅ 導向含參數的新網址
       window.location.href = 'propertiesdemo.php?' + params.toString();
     });
     const detailFieldOptions = {
-      '贊助金額': ['1萬以下', '1萬～5萬', '5萬以上'],
-      '贊助方式': ['金錢', '產品'],
+      // 合作相關
+      '合作名稱': ['產學合作', '社會公益', '品牌推廣'],
+      '合作方式_組織團體': ['活動合辦', '聯誼活動', '長期合作', '成果發表'],
+      '合作方式_企業': ['演講講座', '實習需求', '產學合作', '其他'],
       '合作地點': ['台北市', '新北市', '台中市', '台南市', '高雄市'],
-      '合作方式': ['活動合辦', '聯誼活動', '長期合作', '成果發表']
+      '合作效益': ['提升知名度', '拓展關係網', '技術交流'],
+
+      // 贊助相關
+      '贊助方式': ['金錢', '產品'],
+      '贊助金額': ['1萬以下', '1萬~5萬', '5萬以上'],
+      // '活動名稱': ['校園音樂祭', '創業競賽', '職涯講座'],
+
+      // 實習相關
+      '職缺名稱': ['軟體工程師', '行銷助理', '設計實習生'],
+      '地點': ['台北市', '新竹市', '高雄市', '可遠端'],
+      '薪資': ['無薪', '時薪 183', '月薪 20000~30000'],
+      '技能要求': ['HTML/CSS', 'Python', 'Illustrator', '社群經營'],
+      '實習期間': ['一個月', '兩個月', '整學期'],
+
+      // 招募相關
+      '招募類型': ['志工', '兼職', '活動協助'],
+      '條件': ['具溝通能力', '時間彈性', '有責任感'],
+      '活動時間': ['平日晚間', '週末全天', '寒暑假']
     };
+
 
     document.getElementById('fieldSelect').addEventListener('change', function() {
       const field = this.value;
       const wrapper = document.getElementById('fieldValueWrapper');
       const select = document.getElementById('fieldValueSelect');
 
-      // 如果這個欄位有對應細項條件，就顯示
-      if (detailFieldOptions[field]) {
+      select.innerHTML = '<option value="">請選擇條件</option>';
+
+      // ⚠️ 根據使用者身分動態找細項清單
+      let detailKey = field;
+      if (field === '合作方式') {
+        detailKey = `${field}_${userPermission}`;
+      }
+
+      const options = detailFieldOptions[detailKey];
+
+      if (options) {
         wrapper.style.display = 'block';
-        select.innerHTML = '<option value="">請選擇條件</option>';
-        detailFieldOptions[field].forEach(opt => {
+        options.forEach(opt => {
           const option = document.createElement('option');
           option.value = opt;
           option.textContent = opt;
@@ -671,7 +752,6 @@ $result = mysqli_stmt_get_result($stmt);
         });
       } else {
         wrapper.style.display = 'none';
-        select.innerHTML = '<option value="">請選擇條件</option>';
       }
     });
   </script>
