@@ -524,7 +524,7 @@
                                         <div class='col-md-6'><input type='tel' class='form-control' name='s_phone' value="<?= $data['s_phone'] ?>" placeholder='聯絡人手機號碼' required></div>
 
                                         <label>平台會員訊息</label>
-                                        <div class="col-md-6"><input type="email" class="form-control" name="u_email" value="<?= $data['u_email'] ?>" placeholder="Email" required></div>
+                                        <div class="col-md-6"><input type="email" class="form-control" name="u_email" value="<?= $data['u_email'] ?>" placeholder="Email" readonly></div>
                                         <div class="col-md-6"><input type="text" class="form-control" name="u_password" value="<?= $account['u_password'] ?>" placeholder="密碼" required></div>
                                         <div class="col-md-12"><textarea class="form-control" name="u_content" rows="5" placeholder="組織簡介" required><?= htmlspecialchars($account['u_content']) ?></textarea></div>
 
