@@ -37,17 +37,31 @@
   * Author: BootstrapMade.com
   * License: https://bootstrapmade.com/license/
   ======================================================== -->
-</head>
 
-<body class="starter-page-page" style="
-  padding-top: 100px;background-image: url('./assets/img/bg2.png');
+
+  <style>
+    section,
+    .container,
+    .your-other-blocks {
+      background-color: transparent !important;
+    }
+
+    .page-title,
+    .page-title .container,
+    .breadcrumbs {
+      background: transparent !important;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body class="properties-page" style="
+  background-image: url('./assets/img/bg2.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   min-height: 100vh;
-  margin: 0;">
-
-<body class="property-single-page">
+  margin: 0;
+">
 
   <header id="header" class="header d-flex align-items-center fixed-top">
     <div class="container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
@@ -104,28 +118,25 @@
 
     <!-- Page Title -->
     <div class="page-title" data-aos="fade">
-      <div class="heading">
-        <div class="container">
-          <div class="row d-flex justify-content-center text-center">
-            <div class="col-lg-8">
-              <h1>最新專案</h1>
-              <!-- <p class="mb-0">Odio et unde deleniti. Deserunt numquam exercitationem. Officiis quo odio sint voluptas consequatur ut a odio voluptatem. Sit dolorum debitis veritatis natus dolores. Quasi ratione sint. Sit quaerat ipsum dolorem.</p> -->
-            </div>
-          </div>
-        </div>
-      </div>
       <nav class="breadcrumbs">
-        <div class="container">
+        <div class="container" style="padding: 85px 0 0 0;">
           <ol>
             <li><a href="index.php">首頁</a></li>
-            <li><a href="propertiesdemo.php">最新專案</a></li>
+            <li class="current">最新專案</li>
           </ol>
         </div>
       </nav>
     </div><!-- End Page Title -->
+      
 
     <!-- Real Estate 2 Section -->
     <section id="real-estate-2" class="real-estate-2 section">
+        
+      <!-- Section Title -->
+      <div class="container section-title" data-aos="fade-up">
+        <h2>最新專案</h2>
+      </div><!-- End Section Title -->
+
       <div class="container" data-aos="fade-up">
         <div class="row justify-content-between gy-4 mt-4">
 
@@ -197,7 +208,7 @@
                   $table = 'cor_spons';
                   $title_key = 'title';
                   break;
-                case '招募':
+                case '實習':
                   $table = 'cor_intern';
                   $title_key = 'intern_title';
                   break;
@@ -289,7 +300,7 @@
                   ";
                   break;
 
-                case '招募': // cor_intern
+                case '實習': // cor_intern
                   echo "
                   <p>🧑‍💼 <strong>職缺名稱：</strong> " . htmlspecialchars($content_row['intern_title'] ?? '無資料') . "</p>
                   <p>👥 <strong>招募人數：</strong> " . htmlspecialchars($content_row['intern_number'] ?? '無資料') . " 人</p>

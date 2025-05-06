@@ -74,10 +74,10 @@ if ($u_permission == '組織團體') {
                     $coop_type     = $_POST['coop_type']    ?? '';
                     $coop_name     = $_POST['coop_name']     ?? '';
                     $coop_desc     = $_POST['coop_desc']     ?? '';
-                    $recruit_city  = $_POST['recruit_city'] ?? '';
-                    $recruit_district = $_POST['recruit_district'] ?? '';
+                    $city  = $_POST['city'] ?? '';
+                    $district = $_POST['district'] ?? '';
                     // 前端 textarea name="未設定"，這裡要對應一下，如果你改了 name，這裡也要同步：
-                    $recruit_address = $_POST['recruit_address']     ?? '';
+                    $address = $_POST['address']     ?? '';
         
                     // 多選「合作預期效益」
                     $benefits = $_POST['benefit'] ?? [];
@@ -100,9 +100,9 @@ if ($u_permission == '組織團體') {
                           '$coop_name',
                           '$coop_desc',
                           $benefits_json,
-                          '$recruit_city',
-                          '$recruit_district',
-                          '$recruit_address',
+                          '$city',
+                          '$district',
+                          '$address',
                           '$coop_start',
                           '$coop_end',
                           '$c_email',
@@ -123,8 +123,8 @@ if ($u_permission == '組織團體') {
                 elseif ($coop_target === 'company') {
                     // 基本欄位
                     $coop_type = $_POST['coop_type'] ?? '';
-                    $coop_name = $_POST['coopname']   ?? '';
-                    $coop_desc = $_POST['coopdesc']   ?? '';
+                    $coop_name = $_POST['coop_name']   ?? '';
+                    $coop_desc = $_POST['coop_desc']   ?? '';
         
                     // 多選「合作預期效益」
                     $benefits = $_POST['benefit'] ?? [];
@@ -133,8 +133,8 @@ if ($u_permission == '組織團體') {
                         : "NULL";
         
                     // 合作期間
-                    $coop_start = $_POST['coopstart'] ?? '';
-                    $coop_end   = $_POST['coopend']   ?? '';
+                    $coop_start = $_POST['coop_start'] ?? '';
+                    $coop_end   = $_POST['coop_end']   ?? '';
         
                     // 組 SQL
                     $sql = "
@@ -262,14 +262,14 @@ if ($u_permission == '組織團體') {
         // }
     } elseif ($tag === '實習') {
         // 處理企業實習 org_internship
-        $intern_title = $_POST['recruit_title']; // 注意，表單欄位一樣
-        $intern_number = intval($_POST['recruit_number']);
+        $intern_title = $_POST['intern_title']; // 注意，表單欄位一樣
+        $intern_number = intval($_POST['intern_number']);
         $salary = $_POST['salary'];
-        $intern_city = $_POST['recruit_city'];
-        $intern_district = $_POST['recruit_district'];
+        $intern_city = $_POST['intern_city'];
+        $intern_district = $_POST['intern_district'];
         $worktime = $_POST['worktime'];
         $jobskill = $_POST['jobskill'];
-        $intern_detail = $_POST['recruit_detail'];
+        $intern_detail = $_POST['intern_detail'];
 
         $experience = isset($_POST['ex']) ? '具備相關經驗' : NULL;
         $language = isset($_POST['language']) ? '語言能力' : NULL;

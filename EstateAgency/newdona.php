@@ -165,16 +165,6 @@
                     <form action="postdb.php" method="post" class="php-email-form" data-aos="fade-up"
                         data-aos-delay="200">
                         <div class="row gy-4">
-                            <!-- <p>一、需求標題</p>
-                            <div class="col-md-6">
-                                <input type="text" class="form-control" name="title" placeholder="請輸入簡要說明" required>
-                            </div>
-
-                            <p>二、需求詳細描述</p>
-                            <div class="col-md-12">
-                                <textarea class="form-control" name="content" rows="3" placeholder="請詳細說明需求和期望"
-                                    required></textarea>
-                            </div> -->
                             <?php
                             $u_permission = $_SESSION['u_permission'];
 
@@ -314,8 +304,8 @@
 
                                                 <div class="col-md-4">
                                                     <label>合作地點</label>
-                                                    <select id="city" class="form-select" name="recruit_city">
-                                                        <option selected disabled value="">選擇縣市</option>
+                                                    <select id="city" class="form-select" name="city">
+                                                        <option selected disabled value="_">選擇縣市</option>
                                                         <option value="台北市">台北市</option>
                                                         <option value="新北市">新北市</option>
                                                         <option value="桃園市">桃園市</option>
@@ -324,13 +314,13 @@
 
                                                 <div class="col-md-4">
                                                     <label></label>
-                                                    <select id="district" class="form-select" name="recruit_district">
+                                                    <select id="district" class="form-select" name="district">
                                                         <option selected disabled value="">選擇行政區</option>
                                                     </select>
                                                 </div>
 
                                                 <div class="col-md-12">
-                                                    <textarea class="form-control" name="recruit_address" rows="3" placeholder="詳細地址" ></textarea>
+                                                    <textarea class="form-control" name="address" rows="3" placeholder="詳細地址" ></textarea>
                                                 </div>
 
                                                 <div class="col-md-12">
@@ -361,11 +351,11 @@
                                                     </select>
                                                 </div>
                                                 <div class="col-md-4">
-                                                    <input type="text" class="form-control" name="coopname" placeholder="合作項目名稱" >
+                                                    <input type="text" class="form-control" name="coop_name" placeholder="合作項目名稱" >
                                                 </div>
 
                                                 <div class="col-md-12">
-                                                    <textarea class="form-control" name="coopdesc" rows="3" placeholder="詳細合作內容描述" ></textarea>
+                                                    <textarea class="form-control" name="coop_desc" rows="3" placeholder="詳細合作內容描述" ></textarea>
                                                 </div>
 
                                                 
@@ -390,10 +380,10 @@
                                                     <label>合作時間</label>
                                                     <div class="row">
                                                         <div class="col-md-4">
-                                                            <input type="date" class="form-control" name="coopstart" placeholder="開始日期" >
+                                                            <input type="date" class="form-control" name="coop_start" placeholder="開始日期" >
                                                         </div>
                                                         <div class="col-md-4">
-                                                            <input type="date" class="form-control" name="coopend" placeholder="結束日期" >
+                                                            <input type="date" class="form-control" name="coop_end" placeholder="結束日期" >
                                                         </div>
                                                     </div>
                                                 </div>
@@ -409,7 +399,6 @@
                                 <select class="form-select" id="demandtype2" name="tag" >
                                     <option selected disabled value="_">需求類型</option>
                                     <option value="贊助">贊助</option>
-                                    
                                     <option value="實習">實習</option>
                                 </select>
                             </div>
@@ -498,11 +487,11 @@
                                     <div class="row gy-3">
                                         <div class="col-md-4">
                                             <label>職缺名稱</label>
-                                            <input type="text" class="form-control" name="recruit_title" placeholder="招募職缺名稱">
+                                            <input type="text" class="form-control" name="intern_title" placeholder="招募職缺名稱">
                                         </div>
                                         <div class="col-md-4">
                                             <label>人數</label>
-                                            <input type="number" class="form-control" name="recruit_number" placeholder="招募人數">
+                                            <input type="number" class="form-control" name="intern_number" placeholder="招募人數">
                                         </div>                                       
                                         <div class="col-md-4">
                                             <label>薪資</label>
@@ -510,7 +499,7 @@
                                         </div>
                                         <div class="col-md-4">
                                             <label>地點</label>
-                                            <select id="city" class="form-select" name="recruit_city">
+                                            <select id="city" class="form-select" name="intern_city">
                                                 <option selected disabled value="">選擇縣市</option>
                                                 <option value="台北市">台北市</option>
                                                 <option value="新北市">新北市</option>
@@ -518,8 +507,8 @@
                                             </select>
                                         </div>
                                         <div class="col-md-4">
-                                        <label></label>
-                                            <select id="district" class="form-select" name="recruit_district">
+                                            <label></label>
+                                            <select id="district" class="form-select" name="intern_district">
                                                 <option selected disabled value="">選擇行政區</option>
                                             </select>
                                         </div>
@@ -527,13 +516,12 @@
                                             <label>上班時段</label>
                                             <input type="text" class="form-control" name="worktime" placeholder="上班時段">
                                         </div>
-                                        <br>
                                         <div class="col-md-4">
                                             <label>工作技能</label>
                                             <input type="text" class="form-control" name="jobskill" placeholder="工作技能">
                                         </div>
                                         <div class="col-md-12">
-                                            <textarea class="form-control" name="recruit_detail" rows="3" placeholder="職缺說明與條件"></textarea>
+                                            <textarea class="form-control" name="intern_detail" rows="3" placeholder="職缺說明與條件"></textarea>
                                         </div>
 
                                         <div class="col-md-6">
@@ -833,6 +821,60 @@
                 });
             }
         });
+
+        document.addEventListener("DOMContentLoaded", function () {
+    const typeSelect2 = document.getElementById("demandtype2"); // 企業的需求選單
+    const sponsorSection2 = document.getElementById("sponsorSection2");
+    const internSection = document.getElementById("internsection");
+
+    const titleInput = document.getElementById("title");
+    const contentTextarea = document.getElementById("content");
+
+    if (typeSelect2) {
+        typeSelect2.addEventListener("change", function () {
+            const value = this.value;
+
+            // 隱藏所有主區塊
+            if (sponsorSection2) sponsorSection2.style.display = "none";
+            if (internSection) internSection.style.display = "none";
+
+            // 先移除 required 屬性
+            if (titleInput) titleInput.removeAttribute("required");
+            if (contentTextarea) contentTextarea.removeAttribute("required");
+
+            // 顯示對應區塊 & 加上 required
+            if (value === "贊助" && sponsorSection2) {
+                sponsorSection2.style.display = "block";
+                if (titleInput) titleInput.setAttribute("required", "true");
+                if (contentTextarea) contentTextarea.setAttribute("required", "true");
+            } else if (value === "實習" && internSection) {
+                internSection.style.display = "block";
+                // 若實習欄位也需要 required，可在這裡加
+            }
+        });
+    }
+
+        // 贊助方式選單切換（例如金錢 vs 產品）
+        const sponsor_method2 = document.getElementById("sponsor_method2");
+        const sponsor_amount2 = document.getElementById("sponsor_amount2");
+        const productdona2 = document.getElementById("productdona2");
+
+        if (sponsor_method2) {
+            sponsor_method2.addEventListener("change", function () {
+                const value = this.value;
+
+                if (sponsor_amount2) sponsor_amount2.style.display = "none";
+                if (productdona2) productdona2.style.display = "none";
+
+                if (value === "money" && sponsor_amount2) {
+                    sponsor_amount2.style.display = "block";
+                } else if (value === "product" && productdona2) {
+                    productdona2.style.display = "block";
+                }
+            });
+        }
+    });
+
     </script>
 
 

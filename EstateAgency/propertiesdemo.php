@@ -337,7 +337,7 @@
               $sql = "
     SELECT 
         d.*, 
-        ci.c_name AS intern_c_name, ci.c_phone AS intern_c_phone, ci.c_email AS intern_c_email, ci.title AS intern_title,
+        ci.c_name AS intern_c_name, ci.c_phone AS intern_c_phone, ci.c_email AS intern_c_email, ci.intern_title AS intern_title,
         cs.c_name AS spons_c_name, cs.c_phone AS spons_c_phone, cs.c_email AS spons_c_email, cs.title AS spons_title,cs.sponsor_amount AS sponsor_amount,cs.sponsor_method AS spons_method,
         COALESCE(clc.c_name) AS coop_c_name,
         COALESCE(clc.c_phone) AS coop_c_phone,

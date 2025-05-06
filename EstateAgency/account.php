@@ -145,6 +145,18 @@
         color: gold;
         }
 
+        section,
+        .container,
+        .your-other-blocks {
+        background-color: transparent !important;
+        }
+
+        .page-title,
+        .page-title .container,
+        .breadcrumbs {
+        background: transparent !important;
+        z-index: 1;
+        }
     </style>
 
 </head>
@@ -156,7 +168,6 @@
   background-repeat: no-repeat;
   min-height: 100vh;
   margin: 0;">
-<body class="starter-page-page">
     <?php if (isset($_GET['success'])): ?>
         <div class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 9999;">
             <div id="successToast" class="toast align-items-center text-bg-success border-0 show" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
@@ -330,7 +341,7 @@
         <!-- Page Title -->
         <div class="page-title" data-aos="fade">
             <nav class="breadcrumbs">
-                <div class="container" style="padding: 85px 0 0 0;">
+                <div class="container">
                     <ol>
                         <li><a href="index.php">首頁</a></li>
                         <li class="current">帳號管理</li>
