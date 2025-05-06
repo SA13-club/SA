@@ -352,14 +352,6 @@
                                             <p>二、合作細節</p>
                                             <div class="row gy-3">
                                                 <div class="col-md-4">
-                                                    <input type="text" class="form-control" name="coopname" placeholder="合作項目名稱" >
-                                                </div>
-
-                                                <div class="col-md-12">
-                                                    <textarea class="form-control" name="coopdesc" rows="3" placeholder="詳細合作內容描述" ></textarea>
-                                                </div>
-
-                                                <div class="col-md-4">
                                                     <select class="form-select" id="coop_type" name="coop_type" >
                                                         <option selected disabled value="_">合作類型</option>
                                                         <option value="演講講座">演講講座</option>
@@ -368,6 +360,15 @@
                                                         <option value="其他">其他</option>
                                                     </select>
                                                 </div>
+                                                <div class="col-md-4">
+                                                    <input type="text" class="form-control" name="coopname" placeholder="合作項目名稱" >
+                                                </div>
+
+                                                <div class="col-md-12">
+                                                    <textarea class="form-control" name="coopdesc" rows="3" placeholder="詳細合作內容描述" ></textarea>
+                                                </div>
+
+                                                
 
                                                 <div class="col-md-6">
                                                     <label>合作預期效益（可複選）</label>
