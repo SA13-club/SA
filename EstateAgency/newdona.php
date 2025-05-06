@@ -39,7 +39,7 @@
 </head>
 
 <body class="starter-page-page" style="
-  background-image: url('/SA/EstateAgency/assets/img/bg2.png');
+  background-image: url('./assets/img/bg2.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

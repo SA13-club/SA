@@ -149,6 +149,13 @@
 
 </head>
 
+<body class="starter-page-page" style="
+  padding-top: 100px;background-image: url('./assets/img/bg2.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  margin: 0;">
 <body class="starter-page-page">
 
     <header id="header" class="header d-flex align-items-center fixed-top">

@@ -98,7 +98,7 @@
 </head>
 
 <body class="properties-page" style="
-  background-image: url('/SA/EstateAgency/assets/img/bg2.png');
+  background-image: url('./assets/img/bg2.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -205,6 +205,9 @@
                        
         echo "<option value=\"$tag_value\">$tag_display</option>";
     }
+
+
+    
     ?>
                 </select>
               </div>
