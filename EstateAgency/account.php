@@ -157,6 +157,19 @@
   min-height: 100vh;
   margin: 0;">
 <body class="starter-page-page">
+    <?php if (isset($_GET['success'])): ?>
+        <div class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 9999;">
+            <div id="successToast" class="toast align-items-center text-bg-success border-0 show" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        資料已成功更新！
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
+
 
     <header id="header" class="header d-flex align-items-center fixed-top">
         <div class="container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
@@ -373,8 +386,7 @@
                                             <p>📞 <strong>聯絡人電話：</strong><?= htmlspecialchars($data['s_phone']) ?></p>
                                         </li>
                                         <li>
-                                            <p>📜 <strong>組織簡介：</strong></p>
-                                            <p><?= nl2br(htmlspecialchars($data['u_content'])) ?></p>
+                                            <p>📜 <strong>組織簡介：</strong><?= nl2br(htmlspecialchars($data['u_content'])) ?></p>
                                         </li>
                                     <?php endif; ?>
                                 </ul>
@@ -454,6 +466,7 @@
                             <?php endwhile; ?>
                         </div>
 
+
                         <?php if ($u_permission === '企業'): ?>
                             <!-- 表單：基本資料 -->
                             <div id="form-section" class="contact section-content" style="display: none;">
@@ -468,6 +481,7 @@
                                                 <option value='大眾傳播相關業' <?= ($data['c_industry'] == '大眾傳播相關業') ? 'selected' : '' ?>>大眾傳播相關業</option>
                                                 <option value='旅遊／休閒／運動業' <?= ($data['c_industry'] == '旅遊／休閒／運動業') ? 'selected' : '' ?>>旅遊／休閒／運動業</option>
                                                 <option value='住宿／餐飲服務業' <?= ($data['c_industry'] == '住宿／餐飲服務業') ? 'selected' : '' ?>>住宿／餐飲服務業</option>
+                                                <option value='高科技' <?= ($data['c_industry'] == '高科技') ? 'selected' : '' ?>>高科技</option>
                                             </select>
                                         </div>
                                         <div class='col-md-5'><input type='text' class='form-control' name='c_address' value="<?= $data['c_address'] ?>" placeholder='公司地址' required></div>
@@ -483,7 +497,7 @@
                                         <label>平台會員訊息</label>
                                         <div class='col-md-5'><input type='email' class='form-control' name='u_email' value="<?= $data['u_email'] ?>" placeholder='Email' required></div>
                                         <div class='col-md-5'><input type='text' class='form-control' name='u_password' value="<?= $account['u_password'] ?>" placeholder='密碼' required></div>
-                                        <div class='col-md-12'><textarea class='form-control' name='u_content' rows='3' placeholder='公司簡介' required><?= htmlspecialchars($account['u_content']) ?></textarea></div>
+                                        <div class='col-md-12'><textarea class='form-control' name='u_content' rows='5' placeholder='公司簡介' required><?= htmlspecialchars($account['u_content']) ?></textarea></div>
 
                                         <div class='col-md-12 text-center'><button type='submit'>更改</button></div>
                                     </div>
@@ -714,6 +728,11 @@
                     });
                 });
             });
+            if (window.location.search.includes('success=1')) {
+                const url = new URL(window.location);
+                url.searchParams.delete('success');
+                window.history.replaceState({}, document.title, url.toString());
+            }
             </script>
 
         </section>
@@ -799,52 +818,65 @@
     <!-- Main JS File -->
     <script src="assets/js/main.js"></script>
     
-<script>
-// AJAX 呼叫 update_status.php
-document.querySelectorAll('.js-action').forEach(btn=>{
-  btn.onclick = async ()=>{
-    const did  = btn.dataset.did;
-    const step = btn.dataset.step;
-    const res = await fetch('update_status.php', {
-      method:'POST',
-      headers:{'Content-Type':'application/x-www-form-urlencoded'},
-      body:`d_id=${did}&step=${step}`
+    <script>
+    // AJAX 呼叫 update_status.php
+    document.querySelectorAll('.js-action').forEach(btn=>{
+    btn.onclick = async ()=>{
+        const did  = btn.dataset.did;
+        const step = btn.dataset.step;
+        const res = await fetch('update_status.php', {
+        method:'POST',
+        headers:{'Content-Type':'application/x-www-form-urlencoded'},
+        body:`d_id=${did}&step=${step}`
+        });
+        const j = await res.json();
+        if (j.status) location.reload();
+        else alert('更新失敗');
+    };
     });
-    const j = await res.json();
-    if (j.status) location.reload();
-    else alert('更新失敗');
-  };
-});
 
 
-document.querySelectorAll('.star-rating').forEach(rating => {
-    const stars = rating.querySelectorAll('.star');
-    let selectedRating = 0;
+    document.querySelectorAll('.star-rating').forEach(rating => {
+        const stars = rating.querySelectorAll('.star');
+        let selectedRating = 0;
 
-    stars.forEach(star => {
-        star.addEventListener('mouseover', () => {
-            const val = parseInt(star.dataset.value);
-            stars.forEach(s => {
-                s.classList.toggle('hovered', parseInt(s.dataset.value) <= val);
+        stars.forEach(star => {
+            star.addEventListener('mouseover', () => {
+                const val = parseInt(star.dataset.value);
+                stars.forEach(s => {
+                    s.classList.toggle('hovered', parseInt(s.dataset.value) <= val);
+                });
+            });
+
+            star.addEventListener('mouseout', () => {
+                stars.forEach(s => s.classList.remove('hovered'));
+            });
+
+            star.addEventListener('click', () => {
+                selectedRating = parseInt(star.dataset.value);
+                rating.dataset.rating = selectedRating;
+                stars.forEach(s => {
+                    s.classList.toggle('selected', parseInt(s.dataset.value) <= selectedRating);
+                });
+                // 你可以在這裡做後端 AJAX 提交、console.log，或其他處理
+                console.log("使用者評分為：" + selectedRating);
             });
         });
-
-        star.addEventListener('mouseout', () => {
-            stars.forEach(s => s.classList.remove('hovered'));
-        });
-
-        star.addEventListener('click', () => {
-            selectedRating = parseInt(star.dataset.value);
-            rating.dataset.rating = selectedRating;
-            stars.forEach(s => {
-                s.classList.toggle('selected', parseInt(s.dataset.value) <= selectedRating);
-            });
-            // 你可以在這裡做後端 AJAX 提交、console.log，或其他處理
-            console.log("使用者評分為：" + selectedRating);
-        });
     });
-});
-</script>
+    </script>
+
+    <!-- Bootstrap 5 JS（CDN）-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            const toastEl = document.getElementById('successToast');
+            if (toastEl) {
+                const toast = new bootstrap.Toast(toastEl);
+                toast.show();
+            }
+        });
+    </script>
 
 
 </body>
