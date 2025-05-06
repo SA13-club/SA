@@ -1,6 +1,5 @@
 <?php
-// 在文件開頭啟動會話
-session_start();
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -39,6 +38,14 @@ session_start();
   * License: https://bootstrapmade.com/license/
   ======================================================== -->
 </head>
+
+<body class="starter-page-page" style="
+  padding-top: 100px;background-image: url('./assets/img/bg2.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  margin: 0;">
 
 <body class="property-single-page">
 
