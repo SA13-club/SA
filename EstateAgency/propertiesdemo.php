@@ -189,26 +189,25 @@
               <!-- 第一個下拉框：選擇類型 -->
               <div class="col-md-3">
                 <select class="form-select form-select-lg" name="type">
-                <?php
-    $link = mysqli_connect('localhost', 'root', '', 'sa');
-    if (!$link) {
-        die('連線失敗: ' . mysqli_connect_error());
-    }
+                  <?php
+                  $link = mysqli_connect('localhost', 'root', '', 'sa');
+                  if (!$link) {
+                    die('連線失敗: ' . mysqli_connect_error());
+                  }
 
-    $tag_sql = "SELECT DISTINCT tag FROM demanded WHERE tag IS NOT NULL AND tag != ''";
-    $tag_result = mysqli_query($link, $tag_sql);
+                  $tag_sql = "SELECT DISTINCT tag FROM demanded WHERE tag IS NOT NULL AND tag != ''";
+                  $tag_result = mysqli_query($link, $tag_sql);
 
-    while ($row = mysqli_fetch_assoc($tag_result)) {
-        $tag_value = htmlspecialchars($row['tag']);
-        $tag_display = $tag_value === 'spon' ? '贊助' :
-                       ($tag_value === 'intern' ? '實習' : $tag_value);
-                       
-        echo "<option value=\"$tag_value\">$tag_display</option>";
-    }
+                  while ($row = mysqli_fetch_assoc($tag_result)) {
+                    $tag_value = htmlspecialchars($row['tag']);
+                    $tag_display = $tag_value === 'spon' ? '贊助' : ($tag_value === 'intern' ? '實習' : $tag_value);
+
+                    echo "<option value=\"$tag_value\">$tag_display</option>";
+                  }
 
 
-    
-    ?>
+
+                  ?>
                 </select>
               </div>
 
@@ -430,6 +429,7 @@
                   return $tag;
               }
             }
+            $filteredRows = [];
             while ($row = mysqli_fetch_assoc($result)) {
               $displayTag = normalizeTag($row['tag']);
               if ($displayTag == 'spon') $displayTag = '贊助';
@@ -444,7 +444,6 @@
 
                 switch ($filterField) {
                   case '贊助方式':
-                    // cor_spons 用 spons_method，org_donate 用 donate_method
                     if (
                       (!empty($row['donate_method']) && strpos($row['donate_method'], $selectedFieldValue) !== false) ||
                       (!empty($row['spons_method']) && strpos($row['spons_method'], $selectedFieldValue) !== false)
@@ -452,7 +451,6 @@
                       $fieldMatched = true;
                     }
                     break;
-
                   case '合作地點':
                     if (!empty($row['coop_city']) && strpos($row['coop_city'], $selectedFieldValue) !== false) {
                       $fieldMatched = true;
@@ -470,7 +468,6 @@
                     break;
                   case '贊助金額':
                     $amount = $row['sponsor_amount'] ?? null;
-
                     if ($amount !== null) {
                       if ($selectedFieldValue === '1萬以下' && $amount < 10000) $fieldMatched = true;
                       elseif ($selectedFieldValue === '1萬~5萬' && $amount >= 10000 && $amount <= 50000) $fieldMatched = true;
@@ -481,24 +478,26 @@
 
                 if (!$fieldMatched) continue;
               }
+
               if ($u_permission == '企業' && $row['tag'] == '合作' && $row['coop_c_name'] == null) {
-                continue; // 這是合作文章，但不是 corp_coop 來的，就略過
+                continue;
               }
+
               $tag = $row['tag'];
               if ($tag == 'spon') {
                 $tag = '贊助';
               }
 
+              ob_start(); // ✅ 開啟輸出緩衝
               echo "
-              <div class='dcard-post' data-category='{$tag}'>
-                  <a href='property-single.php?id={$row['d_id']}'>
-                      <div class='dcard-header'>
-                          <span class='dcard-tag'>#{$tag}</span>
-                      </div>
-                      <div class='dcard-body'>
-              ";
+    <div class='dcard-post' data-category='{$tag}'>
+        <a href='property-single.php?id={$row['d_id']}'>
+            <div class='dcard-header'>
+                <span class='dcard-tag'>#{$tag}</span>
+            </div>
+            <div class='dcard-body'>
+  ";
 
-              // 主標題處理
               switch ($row['tag']) {
                 case '合作':
                   $title = $row['coop_title'];
@@ -522,7 +521,6 @@
                   break;
               }
 
-              // 聯絡人資訊顯示（先定義）
               $contact_name = $row['intern_c_name'] ?? $row['spons_c_name'] ?? $row['donate_c_name'] ?? $row['coop_c_name'] ?? null;
               $contact_phone = $row['intern_c_phone'] ?? $row['spons_c_phone'] ?? $row['donate_c_phone'] ?? $row['coop_c_phone'] ?? null;
               $contact_email = $row['intern_c_email'] ?? $row['spons_c_email'] ?? $row['donate_c_email'] ?? $row['coop_c_email'] ?? null;
@@ -530,20 +528,31 @@
               echo "<div class='dcard-footer'>";
               if ($contact_name) {
                 echo "
-                      <span>👤 聯絡人：{$contact_name}</span>
-                      <span>📞 電話：{$contact_phone}</span>
-                      <span>✉️ Email：{$contact_email}</span>
-                  ";
+          <span>👤 聯絡人：{$contact_name}</span>
+          <span>📞 電話：{$contact_phone}</span>
+          <span>✉️ Email：{$contact_email}</span>
+      ";
               } else {
                 echo "<span>尚無聯絡資料</span>";
               }
 
               echo "
-                      </div> <!-- dcard-footer -->
-                  </div> <!-- dcard-body -->
-                  </a>
-              </div>
-              ";
+        </div> <!-- dcard-footer -->
+        </div> <!-- dcard-body -->
+        </a>
+    </div>
+  ";
+
+              $filteredRows[] = ob_get_clean(); // ✅ 儲存輸出
+            }
+
+            // ✅ 根據結果輸出
+            if (empty($filteredRows)) {
+              echo "<p>沒有符合條件的文章</p>";
+            } else {
+              foreach ($filteredRows as $html) {
+                echo $html;
+              }
             }
 
 
