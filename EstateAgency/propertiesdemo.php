@@ -94,6 +94,13 @@
     .filter-bar py-3 border-bottom bg-light {
       background-color: white;
     }
+
+    .filter-info {
+      margin: 1rem 0;
+      padding: 0.5rem 1rem;
+      background-color: #f8f9fa;
+      border-left: 4px solid rgb(18, 226, 36);
+    }
   </style>
 </head>
 
@@ -430,7 +437,17 @@
               }
             }
             $filteredRows = [];
+            $today = date('Y-m-d');
+            if ($filterTag || ($filterField && $selectedFieldValue)) {
+              echo "<div class='filter-info'>";
+              if ($filterTag) echo "<p>🔍 目前篩選：<strong>類型 - " . htmlspecialchars(normalizeTag($filterTag)) . "</strong></p>";
+              if ($filterField && $selectedFieldValue) echo "<p>🔍 目前篩選：<strong>{$filterField} - " . htmlspecialchars($selectedFieldValue) . "</strong></p>";
+              echo "</div>";
+            }
             while ($row = mysqli_fetch_assoc($result)) {
+              if (!empty($row['deadline']) && $row['deadline'] < $today) {
+                continue; // ✅ 跳過已過期的文章
+              }
               $displayTag = normalizeTag($row['tag']);
               if ($displayTag == 'spon') $displayTag = '贊助';
               elseif ($displayTag == '實習') $displayTag = '實習';
@@ -520,7 +537,14 @@
                   echo "<p><strong>✏️ 標題：</strong> " . (!empty($title) ? htmlspecialchars($title) : '無標題') . "</p>";
                   break;
               }
-
+              if (normalizeTag($filterTag) === '贊助') {
+                $amount = $row['sponsor_amount'] ?? null;
+                if ($amount) {
+                  echo "<p><strong>💰 贊助金額：</strong> " . htmlspecialchars($amount) . " 元</p>";
+                } else {
+                  echo "<p><strong>💰 贊助金額：</strong> 詳談</p>";
+                }
+              }
               $contact_name = $row['intern_c_name'] ?? $row['spons_c_name'] ?? $row['donate_c_name'] ?? $row['coop_c_name'] ?? null;
               $contact_phone = $row['intern_c_phone'] ?? $row['spons_c_phone'] ?? $row['donate_c_phone'] ?? $row['coop_c_phone'] ?? null;
               $contact_email = $row['intern_c_email'] ?? $row['spons_c_email'] ?? $row['donate_c_email'] ?? $row['coop_c_email'] ?? null;
