@@ -115,14 +115,16 @@
                 section,
                 .container,
                 .your-other-blocks {
-                background-color: transparent !important;
+                    background-color: transparent !important;
                 }
+
                 .page-title,
                 .page-title .container,
                 .breadcrumbs {
-                background: transparent !important;
-                z-index: 1;
+                    background: transparent !important;
+                    z-index: 1;
                 }
+
                 .fancy-heading {
                     font-size: 40px;
                     /* 標題字大一點有氣勢 */
@@ -561,7 +563,7 @@
                             </div>
                             <p>四、需求截止日期</p>
                             <div class="col-md-5">
-                                <input type="date" name="deadline" class="form-control">
+                                <input type="date" name="deadline" class="form-control" id="deadlineInput">
                             </div>
                             <div class="col-md-12 text-center">
                                 <button type="submit">發布需求</button>
@@ -731,7 +733,7 @@
             const coop_type = document.getElementById("coop_type");
             const union_club = document.getElementById("union_club");
             const speecher_find = document.getElementById("speecher_find");
-            
+
 
 
 
@@ -822,67 +824,106 @@
             }
         });
 
-        document.addEventListener("DOMContentLoaded", function () {
-    const typeSelect2 = document.getElementById("demandtype2"); // 企業的需求選單
-    const sponsorSection2 = document.getElementById("sponsorSection2");
-    const internSection = document.getElementById("internsection");
+        document.addEventListener("DOMContentLoaded", function() {
+            const typeSelect2 = document.getElementById("demandtype2"); // 企業的需求選單
+            const sponsorSection2 = document.getElementById("sponsorSection2");
+            const internSection = document.getElementById("internsection");
 
-    const titleInput = document.getElementById("title");
-    const contentTextarea = document.getElementById("content");
+            const titleInput = document.getElementById("title");
+            const contentTextarea = document.getElementById("content");
 
-    if (typeSelect2) {
-        typeSelect2.addEventListener("change", function () {
-            const value = this.value;
+            if (typeSelect2) {
+                typeSelect2.addEventListener("change", function() {
+                    const value = this.value;
 
-            // 隱藏所有主區塊
-            if (sponsorSection2) sponsorSection2.style.display = "none";
-            if (internSection) internSection.style.display = "none";
+                    // 隱藏所有主區塊
+                    if (sponsorSection2) sponsorSection2.style.display = "none";
+                    if (internSection) internSection.style.display = "none";
 
-            // 先移除 required 屬性
-            if (titleInput) titleInput.removeAttribute("required");
-            if (contentTextarea) contentTextarea.removeAttribute("required");
+                    // 先移除 required 屬性
+                    if (titleInput) titleInput.removeAttribute("required");
+                    if (contentTextarea) contentTextarea.removeAttribute("required");
 
-            // 顯示對應區塊 & 加上 required
-            if (value === "贊助" && sponsorSection2) {
-                sponsorSection2.style.display = "block";
-                if (titleInput) titleInput.setAttribute("required", "true");
-                if (contentTextarea) contentTextarea.setAttribute("required", "true");
-            } else if (value === "實習" && internSection) {
-                internSection.style.display = "block";
-                // 若實習欄位也需要 required，可在這裡加
+                    // 顯示對應區塊 & 加上 required
+                    if (value === "贊助" && sponsorSection2) {
+                        sponsorSection2.style.display = "block";
+                        if (titleInput) titleInput.setAttribute("required", "true");
+                        if (contentTextarea) contentTextarea.setAttribute("required", "true");
+                    } else if (value === "實習" && internSection) {
+                        internSection.style.display = "block";
+                        // 若實習欄位也需要 required，可在這裡加
+                    }
+                });
+            }
+
+            // 贊助方式選單切換（例如金錢 vs 產品）
+            const sponsor_method2 = document.getElementById("sponsor_method2");
+            const sponsor_amount2 = document.getElementById("sponsor_amount2");
+            const productdona2 = document.getElementById("productdona2");
+
+            if (sponsor_method2) {
+                sponsor_method2.addEventListener("change", function() {
+                    const value = this.value;
+
+                    if (sponsor_amount2) sponsor_amount2.style.display = "none";
+                    if (productdona2) productdona2.style.display = "none";
+
+                    if (value === "money" && sponsor_amount2) {
+                        sponsor_amount2.style.display = "block";
+                    } else if (value === "product" && productdona2) {
+                        productdona2.style.display = "block";
+                    }
+                });
             }
         });
-    }
-
-        // 贊助方式選單切換（例如金錢 vs 產品）
-        const sponsor_method2 = document.getElementById("sponsor_method2");
-        const sponsor_amount2 = document.getElementById("sponsor_amount2");
-        const productdona2 = document.getElementById("productdona2");
-
-        if (sponsor_method2) {
-            sponsor_method2.addEventListener("change", function () {
-                const value = this.value;
-
-                if (sponsor_amount2) sponsor_amount2.style.display = "none";
-                if (productdona2) productdona2.style.display = "none";
-
-                if (value === "money" && sponsor_amount2) {
-                    sponsor_amount2.style.display = "block";
-                } else if (value === "product" && productdona2) {
-                    productdona2.style.display = "block";
-                }
-            });
-        }
-    });
-
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('.php-email-form');
+            const deadlineInput = document.getElementById('deadlineInput');
 
+            // 設定 deadline 的 min 為今天
+            const today = new Date().toISOString().split('T')[0];
+            deadlineInput.setAttribute('min', today);
 
+            form.addEventListener('submit', function(e) {
+                const coopStartInputs = document.querySelectorAll('input[name="coop_start"]');
+                const coopEndInputs = document.querySelectorAll('input[name="coop_end"]');
+                const deadlineDate = new Date(deadlineInput.value);
 
+                // ❗ 驗證：deadline 不得早於今天
+                if (deadlineInput.value && deadlineDate < new Date(today)) {
+                    e.preventDefault();
+                    alert("截止日期不能早於今天！");
+                    deadlineInput.focus();
+                    return;
+                }
 
+                // ✅ 逐對檢查合作開始與結束時間
+                coopStartInputs.forEach((startInput, index) => {
+                    const endInput = coopEndInputs[index];
+                    const startDate = new Date(startInput.value);
+                    const endDate = new Date(endInput.value);
 
+                    // ❗ 驗證：合作結束時間早於開始
+                    if (startInput.value && endInput.value && endDate < startDate) {
+                        e.preventDefault();
+                        alert("合作結束時間不能早於開始時間，請重新選擇！");
+                        endInput.focus();
+                        return;
+                    }
 
-
+                    // ❗ 驗證：合作結束時間不得早於 deadline
+                    if (endInput.value && deadlineInput.value && endDate < deadlineDate) {
+                        e.preventDefault();
+                        alert("合作結束時間不能早於需求截止日，請重新選擇！");
+                        endInput.focus();
+                        return;
+                    }
+                });
+            });
+        });
+    </script>
 
 
 </body>
