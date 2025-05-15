@@ -189,13 +189,162 @@
 
       <!-- Section Title -->
       <div class="container section-title" data-aos="fade-up">
-        <h2>CoLaB</h2>
-        <p>全台最大社團產業合作媒合平台</p>
+        <h2>推薦文章</h2>
+        <p>依照評分推薦</p>
       </div><!-- End Section Title -->
 
       <div class="container">
 
         <div class="row gy-4">
+                   <?php
+$servername = "localhost";
+$username   = "root";
+$password   = "";
+$dbname     = "sa";
+
+// 建立連線
+$conn = new mysqli($servername, $username, $password, $dbname);
+if ($conn->connect_error) {
+    die("連線失敗: " . $conn->connect_error);
+}
+
+// 1. 計算每個 email 的平均分並排序
+$ratings = [];
+$sql = "
+    SELECT a_u_email AS email, b_feedback AS feedback
+      FROM match_db
+     WHERE status = 'completed' AND b_feedback <> 0
+    UNION ALL
+    SELECT b_u_email AS email, a_feedback AS feedback
+      FROM match_db
+     WHERE status = 'completed' AND a_feedback <> 0
+";
+$res = $conn->query($sql);
+while ($row = $res->fetch_assoc()) {
+    $email = $row['email'];
+    $score = (float)$row['feedback'];
+    if (!isset($ratings[$email])) {
+        $ratings[$email] = ['total'=>0,'count'=>0];
+    }
+    $ratings[$email]['total'] += $score;
+    $ratings[$email]['count']++;
+}
+$averages = [];
+foreach ($ratings as $email => $d) {
+    $averages[$email] = round($d['total'] / $d['count'], 2);
+}
+arsort($averages);
+$topUsers = array_keys($averages);
+
+// 2. 依平均分高低，為每個 user 找一篇「尚未 completed/terminated」的文章
+$foundDemands = [];
+foreach ($topUsers as $email) {
+    $lastCheckedId = null;
+    while (true) {
+        // 取該 user 最新一篇未檢查過的文章
+        $stmt1 = $conn->prepare("
+            SELECT d_id, d_date 
+              FROM demanded
+             WHERE u_email = ?
+               AND (? IS NULL OR d_id < ?)
+             ORDER BY d_id DESC
+             LIMIT 1
+        ");
+        $stmt1->bind_param('sis', $email, $lastCheckedId, $lastCheckedId);
+        $stmt1->execute();
+        $r1 = $stmt1->get_result();
+        $stmt1->close();
+        if (!$r1 || $r1->num_rows === 0) {
+            // 沒文章了，跳到下一位
+            break;
+        }
+        $row1 = $r1->fetch_assoc();
+        $d_id = (int)$row1['d_id'];
+        $lastCheckedId = $d_id;
+
+        // 檢查這筆 demanded 在 match_db 是否已有 completed/terminated
+        $stmt2 = $conn->prepare("
+            SELECT COUNT(*) 
+              FROM match_db
+             WHERE demanded_id = ?
+               AND status IN ('completed','terminated')
+        ");
+        $stmt2->bind_param('i', $d_id);
+        $stmt2->execute();
+        $stmt2->bind_result($cnt);
+        $stmt2->fetch();
+        $stmt2->close();
+
+        if ($cnt === 0) {
+            // 找到符合條件的文章，收錄後跳出 inner while
+            $foundDemands[] = ['d_id'=> $d_id, 'd_date'=> $row1['d_date']];
+            break;
+        }
+        // 若有記錄，繼續往更舊文章找
+    }
+    if (count($foundDemands) >= 6) {
+        break;  // 已經收齊 6 筆
+    }
+}
+
+// 3. 如果還沒滿 6 筆，用 demanded 最新文章補足，並避開已完成/終止
+if (count($foundDemands) < 6) {
+    $r = $conn->query("
+        SELECT d_id, d_date 
+          FROM demanded 
+         ORDER BY d_id DESC
+    ");
+    // 準備檢查 match_db 狀態的 statement
+    $checkStmt = $conn->prepare("
+        SELECT COUNT(*) 
+          FROM match_db
+         WHERE demanded_id = ?
+           AND status IN ('completed','terminated')
+    ");
+
+    // 補足直到滿 6 筆
+    while (count($foundDemands) < 6 && ($row = $r->fetch_assoc())) {
+        $d_id = (int)$row['d_id'];
+        // 排除已蒐集過的
+        $exists = false;
+        foreach ($foundDemands as $d) {
+            if ($d['d_id'] === $d_id) {
+                $exists = true;
+                break;
+            }
+        }
+        if ($exists) continue;
+
+        // 檢查是否已完成或終止
+        $checkStmt->bind_param('i', $d_id);
+        $checkStmt->execute();
+        $checkStmt->bind_result($termCount);
+        $checkStmt->fetch();
+        $checkStmt->reset();
+
+        if ($termCount === 0) {
+            $foundDemands[] = ['d_id'=> $d_id, 'd_date'=> $row['d_date']];
+        }
+    }
+    $checkStmt->close();
+}
+
+// 4. 輸出結果
+if (!empty($foundDemands)) {
+    echo "<h3>選定文章列表</h3>";
+    foreach ($foundDemands as $d) {
+        echo "<p>文章 ID：{$d['d_id']}；發布時間：{$d['d_date']}</p>";
+    }
+} else {
+    echo "<p>目前沒有任何文章可供媒合。</p>";
+}
+
+$conn->close();
+?>
+
+
+
+
 
           <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
             <div class="service-item  position-relative">
@@ -209,68 +358,6 @@
             </div>
           </div><!-- End Service Item -->
 
-          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
-            <div class="service-item position-relative">
-              <div class="icon">
-                <i class="bi bi-broadcast"></i>
-              </div>
-              <a href="service-details.php" class="stretched-link">
-                <h3>標題</h3>
-              </a>
-              <p>內文</p>
-            </div>
-          </div><!-- End Service Item -->
-
-          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
-            <div class="service-item position-relative">
-              <div class="icon">
-                <i class="bi bi-easel"></i>
-              </div>
-              <a href="service-details.php" class="stretched-link">
-                <h3>標題</h3>
-              </a>
-              <p>內文</p>
-            </div>
-          </div><!-- End Service Item -->
-
-          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="400">
-            <div class="service-item position-relative">
-              <div class="icon">
-                <i class="bi bi-bounding-box-circles"></i>
-              </div>
-              <a href="service-details.php" class="stretched-link">
-                <h3>標題</h3>
-              </a>
-              <p>內文</p>
-              <a href="service-details.php" class="stretched-link"></a>
-            </div>
-          </div><!-- End Service Item -->
-
-          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="500">
-            <div class="service-item position-relative">
-              <div class="icon">
-                <i class="bi bi-calendar4-week"></i>
-              </div>
-              <a href="service-details.php" class="stretched-link">
-                <h3>標題</h3>
-              </a>
-              <p>內文</p>
-              <a href="service-details.php" class="stretched-link"></a>
-            </div>
-          </div><!-- End Service Item -->
-
-          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="600">
-            <div class="service-item position-relative">
-              <div class="icon">
-                <i class="bi bi-chat-square-text"></i>
-              </div>
-              <a href="service-details.php" class="stretched-link">
-                <h3>標題</h3>
-              </a>
-              <p>內文</p>
-              <a href="service-details.php" class="stretched-link"></a>
-            </div>
-          </div><!-- End Service Item -->
 
         </div>
 
