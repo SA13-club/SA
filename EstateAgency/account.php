@@ -338,6 +338,68 @@
         $result = $stmt->get_result();
         ?>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<?php
+$u_email = $_SESSION['u_email'];
+$savedSql = "
+  SELECT 
+    d.d_id,
+    d.tag,
+    d.d_date,
+    o.event_name   AS donate_title,
+    c.title        AS spons_title,
+    i.intern_title AS intern_title,
+    co.coop_name   AS coop_title,
+    o.c_name       AS donate_c_name, o.c_phone AS donate_c_phone, o.c_email AS donate_c_email,
+    c.c_name       AS spons_c_name,  c.c_phone AS spons_c_phone,  c.c_email AS spons_c_email,
+    i.c_name       AS intern_c_name, i.c_phone AS intern_c_phone, i.c_email AS intern_c_email,
+    co.c_name      AS coop_c_name,   co.c_phone AS coop_c_phone,   co.c_email AS coop_c_email
+  FROM user_favorites uf
+  JOIN demanded d         ON uf.d_id = d.d_id
+  LEFT JOIN org_donate o  ON d.d_id = o.d_id
+  LEFT JOIN cor_spons c   ON d.d_id = c.d_id
+  LEFT JOIN cor_intern i  ON d.d_id = i.d_id
+  LEFT JOIN org_coop co   ON d.d_id = co.d_id
+  LEFT JOIN corp_coop co2 ON d.d_id = co2.d_id
+  WHERE uf.user_email = ?
+  ORDER BY d.d_date DESC
+";
+
+// 2. 執行查詢
+$stmt = $conn->prepare($savedSql);
+$stmt->bind_param('s', $u_email);
+$stmt->execute();
+$result2 = $stmt->get_result();
+
+?>
+
+
+
+
+
+
+
+
+
+
+
+
+
         <!-- Page Title -->
         <div class="page-title" data-aos="fade">
             <nav class="breadcrumbs">
@@ -408,6 +470,10 @@
                         </div>
                         <div>
                             <h3 class="hover-underline" id="nav-projects" onclick="showSection('projects')"><a href="#">合作專案</a></h3>
+                            
+                        </div>
+                        <div>
+                            <h3 class="hover-underline" id="nav-saved" onclick="showSection('saved')"><a href="#">收藏的文章</a></h3>
                         </div>
                     </div>
 
@@ -678,6 +744,70 @@
                                         $conn->close();
                                         ?>
                             </div>
+
+                        <div id="saved-section" class="section-content">
+                            
+                            <?php while ($row = $result2->fetch_assoc()): ?>
+                                <?php
+                             
+                                
+                                $contact_name = $row['donate_c_name'] ?? $row['spons_c_name'] ?? $row['intern_c_name'] ?? $row['coop_c_name'] ?? '無資料';
+                                $contact_phone = $row['donate_c_phone'] ?? $row['spons_c_phone'] ?? $row['intern_c_phone'] ?? $row['coop_c_phone'] ?? '無資料';
+                                $contact_email = $row['donate_c_email'] ?? $row['spons_c_email'] ?? $row['intern_c_email'] ?? $row['coop_c_email'] ?? '無資料';
+
+                                // 主標題處理
+                                $title = '';
+                                switch ($row['tag']) {
+                                    case '合作':
+                                        $title = $row['coop_title'] ?? '';
+                                        $label = '✏️ 合作標題：';
+                                        break;
+                                    case '贊助':
+                                        $title = $row['spons_title'] ?? '';
+                                        $label = '✏️ 活動標題：';
+                                        break;
+                                    case '實習':
+                                        $title = $row['intern_title'] ?? '';
+                                        $label = '✏️ 職缺標題：';
+                                        break;
+                                    case 'spon':
+                                        $title = $row['donate_title'] ?? '';
+                                        $label = '✏️ 活動標題：';
+                                        break;
+                                    default:
+                                        $title = $row['title'] ?? '';
+                                        $label = '✏️ 標題：';
+                                        break;
+                                }
+                                ?>
+                                <div class='dcard-post'>
+                                     <a href="./property-single.php?id=<?=$row['d_id']?>">
+                                        <div class='dcard-header'>
+                                            <?php if ($row['tag'] == 'spon') {
+                                                $row['tag'] = '贊助';
+                                            } ?>
+                                            <span class='dcard-tag'>#<?= htmlspecialchars($row['tag']) ?></span>
+                                        </div>
+
+                                        <div class='dcard-body'>
+                                            <p><strong><?= $label ?></strong> <?= !empty($title) ? htmlspecialchars($title) : '無標題' ?></p>
+                                        </div>
+
+                                        <div class='dcard-footer'>
+                                            <div>
+                                                <span>👤 聯絡人：<?= htmlspecialchars($contact_name) ?></span>
+                                                <span>📞 電話：<?= htmlspecialchars($contact_phone) ?></span>
+                                                <span>✉️ Email：<?= htmlspecialchars($contact_email) ?></span>
+                                            </div>
+                                              
+
+                                            
+                                        </div>
+                                   
+                                    </a>
+                                </div>
+                            <?php endwhile; ?>
+                        </div>
                         </div>
                     </div>
                 </div>
@@ -688,7 +818,12 @@
 
             <script>
                 function showSection(section) {
-                    const sections = ['form', 'published', 'projects'];
+                    const sections = ['form', 'published', 'projects','saved'];
+                   
+                        
+                       
+                        
+
                     sections.forEach(id => {
                         // 顯示/隱藏右側內容
                         const content = document.getElementById(id + '-section');
@@ -704,6 +839,7 @@
                             }
                         }
                     });
+                  
                 }
 
                 // 預設載入「已發佈的文章」
@@ -888,6 +1024,45 @@
             }
         });
     </script>
+
+
+
+
+
+
+
+
+
+
+<script>
+document.querySelectorAll('.bi-heart, .bi-heart-fill').forEach(icon=>{
+  icon.addEventListener('click', e=>{
+    const el = e.currentTarget;
+    const did = el.dataset.id;
+
+    fetch(window.location.href, {
+      method: 'POST',
+      headers: {'Content-Type':'application/x-www-form-urlencoded'},
+      body: 'action=toggle_favorite&d_id='+encodeURIComponent(did)
+    })
+    .then(r=>r.json())
+    .then(json=>{
+      if (json.error) {
+        alert(json.error);
+        return;
+      }
+      if (json.saved) {
+        el.classList.replace('bi-heart','bi-heart-fill');
+        el.classList.add('saved');
+      } else {
+        el.classList.replace('bi-heart-fill','bi-heart');
+        el.classList.remove('saved');
+      }
+    })
+
+  });
+});
+</script>
 
 
 </body>

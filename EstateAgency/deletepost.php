@@ -1,4 +1,4 @@
-<meta http-equiv="refresh" content="3; url=newdona.php">
+<meta http-equiv="refresh" content="3; url=account.php">
 
 <?php
 $d_id = $_GET['id'];

@@ -208,15 +208,9 @@
 
                                                 <div id="sponsor_amount"  style="display: none;">               
                                                     <div class="col-md-4">
-                                                        <select class="form-select" name="sponsor_amount"  >
-                                                            <option selected disabled value="_">贊助金額</option>
-                                                            <option value="10000">10000以內</option>
-                                                            <option value="20000">10000~20000</option>
-                                                            <option value="30000">20000~30000</option>
-                                                            <option value="40000">30000~40000</option>
-                                                            <option value="50000">40000~50000</option>
-                                                            <option value="other">金額詳談</option>
-                                                        </select>
+                                                        <label>贊助金額</label>
+                                                <input type="number" class="form-control" name="sponsor_amount"  >
+                                                           
                                                     </div>
                                                     <div class="col-md-6" id="money_options">
                                                         <label>金錢贊助曝光方式（可複選）</label>
@@ -429,15 +423,9 @@
                                         <!-- 金錢贊助細節 -->
                                         <div id="sponsor_amount2" style="display: none;">
                                             <div class="col-md-4">
-                                                <select class="form-select" id="sponsor_amount_select" name="sponsor_amount" >
-                                                    <option selected disabled value="_">贊助金額</option>
-                                                    <option value="10000">10000以內</option>
-                                                    <option value="20000">10000~20000</option>
-                                                    <option value="30000">20000~30000</option>
-                                                    <option value="40000">30000~40000</option>
-                                                    <option value="50000">40000~50000</option>
-                                                    <option value="other">金額詳談</option>
-                                                </select>
+                                             <label>贊助金額</label>
+                                                <input type="number" class="form-control" name="sponsor_amount" >
+                                                    
                                             </div>
 
                                             <div class="col-md-6" id="money_options2">
