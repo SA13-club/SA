@@ -112,6 +112,7 @@
   min-height: 100vh;
   margin: 0;
 ">
+ 
 
   <header id="header" class="header d-flex align-items-center fixed-top">
     <div class="container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
@@ -212,6 +213,61 @@
                     echo "<option value=\"$tag_value\">$tag_display</option>";
                   }
 
+                  
+session_start();
+header('Content-Type: application/json');
+
+// 检测这是一个收藏切换请求
+if (isset($_POST['action']) && $_POST['action']==='toggle_favorite' && isset($_POST['d_id'])) {
+    if (empty($_SESSION['u_email'])) {
+        echo json_encode(['error'=>'未登入']);
+        exit;
+    }
+
+    $user = $_SESSION['u_email'];
+    $d_id  = intval($_POST['d_id']);
+
+    // 复用页面既有的 $conn
+    $conn = new mysqli('localhost','root','','sa');
+    if ($conn->connect_error) {
+        echo json_encode(['error'=>'DB 連線失敗']);
+        exit;
+    }
+
+    // 切换收藏状态
+    $stmt = $conn->prepare("
+        SELECT 1 FROM user_favorites 
+         WHERE user_email=? AND d_id=?
+    ");
+    $stmt->bind_param('si',$user,$d_id);
+    $stmt->execute();
+    $stmt->store_result();
+    $exists = $stmt->num_rows>0;
+    $stmt->close();
+
+    if ($exists) {
+        $del = $conn->prepare("
+            DELETE FROM user_favorites 
+             WHERE user_email=? AND d_id=?
+        ");
+        $del->bind_param('si',$user,$d_id);
+        $del->execute();
+        $del->close();
+        echo json_encode(['saved'=>false]);
+    } else {
+        $ins = $conn->prepare("
+            INSERT INTO user_favorites (user_email,d_id) 
+            VALUES (?,?)
+        ");
+        $ins->bind_param('si',$user,$d_id);
+        $ins->execute();
+        $ins->close();
+        echo json_encode(['saved'=>true]);
+    }
+
+    $conn->close();
+    exit;  // 处理完 Ajax 请求后立刻结束脚本
+}
 
 
                   ?>
@@ -246,6 +302,19 @@
                     <option value="">請選擇標籤</option>
 
                     <?php
+
+                    $currentUser = $_SESSION['u_email'] ?? '';
+$myFavs = [];
+if ($currentUser) {
+  $resFav = mysqli_query($link, "
+    SELECT d_id
+      FROM user_favorites
+     WHERE user_email = '" . mysqli_real_escape_string($link, $currentUser) . "'
+  ");
+  while ($fav = mysqli_fetch_assoc($resFav)) {
+    $myFavs[] = (int)$fav['d_id'];
+  }
+}
                     $link = mysqli_connect('localhost', 'root', '', 'sa');
                     $u_permission = $_SESSION['u_permission'];
 
@@ -504,6 +573,8 @@
               if ($tag == 'spon') {
                 $tag = '贊助';
               }
+              $d_id  = (int)$row['d_id'];
+  $saved = in_array($d_id, $myFavs);
 
               ob_start(); // ✅ 開啟輸出緩衝
               echo "
@@ -555,6 +626,13 @@
           <span>👤 聯絡人：{$contact_name}</span>
           <span>📞 電話：{$contact_phone}</span>
           <span>✉️ Email：{$contact_email}</span>
+
+        
+                              
+            <i class='bi " 
+            . ($saved ? "bi-heart-fill saved" : "bi-heart")
+            . "' data-id='{$d_id}' title='收藏'></i>
+
       ";
               } else {
                 echo "<span>尚無聯絡資料</span>";
@@ -805,6 +883,40 @@
       }
     });
   </script>
+
+
+
+<!-- 儲存文章 -->
+
+<script>
+document.querySelectorAll('.bi-heart, .bi-heart-fill').forEach(icon=>{
+  icon.addEventListener('click', e=>{
+    const el = e.currentTarget;
+    const did = el.dataset.id;
+
+    fetch(window.location.href, {
+      method: 'POST',
+      headers: {'Content-Type':'application/x-www-form-urlencoded'},
+      body: 'action=toggle_favorite&d_id='+encodeURIComponent(did)
+    })
+    .then(r=>r.json())
+    .then(json=>{
+      if (json.error) {
+        alert(json.error);
+        return;
+      }
+      if (json.saved) {
+        el.classList.replace('bi-heart','bi-heart-fill');
+        el.classList.add('saved');
+      } else {
+        el.classList.replace('bi-heart-fill','bi-heart');
+        el.classList.remove('saved');
+      }
+    })
+
+  });
+});
+</script>
 
 
 

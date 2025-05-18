@@ -265,7 +265,7 @@ $types = '';
 if ($u_permission === '組織團體') {
     $sql = "
         SELECT d.*,
-               ci.c_name AS intern_c_name, ci.c_phone AS intern_c_phone, ci.c_email AS intern_c_email, ci.title AS intern_title, ci.content AS intern_content,
+               ci.c_name AS intern_c_name, ci.c_phone AS intern_c_phone, ci.c_email AS intern_c_email, ci.intern_title AS intern_title, ci.intern_detail AS intern_content,
                cs.c_name AS spons_c_name, cs.c_phone AS spons_c_phone, cs.c_email AS spons_c_email, cs.title AS spons_title, cs.content AS spons_content,
                 clc.c_name AS club_c_name,
                 clc.c_phone AS club_c_phone,
@@ -317,7 +317,7 @@ $keyword_like = "%$keyword%";
 if (!empty($keyword)) {
     if ($u_permission === '組織團體') {
         $sql .= " AND (
-            (ci.title LIKE ? OR ci.content LIKE ?) OR
+            (ci.intern_title LIKE ? OR ci.intern_detail LIKE ?) OR
             (cs.title LIKE ? OR cs.content LIKE ?)
             OR
             (clc.coop_name LIKE ? OR clc.coop_desc LIKE ?)
@@ -329,12 +329,23 @@ if (!empty($keyword)) {
          
         )";
     }
-
-    // 增加 4 個 keyword_like 參數
-    for ($i = 0; $i < 4; $i++) {
-        $params[] = &$keyword_like;
-        $types .= 's';
+if (!empty($keyword)) {
+    if ($u_permission === '組織團體') {
+        // SQL 已经有 6 个 LIKE ?，下面就绑定 6 个
+        for ($i = 0; $i < 6; $i++) {
+            $params[] = &$keyword_like;
+            $types  .= 's';
+        }
     }
+    elseif ($u_permission === '企業') {
+        // 企业分支只有 4 个 LIKE ? 
+        for ($i = 0; $i < 4; $i++) {
+            $params[] = &$keyword_like;
+            $types  .= 's';
+        }
+    }
+}
+
 }
 
 // 準備和綁定參數
