@@ -209,11 +209,12 @@ if ($conn->connect_error) {
 }
 
 // 1. 計算每個 email 的平均分並排序
+
 $ratings = [];
 $sql = "
     SELECT a_u_email AS email, b_feedback AS feedback
       FROM match_db
-     WHERE status = 'completed' AND b_feedback <> 0
+     WHERE status = 'completed' AND b_feedback <> 0 
     UNION ALL
     SELECT b_u_email AS email, a_feedback AS feedback
       FROM match_db
@@ -287,25 +288,37 @@ foreach ($topUsers as $email) {
     }
 }
 
+
 // 3. 如果還沒滿 6 筆，用 demanded 最新文章補足，並避開已完成/終止
+// 3. 如果还没满 6 笔，用 demanded 最新文章补足，避开相同 u_permission
 if (count($foundDemands) < 6) {
-    $r = $conn->query("
-        SELECT d_id, d_date 
-          FROM demanded 
+    // 取 session 里的 u_permission
+    $u_permission = $_SESSION['u_permission'];
+
+    // 准备语句：排除掉相同 permission 的记录
+    $stmt3 = $conn->prepare("
+        SELECT d_id, d_date
+          FROM demanded
+         WHERE u_permission != ?
          ORDER BY d_id DESC
     ");
-    // 準備檢查 match_db 狀態的 statement
+    $stmt3->bind_param('s', $u_permission);
+    $stmt3->execute();
+    $r = $stmt3->get_result();
+
+    // 准备检查 match_db 状态的语句
     $checkStmt = $conn->prepare("
-        SELECT COUNT(*) 
+        SELECT COUNT(*)
           FROM match_db
          WHERE demanded_id = ?
            AND status IN ('completed','terminated')
     ");
 
-    // 補足直到滿 6 筆
+    // 循环补足到 6 笔
     while (count($foundDemands) < 6 && ($row = $r->fetch_assoc())) {
         $d_id = (int)$row['d_id'];
-        // 排除已蒐集過的
+
+        // 排除已收录过的
         $exists = false;
         foreach ($foundDemands as $d) {
             if ($d['d_id'] === $d_id) {
@@ -313,27 +326,51 @@ if (count($foundDemands) < 6) {
                 break;
             }
         }
-        if ($exists) continue;
+        if ($exists) {
+            continue;
+        }
 
-        // 檢查是否已完成或終止
+        // 检查这篇 demanded 是否在 match_db 里已有 completed/terminated
         $checkStmt->bind_param('i', $d_id);
         $checkStmt->execute();
         $checkStmt->bind_result($termCount);
         $checkStmt->fetch();
         $checkStmt->reset();
 
+        // 仅当没有 completed/terminated 才收录
         if ($termCount === 0) {
-            $foundDemands[] = ['d_id'=> $d_id, 'd_date'=> $row['d_date']];
+            $foundDemands[] = [
+                'd_id'   => $d_id,
+                'd_date' => $row['d_date'],
+            ];
         }
     }
+
     $checkStmt->close();
+    $stmt3->close();
 }
+
 
 // 4. 輸出結果
 if (!empty($foundDemands)) {
     echo "<h3>選定文章列表</h3>";
     foreach ($foundDemands as $d) {
-        echo "<p>文章 ID：{$d['d_id']}；發布時間：{$d['d_date']}</p>";
+         
+
+
+
+        echo '
+        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+            <div class="service-item  position-relative">
+              <div class="icon">
+                <i class="bi bi-activity"></i>
+              </div>
+              <a href="property-single.php?id='.$d['d_id'].'" class="stretched-link">
+                <h3>標題</h3>
+              </a>
+              <p>內文</p>
+            </div>
+          </div><!-- End Service Item -->';
     }
 } else {
     echo "<p>目前沒有任何文章可供媒合。</p>";
@@ -346,17 +383,7 @@ $conn->close();
 
 
 
-          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
-            <div class="service-item  position-relative">
-              <div class="icon">
-                <i class="bi bi-activity"></i>
-              </div>
-              <a href="service-details.php" class="stretched-link">
-                <h3>標題</h3>
-              </a>
-              <p>內文</p>
-            </div>
-          </div><!-- End Service Item -->
+          
 
 
         </div>
