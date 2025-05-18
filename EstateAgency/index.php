@@ -237,33 +237,57 @@ foreach ($ratings as $email => $d) {
 arsort($averages);
 $topUsers = array_keys($averages);
 
-// 2. 依平均分高低，為每個 user 找一篇「尚未 completed/terminated」的文章
+
+$current_perm      = $_SESSION['u_permission'] ?? '';
+$filter_enterprise = ($current_perm === '組織團體');
+
+// …（前面保持不变：算评分、arsort、$topUsers）…
+
+// 2. 依平均分高低，为每个 user 找一篇「尚未 completed/terminated」的文章
 $foundDemands = [];
 foreach ($topUsers as $email) {
     $lastCheckedId = null;
-    while (true) {
-        // 取該 user 最新一篇未檢查過的文章
-        $stmt1 = $conn->prepare("
-            SELECT d_id, d_date 
+
+    // 根据是否要过滤企业发布，准备不同的 SQL
+    if ($filter_enterprise) {
+        $sql1 = "
+            SELECT d_id, d_date
+              FROM demanded
+             WHERE u_email      = ?
+               AND (? IS NULL OR d_id < ?)
+               AND u_permission = '企業'
+             ORDER BY d_id DESC
+             LIMIT 1
+        ";
+    } else {
+        $sql1 = "
+            SELECT d_id, d_date
               FROM demanded
              WHERE u_email = ?
                AND (? IS NULL OR d_id < ?)
+               AND u_permission = '組織團體'
              ORDER BY d_id DESC
              LIMIT 1
-        ");
+        ";
+    }
+
+    while (true) {
+        $stmt1 = $conn->prepare($sql1);
         $stmt1->bind_param('sis', $email, $lastCheckedId, $lastCheckedId);
         $stmt1->execute();
         $r1 = $stmt1->get_result();
         $stmt1->close();
+
         if (!$r1 || $r1->num_rows === 0) {
-            // 沒文章了，跳到下一位
+            // 没文章了，跳到下一位
             break;
         }
-        $row1 = $r1->fetch_assoc();
-        $d_id = (int)$row1['d_id'];
-        $lastCheckedId = $d_id;
 
-        // 檢查這筆 demanded 在 match_db 是否已有 completed/terminated
+        $row1         = $r1->fetch_assoc();
+        $d_id         = (int)$row1['d_id'];
+        $lastCheckedId= $d_id;
+
+        // 检查 match_db 中是否已有 completed/terminated
         $stmt2 = $conn->prepare("
             SELECT COUNT(*) 
               FROM match_db
@@ -277,44 +301,46 @@ foreach ($topUsers as $email) {
         $stmt2->close();
 
         if ($cnt === 0) {
-            // 找到符合條件的文章，收錄後跳出 inner while
             $foundDemands[] = ['d_id'=> $d_id, 'd_date'=> $row1['d_date']];
-            break;
+            break;  // 收录后跳到下一位 user
         }
-        // 若有記錄，繼續往更舊文章找
+        // 否则继续往更旧的文章找
     }
+
     if (count($foundDemands) >= 6) {
-        break;  // 已經收齊 6 筆
+        break;  // 已经收齐 6 笔
     }
 }
 
-
-// 3. 如果還沒滿 6 筆，用 demanded 最新文章補足，並避開已完成/終止
-// 3. 如果还没满 6 笔，用 demanded 最新文章补足，避开相同 u_permission
+// 3. 如果还没满 6 笔，用 demanded 最新文章补足
 if (count($foundDemands) < 6) {
-    // 取 session 里的 u_permission
-    $u_permission = $_SESSION['u_permission'];
-
-    // 准备语句：排除掉相同 permission 的记录
-    $stmt3 = $conn->prepare("
-        SELECT d_id, d_date
-          FROM demanded
-         WHERE u_permission != ?
-         ORDER BY d_id DESC
-    ");
-    $stmt3->bind_param('s', $u_permission);
+    // 同样依据是否过滤企业发布，准备不同的查询
+    if ($filter_enterprise) {
+        $stmt3 = $conn->prepare("
+            SELECT d_id, d_date
+              FROM demanded
+             WHERE u_permission = '企業'
+             ORDER BY d_id DESC
+        ");
+    } else {
+        $stmt3 = $conn->prepare("
+            SELECT d_id, d_date
+              FROM demanded
+              WHERE u_permission = '組織團體'
+             ORDER BY d_id DESC
+        ");
+    }
     $stmt3->execute();
     $r = $stmt3->get_result();
 
-    // 准备检查 match_db 状态的语句
+    // 用 Prepared Statement 检查 match_db
     $checkStmt = $conn->prepare("
-        SELECT COUNT(*)
+        SELECT COUNT(*) 
           FROM match_db
          WHERE demanded_id = ?
            AND status IN ('completed','terminated')
     ");
 
-    // 循环补足到 6 笔
     while (count($foundDemands) < 6 && ($row = $r->fetch_assoc())) {
         $d_id = (int)$row['d_id'];
 
@@ -330,22 +356,17 @@ if (count($foundDemands) < 6) {
             continue;
         }
 
-        // 检查这篇 demanded 是否在 match_db 里已有 completed/terminated
+        // 再检查状态
         $checkStmt->bind_param('i', $d_id);
         $checkStmt->execute();
         $checkStmt->bind_result($termCount);
         $checkStmt->fetch();
         $checkStmt->reset();
 
-        // 仅当没有 completed/terminated 才收录
         if ($termCount === 0) {
-            $foundDemands[] = [
-                'd_id'   => $d_id,
-                'd_date' => $row['d_date'],
-            ];
+            $foundDemands[] = ['d_id'=> $d_id, 'd_date'=> $row['d_date']];
         }
     }
-
     $checkStmt->close();
     $stmt3->close();
 }
