@@ -35,7 +35,6 @@
   * License: https://bootstrapmade.com/license/
   ======================================================== -->
 </head>
-
 <body class="starter-page-page">
 
   <header id="header" class="header d-flex align-items-center fixed-top">
@@ -63,83 +62,44 @@
 
     </div>
   </header>
-
   <main class="main">
-
-    <!-- Page Title -->
-    <div class="page-title" data-aos="fade">
-      <nav class="breadcrumbs">
-        <div class="container" style="padding: 85px 0 0 0;">
-          <ol>
-            <li><a href="index.php">首頁</a></li>
-            <li class="current">登入</li>
-          </ol>
-        </div>
-      </nav>
-    </div><!-- End Page Title -->
-
-    <!-- Starter Section Section -->
-    <section id="starter-section" class="starter-section section contact">
-
-      <!-- Section Title -->
-      <div class="container section-title" data-aos="fade-up">
-        <h2>登入</h2>
-        <p>還不是會員嗎？<a href="SignIn.php" data-bs-toggle="modal" data-bs-target="#SignInPermission">立即註冊</a></p>
-
-        <!-- Modal -->
-        <div class="modal fade" id="SignInPermission" tabindex="-1" aria-labelledby="SignInPermissionLabel" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h1 style="color: #1b1b1b;" class="modal-title fs-5" id="SignInPermissionLabel">請問您的身分是？</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                  <a href="BusinessSignIn.php" class="btn-permission">企業</a>
-                  <a href="OgnizationSignIn.php" class="btn-permission">組織團體</a>
-                  <a href="PersonalSignIn.php" class="btn-permission">個人</a>
-              </div>
+  <section class="forgot-password-section py-5">
+  <div class="container" data-aos="fade-up">
+    <div class="row justify-content-center">
+      <div class="col-lg-6">
+        <div class="card shadow-lg rounded-4 p-4">
+          <h2 class="text-center mb-4">忘記密碼</h2>
+          <form action="send_verification_code.php" method="POST" id="emailForm">
+            <div class="mb-3">
+              <label for="email" class="form-label">請輸入會員電子郵件</label>
+              <input type="email" class="form-control" name="email" id="email" required>
             </div>
+            <button type="submit" class="btn btn-primary w-100" id="sendCodeBtn">發送驗證碼</button>
+          </form>
+
+          <!-- 驗證碼輸入區塊（預設隱藏） -->
+          <form action="verify_code.php" method="POST" id="codeForm" class="mt-4" style="display: none;">
+            <input type="hidden" name="email" id="codeEmail">
+            <div class="mb-3">
+              <label for="code" class="form-label">輸入收到的驗證碼</label>
+              <input type="text" class="form-control" name="code" id="code" required>
+            </div>
+            <button type="submit" class="btn btn-success w-100">確認驗證碼</button>
+            <div class="text-center mt-2">
+              <button type="button" class="btn btn-link" id="resendCodeBtn">重新發送驗證碼</button>
+            </div>
+          </form>
+
+          <div class="text-center mt-3">
+            <a href="LogIn.html">返回登入頁</a>
           </div>
         </div>
-      </div><!-- End Section Title -->
+      </div>
+    </div>
+  </div>
+</section>
+    </main>
 
-        <div class="container" data-aos="fade-up" data-aos-delay="100">
-            <div class="col-lg-12">
-              <form action="LogIn.php" method="post" class="php-email-form" data-aos="fade-up" data-aos-delay="200">
-                <div class="row gy-4">
-  
-                  <div class="col-md-6">
-                    <input type="email" class="form-control" name="u_email" placeholder="電子郵件" required="">
-                  </div>
-  
-                  <div class="col-md-6 ">
-                    <input type="password" class="form-control" name="u_password" placeholder="密碼" required="">
-                  </div>
-
-                  <div class="col-12">
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="invalidCheck">
-                      <label class="form-check-label" for="exampleCheck1">
-                        記住我&nbsp;&nbsp;
-                      </label>
-                      <a href="forget.php">忘記密碼？</a>
-                    </div>
-                  </div>
-  
-                  <div class="col-md-12 text-center">
-  
-                    <button type="submit">登入</button>
-                  </div>
-  
-                </div>
-              </form>
-          </div>
-  
-        </div>
-    </section>
-
-  </main>
 
   <footer id="footer" class="footer light-background">
 
@@ -221,5 +181,61 @@
   <script src="assets/js/main.js"></script>
 
 </body>
+<script>
+  const emailForm = document.getElementById("emailForm");
+  const codeForm = document.getElementById("codeForm");
+  const codeEmail = document.getElementById("codeEmail");
+
+  emailForm.addEventListener("submit", async function (e) {
+    e.preventDefault(); // 阻止預設送出
+
+    const email = document.getElementById("email").value;
+    codeEmail.value = email;
+
+    try {
+      const res = await fetch("send_verification_code.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: `email=${encodeURIComponent(email)}`,
+      });
+
+      if (res.ok) {
+        // 顯示驗證碼欄位
+        emailForm.style.display = "none";
+        codeForm.style.display = "block";
+      } else {
+        alert("發送失敗，請確認信箱是否正確");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("伺服器錯誤，請稍後再試");
+    }
+  });
+
+  document.getElementById("resendCodeBtn").addEventListener("click", async function () {
+    const email = codeEmail.value;
+    try {
+      const res = await fetch("send_verification_code.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: `email=${encodeURIComponent(email)}`,
+      });
+
+      if (res.ok) {
+        alert("已重新發送驗證碼到 " + email);
+      } else {
+        alert("發送失敗，請稍後再試");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("伺服器錯誤");
+    }
+  });
+</script>
+
 
 </html>
