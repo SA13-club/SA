@@ -112,7 +112,7 @@
   min-height: 100vh;
   margin: 0;
 ">
- 
+
 
   <header id="header" class="header d-flex align-items-center fixed-top">
     <div class="container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
@@ -213,61 +213,61 @@
                     echo "<option value=\"$tag_value\">$tag_display</option>";
                   }
 
-                  
-session_start();
-header('Content-Type: application/json');
 
-// 检测这是一个收藏切换请求
-if (isset($_POST['action']) && $_POST['action']==='toggle_favorite' && isset($_POST['d_id'])) {
-    if (empty($_SESSION['u_email'])) {
-        echo json_encode(['error'=>'未登入']);
-        exit;
-    }
+                  session_start();
+                  header('Content-Type: application/json');
 
-    $user = $_SESSION['u_email'];
-    $d_id  = intval($_POST['d_id']);
+                  // 检测这是一个收藏切换请求
+                  if (isset($_POST['action']) && $_POST['action'] === 'toggle_favorite' && isset($_POST['d_id'])) {
+                    if (empty($_SESSION['u_email'])) {
+                      echo json_encode(['error' => '未登入']);
+                      exit;
+                    }
 
-    // 复用页面既有的 $conn
-    $conn = new mysqli('localhost','root','','sa');
-    if ($conn->connect_error) {
-        echo json_encode(['error'=>'DB 連線失敗']);
-        exit;
-    }
+                    $user = $_SESSION['u_email'];
+                    $d_id  = intval($_POST['d_id']);
 
-    // 切换收藏状态
-    $stmt = $conn->prepare("
+                    // 复用页面既有的 $conn
+                    $conn = new mysqli('localhost', 'root', '', 'sa');
+                    if ($conn->connect_error) {
+                      echo json_encode(['error' => 'DB 連線失敗']);
+                      exit;
+                    }
+
+                    // 切换收藏状态
+                    $stmt = $conn->prepare("
         SELECT 1 FROM user_favorites 
          WHERE user_email=? AND d_id=?
     ");
-    $stmt->bind_param('si',$user,$d_id);
-    $stmt->execute();
-    $stmt->store_result();
-    $exists = $stmt->num_rows>0;
-    $stmt->close();
+                    $stmt->bind_param('si', $user, $d_id);
+                    $stmt->execute();
+                    $stmt->store_result();
+                    $exists = $stmt->num_rows > 0;
+                    $stmt->close();
 
-    if ($exists) {
-        $del = $conn->prepare("
+                    if ($exists) {
+                      $del = $conn->prepare("
             DELETE FROM user_favorites 
              WHERE user_email=? AND d_id=?
         ");
-        $del->bind_param('si',$user,$d_id);
-        $del->execute();
-        $del->close();
-        echo json_encode(['saved'=>false]);
-    } else {
-        $ins = $conn->prepare("
+                      $del->bind_param('si', $user, $d_id);
+                      $del->execute();
+                      $del->close();
+                      echo json_encode(['saved' => false]);
+                    } else {
+                      $ins = $conn->prepare("
             INSERT INTO user_favorites (user_email,d_id) 
             VALUES (?,?)
         ");
-        $ins->bind_param('si',$user,$d_id);
-        $ins->execute();
-        $ins->close();
-        echo json_encode(['saved'=>true]);
-    }
+                      $ins->bind_param('si', $user, $d_id);
+                      $ins->execute();
+                      $ins->close();
+                      echo json_encode(['saved' => true]);
+                    }
 
-    $conn->close();
-    exit;  // 处理完 Ajax 请求后立刻结束脚本
-}
+                    $conn->close();
+                    exit;  // 处理完 Ajax 请求后立刻结束脚本
+                  }
 
 
                   ?>
@@ -304,17 +304,17 @@ if (isset($_POST['action']) && $_POST['action']==='toggle_favorite' && isset($_P
                     <?php
 
                     $currentUser = $_SESSION['u_email'] ?? '';
-$myFavs = [];
-if ($currentUser) {
-  $resFav = mysqli_query($link, "
+                    $myFavs = [];
+                    if ($currentUser) {
+                      $resFav = mysqli_query($link, "
     SELECT d_id
       FROM user_favorites
      WHERE user_email = '" . mysqli_real_escape_string($link, $currentUser) . "'
   ");
-  while ($fav = mysqli_fetch_assoc($resFav)) {
-    $myFavs[] = (int)$fav['d_id'];
-  }
-}
+                      while ($fav = mysqli_fetch_assoc($resFav)) {
+                        $myFavs[] = (int)$fav['d_id'];
+                      }
+                    }
                     $link = mysqli_connect('localhost', 'root', '', 'sa');
                     $u_permission = $_SESSION['u_permission'];
 
@@ -510,7 +510,26 @@ if ($currentUser) {
             if ($filterTag || ($filterField && $selectedFieldValue)) {
               echo "<div class='filter-info'>";
               if ($filterTag) echo "<p>🔍 目前篩選：<strong>類型 - " . htmlspecialchars(normalizeTag($filterTag)) . "</strong></p>";
-              if ($filterField && $selectedFieldValue) echo "<p>🔍 目前篩選：<strong>{$filterField} - " . htmlspecialchars($selectedFieldValue) . "</strong></p>";
+              if ($filterField) {
+                if ($filterField === '贊助金額') {
+                  $min = isset($_GET['min']) ? (int)$_GET['min'] : null;
+                  $max = isset($_GET['max']) ? (int)$_GET['max'] : null;
+
+                  $rangeText = '不限';
+                  if ($min !== null && $max !== null) {
+                    $rangeText = number_format($min) . ' ~ ' . number_format($max) . ' 元';
+                  } elseif ($min !== null) {
+                    $rangeText = number_format($min) . ' 元以上';
+                  } elseif ($max !== null) {
+                    $rangeText = number_format($max) . ' 元以下';
+                  }
+
+                  echo "<p>🔍 目前篩選：<strong>{$filterField} - {$rangeText}</strong></p>";
+                } elseif ($selectedFieldValue) {
+                  echo "<p>🔍 目前篩選：<strong>{$filterField} - " . htmlspecialchars($selectedFieldValue) . "</strong></p>";
+                }
+              }
+
               echo "</div>";
             }
             while ($row = mysqli_fetch_assoc($result)) {
@@ -525,12 +544,13 @@ if ($currentUser) {
 
               if ($filterTag && $displayTag !== normalizeTag($filterTag)) continue;
 
-              if ($filterField && $selectedFieldValue) {
+              if ($filterField) {
                 $fieldMatched = false;
 
                 switch ($filterField) {
                   case '贊助方式':
                     if (
+                      $selectedFieldValue &&
                       (!empty($row['donate_method']) && strpos($row['donate_method'], $selectedFieldValue) !== false) ||
                       (!empty($row['spons_method']) && strpos($row['spons_method'], $selectedFieldValue) !== false)
                     ) {
@@ -538,26 +558,36 @@ if ($currentUser) {
                     }
                     break;
                   case '合作地點':
-                    if (!empty($row['coop_city']) && strpos($row['coop_city'], $selectedFieldValue) !== false) {
+                    if ($selectedFieldValue && !empty($row['coop_city']) && strpos($row['coop_city'], $selectedFieldValue) !== false) {
                       $fieldMatched = true;
                     }
                     break;
                   case '合作方式':
-                    if (!empty($row['coop_type']) && strpos($row['coop_type'], $selectedFieldValue) !== false) {
+                    if ($selectedFieldValue && !empty($row['coop_type']) && strpos($row['coop_type'], $selectedFieldValue) !== false) {
                       $fieldMatched = true;
                     }
                     break;
                   case '合作效益':
-                    if (!empty($row['benefit']) && strpos($row['benefit'], $selectedFieldValue) !== false) {
+                    if ($selectedFieldValue && !empty($row['benefit']) && strpos($row['benefit'], $selectedFieldValue) !== false) {
                       $fieldMatched = true;
                     }
                     break;
                   case '贊助金額':
-                    $amount = $row['sponsor_amount'] ?? null;
+                    $rawAmount = $row['sponsor_amount'] ?? null;
+                    $amount = $rawAmount !== null ? (int)str_replace(',', '', trim($rawAmount)) : null;
+
+                    $min = isset($_GET['min']) ? (int)$_GET['min'] : null;
+                    $max = isset($_GET['max']) ? (int)$_GET['max'] : null;
+
                     if ($amount !== null) {
-                      if ($selectedFieldValue === '1萬以下' && $amount < 10000) $fieldMatched = true;
-                      elseif ($selectedFieldValue === '1萬~5萬' && $amount >= 10000 && $amount <= 50000) $fieldMatched = true;
-                      elseif ($selectedFieldValue === '5萬以上' && $amount > 50000) $fieldMatched = true;
+                      if (
+                        ($min === null || $amount >= $min) &&
+                        ($max === null || $amount <= $max)
+                      ) {
+                        $fieldMatched = true;
+                      } else {
+                        $fieldMatched = false;
+                      }
                     }
                     break;
                 }
@@ -574,7 +604,7 @@ if ($currentUser) {
                 $tag = '贊助';
               }
               $d_id  = (int)$row['d_id'];
-  $saved = in_array($d_id, $myFavs);
+              $saved = in_array($d_id, $myFavs);
 
               ob_start(); // ✅ 開啟輸出緩衝
               echo "
@@ -629,9 +659,9 @@ if ($currentUser) {
 
         
                               
-            <i class='bi " 
-            . ($saved ? "bi-heart-fill saved" : "bi-heart")
-            . "' data-id='{$d_id}' title='收藏'></i>
+            <i class='bi "
+                  . ($saved ? "bi-heart-fill saved" : "bi-heart")
+                  . "' data-id='{$d_id}' title='收藏'></i>
 
       ";
               } else {
@@ -807,10 +837,32 @@ if ($currentUser) {
         '成果發表': '成果發表'
       }
     };
+    const sponsorAmountRanges = [{
+        min: 0,
+        max: 10000,
+        label: '1萬以下'
+      },
+      {
+        min: 10000,
+        max: 50000,
+        label: '1萬~5萬'
+      },
+      {
+        min: 50000,
+        max: Infinity,
+        label: '5萬以上'
+      }
+    ];
+
     document.getElementById('applyFilters').addEventListener('click', function() {
       const tag = document.getElementById('tagSelect').value;
       const field = document.getElementById('fieldSelect').value;
-      const detail = document.getElementById('fieldValueSelect')?.value || '';
+
+      const inputEl = document.getElementById('fieldValueInput');
+      const selectEl = document.getElementById('fieldValueSelect');
+
+      const amountMinEl = document.getElementById('sponsorAmountMin');
+      const amountMaxEl = document.getElementById('sponsorAmountMax');
 
       if (!tag) {
         alert('請先選擇標籤！');
@@ -820,14 +872,41 @@ if ($currentUser) {
       const params = new URLSearchParams();
       params.set('tag', tag);
       if (field) params.set('field', field);
-      if (field && detail) {
-        const mappedValue = valueMapping[field]?.[detail] || detail;
-        params.set('fieldValue', mappedValue);
+
+      // ✅ 特別處理贊助金額區間
+      if (field === '贊助金額' && amountMinEl && amountMaxEl) {
+        const min = parseInt(amountMinEl.value);
+        const max = parseInt(amountMaxEl.value);
+
+        // ✅ 防呆檢查：最小不可大於最大
+        if (!isNaN(min) && !isNaN(max) && min > max) {
+          alert('最低金額不能大於最高金額！');
+          amountMinEl.classList.add('is-invalid');
+          amountMaxEl.classList.add('is-invalid');
+          return;
+        } else {
+          amountMinEl.classList.remove('is-invalid');
+          amountMaxEl.classList.remove('is-invalid');
+        }
+
+        if (!isNaN(min)) params.set('min', min);
+        if (!isNaN(max)) params.set('max', max);
+      } else {
+        // 處理其他欄位選項或單一輸入欄
+        const detail = inputEl?.value || selectEl?.value || '';
+        if (field && detail) {
+          const mappedValue = valueMapping[field]?.[detail] || detail;
+          params.set('fieldValue', mappedValue);
+        }
       }
 
       // ✅ 導向含參數的新網址
       window.location.href = 'propertiesdemo.php?' + params.toString();
     });
+
+
+
+
     const detailFieldOptions = {
       // 合作相關
       '合作名稱': ['產學合作', '社會公益', '品牌推廣'],
@@ -838,7 +917,6 @@ if ($currentUser) {
 
       // 贊助相關
       '贊助方式': ['金錢', '產品'],
-      '贊助金額': ['1萬以下', '1萬~5萬', '5萬以上'],
       // '活動名稱': ['校園音樂祭', '創業競賽', '職涯講座'],
 
       // 實習相關
@@ -870,53 +948,70 @@ if ($currentUser) {
 
       const options = detailFieldOptions[detailKey];
 
-      if (options) {
+      if (field === '贊助金額') {
         wrapper.style.display = 'block';
-        options.forEach(opt => {
-          const option = document.createElement('option');
-          option.value = opt;
-          option.textContent = opt;
-          select.appendChild(option);
-        });
+        wrapper.innerHTML = `
+<label>贊助金額區間</label>
+<div class="d-flex gap-2 align-items-center">
+  <input type="number" id="sponsorAmountMin" class="form-control" placeholder="最低金額">
+  <span>~</span>
+  <input type="number" id="sponsorAmountMax" class="form-control" placeholder="最高金額">
+</div>
+<small id="amountError" class="text-danger d-none">最低金額不能大於最高金額</small>
+  `;
+      } else if (options) {
+        // ✅ 顯示下拉選單
+        wrapper.style.display = 'block';
+        wrapper.innerHTML = `
+      <label for="fieldValueSelect">請選擇條件</label>
+      <select id="fieldValueSelect" class="form-select">
+        <option value="">請選擇條件</option>
+        ${options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+      </select>
+    `;
       } else {
+        // 無細項，隱藏區塊
         wrapper.style.display = 'none';
+        wrapper.innerHTML = '';
       }
     });
   </script>
 
 
 
-<!-- 儲存文章 -->
+  <!-- 儲存文章 -->
 
-<script>
-document.querySelectorAll('.bi-heart, .bi-heart-fill').forEach(icon=>{
-  icon.addEventListener('click', e=>{
-    const el = e.currentTarget;
-    const did = el.dataset.id;
+  <script>
+    document.querySelectorAll('.bi-heart, .bi-heart-fill').forEach(icon => {
+      icon.addEventListener('click', e => {
+        const el = e.currentTarget;
+        const did = el.dataset.id;
 
-    fetch(window.location.href, {
-      method: 'POST',
-      headers: {'Content-Type':'application/x-www-form-urlencoded'},
-      body: 'action=toggle_favorite&d_id='+encodeURIComponent(did)
-    })
-    .then(r=>r.json())
-    .then(json=>{
-      if (json.error) {
-        alert(json.error);
-        return;
-      }
-      if (json.saved) {
-        el.classList.replace('bi-heart','bi-heart-fill');
-        el.classList.add('saved');
-      } else {
-        el.classList.replace('bi-heart-fill','bi-heart');
-        el.classList.remove('saved');
-      }
-    })
+        fetch(window.location.href, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'action=toggle_favorite&d_id=' + encodeURIComponent(did)
+          })
+          .then(r => r.json())
+          .then(json => {
+            if (json.error) {
+              alert(json.error);
+              return;
+            }
+            if (json.saved) {
+              el.classList.replace('bi-heart', 'bi-heart-fill');
+              el.classList.add('saved');
+            } else {
+              el.classList.replace('bi-heart-fill', 'bi-heart');
+              el.classList.remove('saved');
+            }
+          })
 
-  });
-});
-</script>
+      });
+    });
+  </script>
 
 
 
