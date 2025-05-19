@@ -196,7 +196,7 @@
       <div class="container">
 
         <div class="row gy-4">
-                   <?php
+          <?php
 $servername = "localhost";
 $username   = "root";
 $password   = "";
@@ -208,17 +208,16 @@ if ($conn->connect_error) {
     die("連線失敗: " . $conn->connect_error);
 }
 
-// 1. 計算每個 email 的平均分並排序
-
+// 計算每個 email 的平均分並排序
 $ratings = [];
 $sql = "
     SELECT a_u_email AS email, b_feedback AS feedback
-      FROM match_db
-     WHERE status = 'completed' AND b_feedback <> 0 
+    FROM match_db
+    WHERE status = 'completed' AND b_feedback <> 0 
     UNION ALL
     SELECT b_u_email AS email, a_feedback AS feedback
-      FROM match_db
-     WHERE status = 'completed' AND a_feedback <> 0
+    FROM match_db
+    WHERE status = 'completed' AND a_feedback <> 0
 ";
 $res = $conn->query($sql);
 while ($row = $res->fetch_assoc()) {
@@ -237,63 +236,85 @@ foreach ($ratings as $email => $d) {
 arsort($averages);
 $topUsers = array_keys($averages);
 
-
+// 判斷使用者身分
 $current_perm      = $_SESSION['u_permission'] ?? '';
 $filter_enterprise = ($current_perm === '組織團體');
 
-// …（前面保持不变：算评分、arsort、$topUsers）…
+// 提取標題與內容的 function
+function getDemandTitleContent($conn, $d_id, $tag, $permission) {
+    if ($tag === 'spon') {
+        if ($permission === '組織團體') {
+            $sql = "SELECT event_name AS title, event_description AS content FROM org_donate WHERE d_id = ?";
+        } 
+    } elseif ($tag === '贊助') {
+        if ($permission === '企業') {
+            $sql = "SELECT title, content FROM cor_spons WHERE d_id = ?";
+        }
+    } elseif ($tag === '合作') {
+        if ($permission === '組織團體') {
+            $sql = "SELECT coop_name AS title, coop_desc AS content FROM club_coop WHERE d_id = ?";
+        } else {
+            $sql = "SELECT coop_name AS title, coop_desc AS content FROM corp_coop WHERE d_id = ?";
+        }
+    } elseif ($tag === '實習') {
+        if ($permission === '企業') {
+            $sql = "SELECT intern_title AS title, intern_detail AS content FROM cor_intern WHERE d_id = ?";
+        } else {
+            // ❗萬一有人誤選，還是給個提示
+            return ['title' => '（此實習文章無對應資料）', 'content' => '非企業帳號的實習文章無法顯示'];
+        }
+    } else {
+        return ['title' => '（未知分類）', 'content' => '這篇文章的分類不明，無法顯示內容'];
+    }
 
-// 2. 依平均分高低，为每个 user 找一篇「尚未 completed/terminated」的文章
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param('i', $d_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $stmt->close();
+
+    if ($row = $result->fetch_assoc()) {
+        return ['title' => $row['title'], 'content' => $row['content']];
+    } else {
+        return ['title' => '（找不到對應資料）', 'content' => '這篇文章無法對應到資料表'];
+    }
+}
+
+
+
+// Step 2：找每個 top user 的一篇未完成文章
 $foundDemands = [];
 foreach ($topUsers as $email) {
     $lastCheckedId = null;
+    $permission = $filter_enterprise ? '企業' : '組織團體';
 
-    // 根据是否要过滤企业发布，准备不同的 SQL
-    if ($filter_enterprise) {
-        $sql1 = "
-            SELECT d_id, d_date
-              FROM demanded
-             WHERE u_email      = ?
-               AND (? IS NULL OR d_id < ?)
-               AND u_permission = '企業'
-             ORDER BY d_id DESC
-             LIMIT 1
-        ";
-    } else {
-        $sql1 = "
-            SELECT d_id, d_date
-              FROM demanded
-             WHERE u_email = ?
-               AND (? IS NULL OR d_id < ?)
-               AND u_permission = '組織團體'
-             ORDER BY d_id DESC
-             LIMIT 1
-        ";
-    }
+    $sql1 = "
+        SELECT d_id, d_date, tag, u_permission
+        FROM demanded
+        WHERE u_email = ?
+          AND (? IS NULL OR d_id < ?)
+          AND u_permission = ?
+        ORDER BY d_id DESC
+        LIMIT 1
+    ";
 
     while (true) {
         $stmt1 = $conn->prepare($sql1);
-        $stmt1->bind_param('sis', $email, $lastCheckedId, $lastCheckedId);
+        $stmt1->bind_param('siss', $email, $lastCheckedId, $lastCheckedId, $permission);
         $stmt1->execute();
         $r1 = $stmt1->get_result();
         $stmt1->close();
 
         if (!$r1 || $r1->num_rows === 0) {
-            // 没文章了，跳到下一位
             break;
         }
 
-        $row1         = $r1->fetch_assoc();
-        $d_id         = (int)$row1['d_id'];
-        $lastCheckedId= $d_id;
+        $row1 = $r1->fetch_assoc();
+        $d_id = (int)$row1['d_id'];
+        $lastCheckedId = $d_id;
 
-        // 检查 match_db 中是否已有 completed/terminated
-        $stmt2 = $conn->prepare("
-            SELECT COUNT(*) 
-              FROM match_db
-             WHERE demanded_id = ?
-               AND status IN ('completed','terminated')
-        ");
+        // 檢查合作狀態
+        $stmt2 = $conn->prepare("SELECT COUNT(*) FROM match_db WHERE demanded_id = ? AND status IN ('completed','terminated')");
         $stmt2->bind_param('i', $d_id);
         $stmt2->execute();
         $stmt2->bind_result($cnt);
@@ -301,50 +322,48 @@ foreach ($topUsers as $email) {
         $stmt2->close();
 
         if ($cnt === 0) {
-            $foundDemands[] = ['d_id'=> $d_id, 'd_date'=> $row1['d_date']];
-            break;  // 收录后跳到下一位 user
+            $tag = $row1['tag'];
+            $u_permission = $row1['u_permission'];
+            $titleContent = getDemandTitleContent($conn, $d_id, $tag, $u_permission);
+            $foundDemands[] = [
+                'd_id'     => $d_id,
+                'd_date'   => $row1['d_date'],
+                'd_title'  => $titleContent['title'],
+                'd_content'=> $titleContent['content']
+            ];
+            break;
         }
-        // 否则继续往更旧的文章找
     }
 
     if (count($foundDemands) >= 6) {
-        break;  // 已经收齐 6 笔
+        break;
     }
 }
 
-// 3. 如果还没满 6 笔，用 demanded 最新文章补足
+// Step 3：補足未滿 6 筆的文章
 if (count($foundDemands) < 6) {
-    // 同样依据是否过滤企业发布，准备不同的查询
-    if ($filter_enterprise) {
-        $stmt3 = $conn->prepare("
-            SELECT d_id, d_date
-              FROM demanded
-             WHERE u_permission = '企業'
-             ORDER BY d_id DESC
-        ");
-    } else {
-        $stmt3 = $conn->prepare("
-            SELECT d_id, d_date
-              FROM demanded
-              WHERE u_permission = '組織團體'
-             ORDER BY d_id DESC
-        ");
-    }
+    $permission = $filter_enterprise ? '企業' : '組織團體';
+    $stmt3 = $conn->prepare("
+        SELECT d_id, d_date, tag, u_permission
+        FROM demanded
+        WHERE u_permission = ?
+        ORDER BY d_id DESC
+    ");
+    $stmt3->bind_param('s', $permission);
     $stmt3->execute();
     $r = $stmt3->get_result();
 
-    // 用 Prepared Statement 检查 match_db
     $checkStmt = $conn->prepare("
         SELECT COUNT(*) 
-          FROM match_db
-         WHERE demanded_id = ?
-           AND status IN ('completed','terminated')
+        FROM match_db
+        WHERE demanded_id = ?
+          AND status IN ('completed','terminated')
     ");
 
     while (count($foundDemands) < 6 && ($row = $r->fetch_assoc())) {
         $d_id = (int)$row['d_id'];
 
-        // 排除已收录过的
+        // 排除已收錄過的
         $exists = false;
         foreach ($foundDemands as $d) {
             if ($d['d_id'] === $d_id) {
@@ -352,11 +371,9 @@ if (count($foundDemands) < 6) {
                 break;
             }
         }
-        if ($exists) {
-            continue;
-        }
+        if ($exists) continue;
 
-        // 再检查状态
+        // 狀態檢查
         $checkStmt->bind_param('i', $d_id);
         $checkStmt->execute();
         $checkStmt->bind_result($termCount);
@@ -364,34 +381,38 @@ if (count($foundDemands) < 6) {
         $checkStmt->reset();
 
         if ($termCount === 0) {
-            $foundDemands[] = ['d_id'=> $d_id, 'd_date'=> $row['d_date']];
+            $tag = $row['tag'];
+            $u_permission = $row['u_permission'];
+            $titleContent = getDemandTitleContent($conn, $d_id, $tag, $u_permission);
+            $foundDemands[] = [
+                'd_id'     => $d_id,
+                'd_date'   => $row['d_date'],
+                'd_title'  => $titleContent['title'],
+                'd_content'=> $titleContent['content']
+            ];
         }
     }
+
     $checkStmt->close();
     $stmt3->close();
 }
 
-
-// 4. 輸出結果
+// Step 4：輸出結果
 if (!empty($foundDemands)) {
     echo "<h3>選定文章列表</h3>";
     foreach ($foundDemands as $d) {
-         
-
-
-
         echo '
         <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
-            <div class="service-item  position-relative">
-              <div class="icon">
-                <i class="bi bi-activity"></i>
-              </div>
-              <a href="property-single.php?id='.$d['d_id'].'" class="stretched-link">
-                <h3>標題</h3>
-              </a>
-              <p>內文</p>
+            <div class="service-item position-relative">
+                <div class="icon">
+                    <i class="bi bi-activity"></i>
+                </div>
+                <a href="property-single.php?id='.$d['d_id'].'" class="stretched-link">
+                    <h3>'.htmlspecialchars($d['d_title']).'</h3>
+                </a>
+                <p>'.nl2br(htmlspecialchars($d['d_content'])).'</p>
             </div>
-          </div><!-- End Service Item -->';
+        </div><!-- End Service Item -->';
     }
 } else {
     echo "<p>目前沒有任何文章可供媒合。</p>";
@@ -399,14 +420,7 @@ if (!empty($foundDemands)) {
 
 $conn->close();
 ?>
-
-
-
-
-
-          
-
-
+       
         </div>
 
       </div>
