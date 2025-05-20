@@ -171,7 +171,63 @@
   background-repeat: no-repeat;
   min-height: 100vh;
   margin: 0;">
-    <?php if (isset($_GET['success'])): ?>
+    <?php 
+
+                 
+                  // 检测这是一个收藏切换请求
+                  if (isset($_POST['action']) && $_POST['action'] === 'toggle_favorite' && isset($_POST['d_id'])) {
+                    if (empty($_SESSION['u_email'])) {
+                      echo json_encode(['error' => '未登入']);
+                      exit;
+                    }
+
+                    $user = $_SESSION['u_email'];
+                    $d_id  = intval($_POST['d_id']);
+
+                    // 复用页面既有的 $conn
+                    $conn = new mysqli('localhost', 'root', '', 'sa');
+                    if ($conn->connect_error) {
+                      echo json_encode(['error' => 'DB 連線失敗']);
+                      exit;
+                    }
+
+                    // 切换收藏状态
+                    $stmt = $conn->prepare("
+        SELECT 1 FROM user_favorites 
+         WHERE user_email=? AND d_id=?
+    ");
+                    $stmt->bind_param('si', $user, $d_id);
+                    $stmt->execute();
+                    $stmt->store_result();
+                    $exists = $stmt->num_rows > 0;
+                    $stmt->close();
+
+                    if ($exists) {
+                      $del = $conn->prepare("
+            DELETE FROM user_favorites 
+             WHERE user_email=? AND d_id=?
+        ");
+                      $del->bind_param('si', $user, $d_id);
+                      $del->execute();
+                      $del->close();
+                      echo json_encode(['saved' => false]);
+                    } else {
+                      $ins = $conn->prepare("
+            INSERT INTO user_favorites (user_email,d_id) 
+            VALUES (?,?)
+        ");
+                      $ins->bind_param('si', $user, $d_id);
+                      $ins->execute();
+                      $ins->close();
+                      echo json_encode(['saved' => true]);
+                    }
+
+                    $conn->close();
+                    exit;  // 处理完 Ajax 请求后立刻结束脚本
+                  }
+
+
+    if (isset($_GET['success'])): ?>
         <div class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 9999;">
             <div id="successToast" class="toast align-items-center text-bg-success border-0 show" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
                 <div class="d-flex">
@@ -824,10 +880,13 @@ if ($currentUser) {
                                                 <span>📞 電話：<?= htmlspecialchars($contact_phone) ?></span>
                                                 <span>✉️ Email：<?= htmlspecialchars($contact_email) ?></span>
 
-                                                 <i class='bi {$iconClass} favorite-icon' 
-                data-id='{$d_id}' 
-                title='收藏'
-                style='{$iconStyle}'></i>
+                                                <?php 
+  echo "<i class=\"bi {$iconClass} favorite-icon\" "
+     . "data-id=\"{$d_id}\" "
+     . "title=\"收藏\" "
+     . "style=\"{$iconStyle}\"></i>";
+?>
+
                                             </div>
                                               
 
