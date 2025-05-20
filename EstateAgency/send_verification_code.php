@@ -1,6 +1,5 @@
 <?php
 
-session_start();
 require 'PHPMailer-master/src/PHPMailer.php';
 require 'PHPMailer-master/src/SMTP.php';
 require 'PHPMailer-master/src/Exception.php';
@@ -15,6 +14,7 @@ $email = $_POST['email'] ?? '';
 // 驗證 email
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     http_response_code(400);
+    file_put_contents("verify_debug.log", "收到 email=$email\n", FILE_APPEND);
     echo json_encode(["status" => "fail", "message" => "無效的電子郵件格式"]);
     exit;
 }
