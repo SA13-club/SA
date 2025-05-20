@@ -35,6 +35,7 @@
   * License: https://bootstrapmade.com/license/
   ======================================================== -->
 </head>
+
 <body class="starter-page-page">
 
   <header id="header" class="header d-flex align-items-center fixed-top">
@@ -48,13 +49,13 @@
 
       <nav id="navmenu" class="navmenu">
         <ul>
-          <li><a href="index.php" >主頁</a></li>
+          <li><a href="index.php">主頁</a></li>
           <li><a href="about.php">關於</a></li>
           <li><a href="services.php">服務</a></li>
           <li><a href="properties.php">最新專案</a></li>
           <li><a href="agents.php">合作單位</a></li>
           <li><a href="contact.php">聯絡我們</a></li>
-          <li><a href="LogIn.html"class="active">登入</a></li>
+          <li><a href="LogIn.html" class="active">登入</a></li>
           <li><a href="#" data-bs-toggle="modal" data-bs-target="#SignInPermission">註冊</a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
@@ -62,43 +63,55 @@
 
     </div>
   </header>
+
   <main class="main">
-  <section class="forgot-password-section py-5">
-  <div class="container" data-aos="fade-up">
-    <div class="row justify-content-center">
-      <div class="col-lg-6">
-        <div class="card shadow-lg rounded-4 p-4">
-          <h2 class="text-center mb-4">忘記密碼</h2>
-          <form action="send_verification_code.php" method="POST" id="emailForm">
-            <div class="mb-3">
-              <label for="email" class="form-label">請輸入會員電子郵件</label>
-              <input type="email" class="form-control" name="email" id="email" required>
-            </div>
-            <button type="submit" class="btn btn-primary w-100" id="sendCodeBtn">發送驗證碼</button>
-          </form>
+    <!-- 添加足夠的上方間距，確保內容不被固定導航欄遮擋 -->
+    <section class="forgot-password-section py-5" style="margin-top: 100px;">
+      <div class="container" data-aos="fade-up">
+        <div class="row justify-content-center">
+          <div class="col-lg-6">
+            <div class="card shadow-lg rounded-4 p-4">
+              <!-- 添加網站標誌或圖標 -->
+              <div class="text-center mb-3">
+                <h1 class="sitename" style="font-size: 1.8rem;">Co<span style="color: #4CAF50;">LaB</span></h1>
+              </div>
 
-          <!-- 驗證碼輸入區塊（預設隱藏） -->
-          <form action="verify_code.php" method="POST" id="codeForm" class="mt-4" style="display: none;">
-            <input type="hidden" name="email" id="codeEmail">
-            <div class="mb-3">
-              <label for="code" class="form-label">輸入收到的驗證碼</label>
-              <input type="text" class="form-control" name="code" id="code" required>
-            </div>
-            <button type="submit" class="btn btn-success w-100">確認驗證碼</button>
-            <div class="text-center mt-2">
-              <button type="button" class="btn btn-link" id="resendCodeBtn">重新發送驗證碼</button>
-            </div>
-          </form>
+              <!-- 使用較大字體和適當間距 -->
+              <h2 class="text-center mb-4">忘記密碼</h2>
+              <!-- 添加簡短說明文字 -->
+              <p class="text-center text-muted mb-4">請輸入您的會員電子郵件，我們將發送驗證碼協助您重設密碼</p>
 
-          <div class="text-center mt-3">
-            <a href="LogIn.html">返回登入頁</a>
+              <form id="emailForm">
+                <div class="mb-3">
+                  <label for="email" class="form-label">電子郵件</label>
+                  <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+                <button type="submit" class="btn btn-success w-100">發送驗證碼</button>
+              </form>
+
+              <!-- 驗證碼輸入區塊（預設隱藏） -->
+              <form id="codeForm" class="mt-4" style="display: none;">
+                <div class="mb-3">
+                  <label for="code" class="form-label">輸入驗證碼</label>
+                  <input type="text" class="form-control" id="code" name="code" required>
+                </div>
+                <button type="submit" class="btn btn-success w-100">確認驗證碼</button>
+                <div class="text-center mt-2">
+                  <button type="button" class="btn btn-link" id="resendCodeBtn">重新發送驗證碼</button>
+                </div>
+              </form>
+
+
+              <div class="text-center mt-3">
+                <a href="LogIn.html" class="btn btn-link">返回登入頁</a>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
-</section>
-    </main>
+    </section>
+  </main>
+
 
 
   <footer id="footer" class="footer light-background">
@@ -184,58 +197,113 @@
 <script>
   const emailForm = document.getElementById("emailForm");
   const codeForm = document.getElementById("codeForm");
-  const codeEmail = document.getElementById("codeEmail");
+  const resendCodeBtn = document.getElementById("resendCodeBtn");
+  let currentEmail = ""; // ✅ 用變數記住 email，供後續驗證使用
 
-  emailForm.addEventListener("submit", async function (e) {
-    e.preventDefault(); // 阻止預設送出
-
+  // 發送驗證碼（第一次）
+  emailForm.addEventListener("submit", async function(e) {
+    e.preventDefault();
     const email = document.getElementById("email").value;
-    codeEmail.value = email;
+    currentEmail = email;
 
     try {
       const res = await fetch("send_verification_code.php", {
         method: "POST",
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
+          "Content-Type": "application/x-www-form-urlencoded"
         },
-        body: `email=${encodeURIComponent(email)}`,
+        body: `email=${encodeURIComponent(email)}`
       });
 
-      if (res.ok) {
-        // 顯示驗證碼欄位
+      const data = await res.json();
+      console.log("伺服器回應：", data);
+
+      if (res.ok && data.status === "success") {
         emailForm.style.display = "none";
         codeForm.style.display = "block";
       } else {
-        alert("發送失敗，請確認信箱是否正確");
+        alert("發送失敗：\n" + data.message);
       }
     } catch (err) {
-      console.error(err);
+      console.error("錯誤：", err);
       alert("伺服器錯誤，請稍後再試");
     }
   });
 
-  document.getElementById("resendCodeBtn").addEventListener("click", async function () {
-    const email = codeEmail.value;
+  // 重新發送驗證碼
+  resendCodeBtn.addEventListener("click", async function() {
+    if (!currentEmail) {
+      alert("找不到 email，請重新操作");
+      return;
+    }
+
     try {
       const res = await fetch("send_verification_code.php", {
         method: "POST",
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
+          "Content-Type": "application/x-www-form-urlencoded"
         },
-        body: `email=${encodeURIComponent(email)}`,
+        body: `email=${encodeURIComponent(currentEmail)}`
       });
 
-      if (res.ok) {
-        alert("已重新發送驗證碼到 " + email);
+      const data = await res.json();
+      console.log("重新發送回應：", data);
+
+      if (res.ok && data.status === "success") {
+        alert("已重新發送驗證碼到 " + currentEmail);
       } else {
-        alert("發送失敗，請稍後再試");
+        alert("發送失敗：\n" + data.message);
       }
     } catch (err) {
-      console.error(err);
-      alert("伺服器錯誤");
+      console.error("錯誤：", err);
+      alert("伺服器錯誤，請稍後再試");
+    }
+  });
+  let codeFormSubmitted = false;
+
+  // 驗證碼送出
+  codeForm.addEventListener("submit", async function(e) {
+    e.preventDefault();
+    console.log("✅ codeForm 被提交");
+
+    if (codeFormSubmitted) {
+      console.warn("⚠️ 已提交過 codeForm，取消重複提交");
+      return;
+    }
+    codeFormSubmitted = true;
+    const code = document.getElementById("code").value;
+
+    if (!currentEmail || !code) {
+      alert("請填寫完整資訊");
+      return;
+    }
+
+    console.log("驗證傳出 email =", currentEmail, "code =", code);
+
+    try {
+      const res = await fetch("verify_code.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: `email=${encodeURIComponent(currentEmail)}&code=${encodeURIComponent(code)}`
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.status === "success") {
+        alert("驗證成功，請繼續後續操作");
+        window.location.href = "reset_password.php"; // 你可以在這裡轉跳
+      } else {
+        alert("驗證失敗：" + data.message);
+      }
+    } catch (err) {
+      console.error("錯誤：", err);
+      alert("伺服器錯誤，請稍後再試");
     }
   });
 </script>
+
 
 
 </html>
