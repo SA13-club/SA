@@ -35,6 +35,207 @@
   * License: https://bootstrapmade.com/license/
   ======================================================== -->
 </head>
+<style>
+  /* 1. 整體區塊調整 */
+.about-images {
+  position: relative;
+  padding: 2rem 1rem;
+}
+
+/* 2. 使用 Flexbox 微調欄位間距 */
+.about-images .row.gy-6 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.about-images.layout-right {
+  padding: 2rem 1rem;
+}
+
+
+/* 3. 統一圖片外觀 */
+.about-images .img-fluid {
+  width: 100%;
+  height: auto;
+  border-radius: 0.75rem;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* 4. 滑鼠懸停放大效果 */
+.about-images .img-fluid:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* 5. 第一張圖往下微位移，製造錯落感 */
+.about-images .col-lg-6:first-child {
+  transform: translateY(1rem);
+}
+
+/* 6. 第二張圖向內縮，並再往上微位移 */
+.about-images .col-lg-6:last-child {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  transform: translate(-1rem, -1rem);
+}
+
+/* 7. 小螢幕下讓圖片自動堆疊 */
+@media (max-width: 767.98px) {
+  .about-images .row.gy-6 {
+    display: block;
+  }
+  .about-images .col-lg-6 {
+    transform: none !important;
+    margin-bottom: 1rem;
+  }
+}
+/* ── 讓圖片欄位變寬（從50%→60%）並撐滿欄位 ── */
+.about-images.layout-right .row.gy-6 .col-lg-6 {
+  flex: 0 0 60%;
+  max-width: 60%;
+}
+
+.about-images.layout-right .row.gy-6 .col-lg-6 .img-fluid {
+  width: 100%;
+  /* 如果還想再放大一點，改成 110% 或 120% */
+  /* width: 110%; */
+}
+/* ── 三圖＋往右斜放 ── */
+.about-images.layout-right.skew-right {
+  padding: 2rem 1rem;
+}
+
+/* Flex 容器，靠右對齊 */
+.about-images.layout-right.skew-right > .row {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+/* 三分之一寬度 */
+.about-images.layout-right.skew-right .col-lg-4 {
+  flex: 0 0 33.333%;
+  max-width: 33.333%;
+  /* 斜轉 5 度 */
+  transform: rotate(5deg);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* 錯落 Y 軸位移 */
+.about-images.layout-right.skew-right .col-lg-4:nth-child(1) {
+  transform: rotate(5deg) translateY(-1rem);
+}
+.about-images.layout-right.skew-right .col-lg-4:nth-child(2) {
+  transform: rotate(5deg) translateY(0);
+}
+.about-images.layout-right.skew-right .col-lg-4:nth-child(3) {
+  transform: rotate(5deg) translateY(1rem);
+}
+
+/* 統一圖片圓角＋陰影＋懸停放大 */
+.about-images.layout-right.skew-right .img-fluid {
+  width: 100%;
+  height: auto;
+  border-radius: 0.75rem;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+.about-images.layout-right.skew-right .img-fluid:hover {
+  transform: rotate(5deg) scale(1.05);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* 小螢幕：直排、取消斜轉與位移 */
+@media (max-width: 767.98px) {
+  .about-images.layout-right.skew-right > .row {
+    display: block;
+  }
+  .about-images.layout-right.skew-right .col-lg-4 {
+    max-width: 100%;
+    transform: none !important;
+    margin-bottom: 1rem;
+  }
+}
+/* ── 讓三張圖再放大 10% ── */
+.about-images.layout-right.skew-right .img-fluid {
+  width: 110%;        /* 原本 100% → 放大到 110% */
+  max-width: none;    /* 取消 max-width 限制 */
+}
+
+/* 如果你想同時在 transform 裡加 scale，也可以這樣： */
+.about-images.layout-right.skew-right .col-lg-4 {
+  /* 原本只有 rotate + translateY，改成加 scale(1.05) */
+  transform: rotate(5deg) translateY(0) scale(1.05);
+}
+.about-images.layout-right.skew-right .col-lg-4:nth-child(1) {
+  transform: rotate(5deg) translateY(-1rem) scale(1.05);
+}
+.about-images.layout-right.skew-right .col-lg-4:nth-child(2) {
+  transform: rotate(5deg) translateY(0) scale(1.05);
+}
+.about-images.layout-right.skew-right .col-lg-4:nth-child(3) {
+  transform: rotate(5deg) translateY(1rem) scale(1.05);
+}
+
+
+
+
+/* ── 四圖＋兩張一層＋向右斜放 ── */
+.about-images.layout-right.skew-right > .row {
+  display: flex;
+  flex-wrap: wrap;      /* 允許換行 */
+  gap: 1rem;
+  justify-content: flex-end;  /* 靠右排 */
+}
+
+/* 每張圖佔 50% 寬度 */
+.about-images.layout-right.skew-right .col-lg-6 {
+  flex: 0 0 50%;
+  max-width: 50%;
+  transform: rotate(5deg);  /* 斜轉 */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* 交替上下錯落 + 放大 */
+.about-images.layout-right.skew-right .col-lg-6:nth-child(odd) {
+  transform: rotate(5deg) translateY(-1rem) scale(1.05);
+}
+.about-images.layout-right.skew-right .col-lg-6:nth-child(even) {
+  transform: rotate(5deg) translateY(1rem) scale(1.05);
+}
+
+/* 圓角、陰影、懸停放大 */
+.about-images.layout-right.skew-right .img-fluid {
+  width: 200%;       /* 從 100% → 120% */
+  max-width: none;   /* 取消限制 */
+  border-radius: 0.75rem;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+.about-images.layout-right.skew-right .img-fluid:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* 手機版：直排、取消斜轉與錯落 */
+@media (max-width: 767.98px) {
+  .about-images.layout-right.skew-right > .row {
+    display: block;
+  }
+  .about-images.layout-right.skew-right .col-lg-6 {
+    max-width: 100%;
+    transform: none !important;
+    margin-bottom: 1rem;
+  }
+}
+
+.about-images.layout-right.skew-right {
+  padding: 2rem 1rem 2rem 1rem;
+  padding-right: 12rem; /* 保留右側空間 */
+
+}
+</style>
 
 <body class="about-page">
 
@@ -121,31 +322,31 @@
         <div class="row gy-4">
 
           <div class="col-lg-6 content" data-aos="fade-up" data-aos-delay="100">
-            <p class="who-we-are">天天開心</p>
+            <p class="who-we-are"></p>
             <h3>註冊與登入</h3>
             <p class="fst-italic">
-              保證完成您的廣告需求 廣告找CoLaB 連結年輕無極限
+             建立新帳號
             </p>
             <ul>
               <li><i class="bi bi-check-circle"></i> <span>註冊與登入</span></li>
               <li><i class="bi bi-check-circle"></i> <span>填寫資訊建立基本資料</span></li>
-              <li><i class="bi bi-check-circle"></i> <span>廣告找CoLaB 廣告聲量大無邊</span></li>
+              
             </ul>
           </div>
 
           <div class="col-lg-6 about-images" data-aos="fade-up" data-aos-delay="200">
-            <div class="row gy-4">
+            <div class="row gy-6">
               <div class="col-lg-6">
-                <img src="assets/img/about-company-1.jpg" class="img-fluid" alt="">
+                <img src="assets/img/註冊2.png" class="img-fluid" alt="">
               </div>
               <div class="col-lg-6">
                 <div class="row gy-4">
                   <div class="col-lg-10">
-                    <img src="assets/img/about-company-2.jpg" class="img-fluid" alt="">
+                    
+                      <img src="assets/img/註冊.png" class="img-fluid" alt="">
+                    
                   </div>
-                  <div class="col-lg-12">
-                    <img src="assets/img/about-company-3.jpg" class="img-fluid" alt="">
-                  </div>
+                  
                 </div>
               </div>
             </div>
@@ -158,39 +359,98 @@
 
         <br><br>
         <div class="row gy-4">
+          <!-- HTML：三圖＋右斜區塊 -->
+<div class="col-lg-6 about-images layout-right skew-right" data-aos="fade-up" data-aos-delay="200">
+  <div class="row gy-4">
+    <div class="col-lg-4">
+      <a href="./newdona.php"><img src="assets/img/發布.png" class="img-fluid" alt=""></a>
+    </div>
+    <div class="col-lg-4">
+      <a href="./account.php"><img src="assets/img/發布4.png" class="img-fluid" alt=""></a>
+    </div>
+    <div class="col-lg-4">
+      <a href="./propertiesdemo.php"><img src="assets/img/發布二.png" class="img-fluid" alt=""></a>
+    </div>
+    <div class="col-lg-4">
+      <a href="./propertiesdemo.php"><img src="assets/img/發布3.png" class="img-fluid" alt=""></a>
+    </div>
+    
+  </div>
+</div>
 
+
+          <div class="col-lg-6 content" data-aos="fade-up" data-aos-delay="100">
+            <p class="who-we-are"></p>
+            <h3>發布需求</h3>
+            <p class="fst-italic">
+              找到合作機會
+            </p>
+            <ul>
+              <li><i class="bi bi-check-circle"></i> <span>前往最新專案，可點擊右側新增專案，述說您的需求，編輯及刪除文章功能在個人帳號內進行管理</span></li>
+              <li><i class="bi bi-check-circle"></i> <span>可以透過關鍵字搜尋或是您感興趣的欄位進行篩選</span></li>
+              <li><i class="bi bi-check-circle"></i> <span>點擊方框查看需求細節是否符與您契合</span></li>
+              
+            </ul>
+          </div>
+
+          
+
+
+
+        </div>
+        <br><br>
+        <div class="row gy-4">
+
+          <div class="col-lg-6 content" data-aos="fade-up" data-aos-delay="100">
+            <p class="who-we-are"></p>
+            <h3>洽談合作</h3>
+            <p class="fst-italic">
+             找尋夥伴
+            </p>
+            <ul>
+              <li><i class="bi bi-check-circle"></i> <span>點擊需求內聊天室按鈕開始與對方家洽合作事宜</span></li>
+              <li><i class="bi bi-check-circle"></i> <span>如果初步洽談順利可以點選我想合作按鈕，雙方進入合作階段<br>
+              分為三階段:同意->洽談中->完成合作(都須雙方按下同意按鈕後才會進入下一階段)
+              
+              </span></li>
+              <li><i class="bi bi-check-circle"></i> <span>在合作完成時在專案管理右邊可以給予對方評分</span></li>
+              
+            </ul>
+          </div>
 
           <div class="col-lg-6 about-images" data-aos="fade-up" data-aos-delay="200">
-            <div class="row gy-4">
+            <div class="row gy-6">
               <div class="col-lg-6">
-                <img src="assets/img/about-company-1.jpg" class="img-fluid" alt="">
+                <a href='./account.php'>
+                  <img src="assets/img/接洽2.png" class="img-fluid" alt="">
+                </a>
               </div>
               <div class="col-lg-6">
                 <div class="row gy-4">
-                  <div class="col-lg-12">
-                    <img src="assets/img/about-company-2.jpg" class="img-fluid" alt="">
+                  <div class="col-lg-10">
+                    
+                      <img src="assets/img/接洽.png" class="img-fluid" alt="">
+                    
                   </div>
-                  <div class="col-lg-12">
-                    <img src="assets/img/about-company-3.jpg" class="img-fluid" alt="">
-                  </div>
+                  
                 </div>
               </div>
             </div>
 
           </div>
+
+
+
+        </div>
+
           
-          <div class="col-lg-6 content" data-aos="fade-up" data-aos-delay="100">
-            <p class="who-we-are">天天開心</p>
-            <h3>遵命老闆</h3>
-            <p class="fst-italic">
-              保證完成您的廣告需求 廣告找CoLaB 連結年輕無極限
-            </p>
-            <ul>
-              <li><i class="bi bi-check-circle"></i> <span>廣告找CoLaB 廣告觸及無設限</span></li>
-              <li><i class="bi bi-check-circle"></i> <span>廣告找CoLaB 廣告成效看得見</span></li>
-              <li><i class="bi bi-check-circle"></i> <span>廣告找CoLaB 廣告聲量大無邊</span></li>
-            </ul>
-          </div>
+          
+
+        </div>
+         
+
+          
+          
 
         </div>
 

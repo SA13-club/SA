@@ -146,32 +146,36 @@
 
       <div class='container'>
 
-          <!-- 搜尋區塊 -->
-<section class="search-bar py-4 bg-light">
-  <div class="container">
-    <form action="./propertiesfind.php" method="GET" class="row g-2 align-items-center justify-content-center">
+                          <!-- 搜尋區塊 -->
+                <section class="search-bar py-4 bg-light">
+                  <div class="container">
+                    <form action="./propertiesfind.php" method="GET" class="row g-2 align-items-center justify-content-center">
 
-      <!-- 第一個下拉框：選擇類型 -->
-      <div class="col-md-3">
-  <select class="form-select form-select-lg" name="type">
-    <option value="all" selected>全部</option>
-    <?php
-    $link = mysqli_connect('localhost', 'root', '', 'sa');
-    if (!$link) {
-        die('連線失敗: ' . mysqli_connect_error());
-    }
+                      <!-- 第一個下拉框：選擇類型 -->
+                      <div class="col-md-3">
+                  <select class="form-select form-select-lg" name="type">
+                    <option value="all" selected>全部</option>
+                    <?php
+                    $link = mysqli_connect('localhost', 'root', '', 'sa');
+                    if (!$link) {
+                        die('連線失敗: ' . mysqli_connect_error());
+                    }
 
-    $tag_sql = "SELECT DISTINCT tag FROM demanded WHERE tag IS NOT NULL AND tag != ''";
-    $tag_result = mysqli_query($link, $tag_sql);
+                    $tag_sql = "SELECT DISTINCT tag FROM demanded WHERE tag IS NOT NULL AND tag != ''";
+                    $tag_result = mysqli_query($link, $tag_sql);
 
-    while ($row = mysqli_fetch_assoc($tag_result)) {
-        $tag_value = htmlspecialchars($row['tag']);
-        $tag_display = $tag_value === 'spon' ? '贊助' :
-                       ($tag_value === 'intern' ? '實習' : $tag_value);
-        echo "<option value=\"$tag_value\">$tag_display</option>";
-    }
-    ?>
-  </select>
+                    while ($row = mysqli_fetch_assoc($tag_result)) {
+                        $tag_value = htmlspecialchars($row['tag']);
+                        $tag_display = $tag_value === 'spon' ? '贊助' :
+                                      ($tag_value === 'intern' ? '實習' : $tag_value);
+                        echo "<option value=\"$tag_value\">$tag_display</option>";
+                    }
+                    ?>
+                  </select>
+
+
+
+                  
 </div>
 
 
@@ -190,7 +194,98 @@
     </form>
   </div>
 </section>
+<section class="filter-bar py-3 bg-light">
+          <div class="container">
+            <div class="row justify-content-center align-items-center">
+              <div class="row justify-content-center align-items-center">
+                <!-- 標籤篩選 -->
+                <div class="col-md-4 mb-2">
+                  <label class="form-label">依標籤篩選：</label>
+                  <select id="tagSelect" class="form-select">
+                    <option value="">請選擇標籤</option>
 
+                    <?php
+
+                    $currentUser = $_SESSION['u_email'] ?? '';
+                    $myFavs = [];
+                    if ($currentUser) {
+                      $resFav = mysqli_query($link, "
+    SELECT d_id
+      FROM user_favorites
+     WHERE user_email = '" . mysqli_real_escape_string($link, $currentUser) . "'
+  ");
+                      while ($fav = mysqli_fetch_assoc($resFav)) {
+                        $myFavs[] = (int)$fav['d_id'];
+                      }
+                    }
+                    $link = mysqli_connect('localhost', 'root', '', 'sa');
+                    $u_permission = $_SESSION['u_permission'];
+
+                    // 建立一個陣列存條件
+                    $tagParts = [];
+
+                    if ($u_permission == '組織團體') {
+                      // 組織團體可以看到：club_coop（合作）、cor_intern、cor_spons
+                      $tagParts[] = "EXISTS (SELECT 1 FROM club_coop cc WHERE cc.d_id = d.d_id)";
+                      $tagParts[] = "EXISTS (SELECT 1 FROM cor_intern ci WHERE ci.d_id = d.d_id)";
+                      $tagParts[] = "EXISTS (SELECT 1 FROM cor_spons cs WHERE cs.d_id = d.d_id)";
+                    } elseif ($u_permission == '企業') {
+                      // 企業可以看到：corp_coop（合作）、org_donate
+                      $tagParts[] = "EXISTS (SELECT 1 FROM corp_coop cc WHERE cc.d_id = d.d_id)";
+                      $tagParts[] = "EXISTS (SELECT 1 FROM org_donate od WHERE od.d_id = d.d_id)";
+                    }
+
+                    // 組合 SQL
+                    $tagCondition = implode(" OR ", $tagParts);
+
+                    $tagQuery = "
+                    SELECT DISTINCT d.tag FROM demanded d
+                    WHERE d.tag IS NOT NULL AND d.tag != '' AND ($tagCondition)
+                  ";
+
+                    $tagResult = mysqli_query($link, $tagQuery);
+
+                    while ($row = mysqli_fetch_assoc($tagResult)) {
+                      $tag = $row['tag'];
+                      $displayTag = $tag;
+                      if ($tag == 'spon') $displayTag = '贊助';
+                      elseif ($tag == '實習') $displayTag = '實習';
+                      elseif ($tag == '合作') $displayTag = '合作';
+                      elseif ($tag == '招募') $displayTag = '招募';
+                      elseif ($tag == '贊助') $displayTag = '贊助';
+
+                      echo "<option value='{$tag}'>{$displayTag}</option>";
+                    }
+                    $filterTag = $_GET['tag'] ?? '';
+                    $filterField = $_GET['field'] ?? '';
+
+                    ?>
+                  </select>
+                </div>
+
+                <div class="col-md-4 mb-2">
+                  <label class="form-label">對應欄位：</label>
+                  <select id="fieldSelect" class="form-select" disabled>
+                    <option value="">請先選擇標籤</option>
+                  </select>
+                </div>
+                <div class="col-md-4 mb-2" id="fieldValueWrapper" style="display: none;">
+                  <label class="form-label">細項條件：</label>
+                  <select id="fieldValueSelect" class="form-select">
+                    <option value="">請選擇條件</option>
+                  </select>
+                </div>
+
+                <div class="col-md-2 mb-2">
+                  <button type="button" id="clearFilters" class="btn btn-outline-secondary w-100">清除篩選</button>
+                </div>
+                <div class="col-md-2 mb-2">
+                  <button type="button" id="applyFilters" class="btn btn-success w-100">確認篩選</button>
+                </div>
+              </div>
+            </div>
+        </section>
+       
 
 
 
@@ -514,6 +609,206 @@ while ($row = mysqli_fetch_assoc($result)) {
     updateVisibleCards(); // 初始顯示全部卡片
   </script>
 
+
+
+<!-- 篩選java -->
+ 
+  <script>
+    const fieldOptions = {
+      '合作': ['合作方式', '合作地點', '合作效益'],
+      '贊助': ['贊助方式', '贊助金額'],
+      '實習': ['職缺名稱', '地點', '薪資', '技能要求', '實習期間'],
+      '招募': ['招募類型', '條件', '活動時間'],
+      'spon': ['贊助方式', '贊助金額'] // 若有用原始 tag
+    };
+
+    document.getElementById('tagSelect').addEventListener('change', function() {
+      const tag = this.value;
+      const fieldSelect = document.getElementById('fieldSelect');
+
+      // 清空欄位
+      fieldSelect.innerHTML = '';
+      if (!tag || !fieldOptions[tag] && !fieldOptions[translateTag(tag)]) {
+        fieldSelect.disabled = true;
+        fieldSelect.innerHTML = '<option value="">無可用欄位</option>';
+        return;
+      }
+
+      const options = fieldOptions[tag] || fieldOptions[translateTag(tag)];
+
+      // 加入選項
+      fieldSelect.disabled = false;
+      fieldSelect.innerHTML = '<option value="">請選擇欄位</option>';
+      options.forEach(field => {
+        const opt = document.createElement('option');
+        opt.value = field;
+        opt.textContent = field;
+        fieldSelect.appendChild(opt);
+      });
+    });
+
+    function translateTag(tag) {
+      // 把資料庫中的原始值轉成中文對照（保險起見）
+      const map = {
+        'spon': '贊助',
+        '實習': '實習',
+        '合作': '合作',
+        '贊助': '贊助',
+        '招募': '招募'
+      };
+      return map[tag] || tag;
+    }
+    const valueMapping = {
+      '贊助方式': {
+        '金錢': 'money',
+        '產品': 'product'
+      },
+      '合作方式': {
+        '活動合辦': '活動合辦',
+        '聯誼活動': '聯誼活動',
+        '長期合作': '長期合作',
+        '成果發表': '成果發表'
+      }
+    };
+    const sponsorAmountRanges = [{
+        min: 0,
+        max: 10000,
+        label: '1萬以下'
+      },
+      {
+        min: 10000,
+        max: 50000,
+        label: '1萬~5萬'
+      },
+      {
+        min: 50000,
+        max: Infinity,
+        label: '5萬以上'
+      }
+    ];
+
+    document.getElementById('applyFilters').addEventListener('click', function() {
+      const tag = document.getElementById('tagSelect').value;
+      const field = document.getElementById('fieldSelect').value;
+
+      const inputEl = document.getElementById('fieldValueInput');
+      const selectEl = document.getElementById('fieldValueSelect');
+
+      const amountMinEl = document.getElementById('sponsorAmountMin');
+      const amountMaxEl = document.getElementById('sponsorAmountMax');
+
+      if (!tag) {
+        alert('請先選擇標籤！');
+        return;
+      }
+
+      const params = new URLSearchParams();
+      params.set('tag', tag);
+      if (field) params.set('field', field);
+
+      // ✅ 特別處理贊助金額區間
+      if (field === '贊助金額' && amountMinEl && amountMaxEl) {
+        const min = parseInt(amountMinEl.value);
+        const max = parseInt(amountMaxEl.value);
+
+        // ✅ 防呆檢查：最小不可大於最大
+        if (!isNaN(min) && !isNaN(max) && min > max) {
+          alert('最低金額不能大於最高金額！');
+          amountMinEl.classList.add('is-invalid');
+          amountMaxEl.classList.add('is-invalid');
+          return;
+        } else {
+          amountMinEl.classList.remove('is-invalid');
+          amountMaxEl.classList.remove('is-invalid');
+        }
+
+        if (!isNaN(min)) params.set('min', min);
+        if (!isNaN(max)) params.set('max', max);
+      } else {
+        // 處理其他欄位選項或單一輸入欄
+        const detail = inputEl?.value || selectEl?.value || '';
+        if (field && detail) {
+          const mappedValue = valueMapping[field]?.[detail] || detail;
+          params.set('fieldValue', mappedValue);
+        }
+      }
+
+      // ✅ 導向含參數的新網址
+      window.location.href = 'propertiesdemo.php?' + params.toString();
+    });
+
+
+
+
+    const detailFieldOptions = {
+      // 合作相關
+      '合作名稱': ['產學合作', '社會公益', '品牌推廣'],
+      '合作方式_組織團體': ['活動合辦', '聯誼活動', '長期合作', '成果發表'],
+      '合作方式_企業': ['演講講座', '實習需求', '產學合作', '其他'],
+      '合作地點': ['台北市', '新北市', '台中市', '台南市', '高雄市'],
+      '合作效益': ['提升知名度', '拓展關係網', '技術交流'],
+
+      // 贊助相關
+      '贊助方式': ['金錢', '產品'],
+      // '活動名稱': ['校園音樂祭', '創業競賽', '職涯講座'],
+
+      // 實習相關
+      '職缺名稱': ['軟體工程師', '行銷助理', '設計實習生'],
+      '地點': ['台北市', '新竹市', '高雄市', '可遠端'],
+      '薪資': ['無薪', '時薪 183', '月薪 20000~30000'],
+      '技能要求': ['HTML/CSS', 'Python', 'Illustrator', '社群經營'],
+      '實習期間': ['一個月', '兩個月', '整學期'],
+
+      // 招募相關
+      '招募類型': ['志工', '兼職', '活動協助'],
+      '條件': ['具溝通能力', '時間彈性', '有責任感'],
+      '活動時間': ['平日晚間', '週末全天', '寒暑假']
+    };
+
+
+    document.getElementById('fieldSelect').addEventListener('change', function() {
+      const field = this.value;
+      const wrapper = document.getElementById('fieldValueWrapper');
+      const select = document.getElementById('fieldValueSelect');
+
+      select.innerHTML = '<option value="">請選擇條件</option>';
+
+      // ⚠️ 根據使用者身分動態找細項清單
+      let detailKey = field;
+      if (field === '合作方式') {
+        detailKey = `${field}_${userPermission}`;
+      }
+
+      const options = detailFieldOptions[detailKey];
+
+      if (field === '贊助金額') {
+        wrapper.style.display = 'block';
+        wrapper.innerHTML = `
+<label>贊助金額區間</label>
+<div class="d-flex gap-2 align-items-center">
+  <input type="number" id="sponsorAmountMin" class="form-control" placeholder="最低金額">
+  <span>~</span>
+  <input type="number" id="sponsorAmountMax" class="form-control" placeholder="最高金額">
+</div>
+<small id="amountError" class="text-danger d-none">最低金額不能大於最高金額</small>
+  `;
+      } else if (options) {
+        // ✅ 顯示下拉選單
+        wrapper.style.display = 'block';
+        wrapper.innerHTML = `
+      <label for="fieldValueSelect">請選擇條件</label>
+      <select id="fieldValueSelect" class="form-select">
+        <option value="">請選擇條件</option>
+        ${options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+      </select>
+    `;
+      } else {
+        // 無細項，隱藏區塊
+        wrapper.style.display = 'none';
+        wrapper.innerHTML = '';
+      }
+    });
+  </script>
 
 
 </body>

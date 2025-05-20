@@ -386,6 +386,22 @@ $stmt->bind_param('s', $u_email);
 $stmt->execute();
 $result2 = $stmt->get_result();
 
+
+
+
+
+ $currentUser = $_SESSION['u_email'] ?? '';
+$myFavs = [];
+if ($currentUser) {
+  $resFav = mysqli_query($conn, "
+    SELECT d_id
+      FROM user_favorites
+     WHERE user_email = '" . mysqli_real_escape_string($conn, $currentUser) . "'
+  ");
+  while ($fav = mysqli_fetch_assoc($resFav)) {
+    $myFavs[] = (int)$fav['d_id'];
+  }
+}
 ?>
 
 
@@ -749,8 +765,12 @@ $result2 = $stmt->get_result();
                             
                             <?php while ($row = $result2->fetch_assoc()): ?>
                                 <?php
-                             
+                                    $d_id  = (int)$row['d_id'];
+                                    $saved = in_array($d_id, $myFavs);
                                 
+                                       $iconClass = $saved ? 'bi-heart-fill saved' : 'bi-heart';
+                $iconStyle = $saved ? 'color:red;' : '';
+
                                 $contact_name = $row['donate_c_name'] ?? $row['spons_c_name'] ?? $row['intern_c_name'] ?? $row['coop_c_name'] ?? '無資料';
                                 $contact_phone = $row['donate_c_phone'] ?? $row['spons_c_phone'] ?? $row['intern_c_phone'] ?? $row['coop_c_phone'] ?? '無資料';
                                 $contact_email = $row['donate_c_email'] ?? $row['spons_c_email'] ?? $row['intern_c_email'] ?? $row['coop_c_email'] ?? '無資料';
@@ -798,6 +818,11 @@ $result2 = $stmt->get_result();
                                                 <span>👤 聯絡人：<?= htmlspecialchars($contact_name) ?></span>
                                                 <span>📞 電話：<?= htmlspecialchars($contact_phone) ?></span>
                                                 <span>✉️ Email：<?= htmlspecialchars($contact_email) ?></span>
+
+                                                 <i class='bi {$iconClass} favorite-icon' 
+                data-id='{$d_id}' 
+                title='收藏'
+                style='{$iconStyle}'></i>
                                             </div>
                                               
 
@@ -1033,39 +1058,71 @@ $result2 = $stmt->get_result();
 
 
 
+  <!-- 儲存文章 -->
 
-<script>
-document.querySelectorAll('.bi-heart, .bi-heart-fill').forEach(icon=>{
-  icon.addEventListener('click', e=>{
-    const el = e.currentTarget;
-    const did = el.dataset.id;
+  <script>
+    document.querySelectorAll('.bi-heart, .bi-heart-fill').forEach(icon => {
+      icon.addEventListener('click', e => {
+        const el = e.currentTarget;
+        const did = el.dataset.id;
 
-    fetch(window.location.href, {
-      method: 'POST',
-      headers: {'Content-Type':'application/x-www-form-urlencoded'},
-      body: 'action=toggle_favorite&d_id='+encodeURIComponent(did)
-    })
-    .then(r=>r.json())
-    .then(json=>{
-      if (json.error) {
-        alert(json.error);
-        return;
-      }
-      if (json.saved) {
-        el.classList.replace('bi-heart','bi-heart-fill');
-        el.classList.add('saved');
-      } else {
-        el.classList.replace('bi-heart-fill','bi-heart');
-        el.classList.remove('saved');
-      }
-    })
+        fetch(window.location.href, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'action=toggle_favorite&d_id=' + encodeURIComponent(did)
+          })
+          .then(r => r.json())
+          .then(json => {
+            if (json.error) {
+              alert(json.error);
+              return;
+            }
+            if (json.saved) {
+              el.classList.replace('bi-heart', 'bi-heart-fill');
+              el.classList.add('saved');
+            } else {
+              el.classList.replace('bi-heart-fill', 'bi-heart');
+              el.classList.remove('saved');
+            }
+          })
 
+      });
+    });
+
+  </script>
+  <script>
+document.querySelectorAll('.favorite-icon').forEach(icon => {
+  icon.addEventListener('click', function(event) {
+    event.stopPropagation(); // 不讓點擊觸發 a 連結
+    event.preventDefault();
+
+    const isSaved = this.classList.contains('bi-heart-fill');
+    const dId = this.dataset.id;
+
+    // 切換圖示與顏色
+    if (isSaved) {
+      this.classList.remove('bi-heart-fill', 'saved');
+      this.classList.add('bi-heart');
+      this.style.color = ''; // 取消紅色
+    } else {
+      this.classList.remove('bi-heart');
+      this.classList.add('bi-heart-fill', 'saved');
+      this.style.color = 'red';
+    }
+
+    // 你可以在這裡觸發 AJAX 送出收藏狀態
+    // sendFavoriteStatus(dId, !isSaved);
   });
 });
 </script>
 
 
+
+
 </body>
+
 
 </html>
 
