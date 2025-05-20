@@ -109,7 +109,6 @@
     .favorite-icon:hover {
       color: red;
     }
-
   </style>
 </head>
 
@@ -207,7 +206,7 @@
               <div class="col-md-3">
                 <select class="form-select form-select-lg" name="type">
                   <?php
-                  $u_permission=$_SESSION['u_permission'];
+                  $u_permission = $_SESSION['u_permission'];
                   $link = mysqli_connect('localhost', 'root', '', 'sa');
                   if (!$link) {
                     die('連線失敗: ' . mysqli_connect_error());
@@ -215,14 +214,14 @@
 
                   $tag_sql = "SELECT DISTINCT tag FROM demanded WHERE tag IS NOT NULL AND tag != '' AND u_permission !='$u_permission'";
                   $tag_result = mysqli_query($link, $tag_sql);
-                echo '<option value="all">全部</option>'; // 預設加入「全部」選項
+                  echo '<option value="all">全部</option>'; // 預設加入「全部」選項
 
-                while ($row = mysqli_fetch_assoc($tag_result)) {
+                  while ($row = mysqli_fetch_assoc($tag_result)) {
                     $tag_value = htmlspecialchars($row['tag']);
                     $tag_display = $tag_value === 'spon' ? '贊助' : ($tag_value === 'intern' ? '實習' : $tag_value);
 
                     echo "<option value=\"$tag_value\">$tag_display</option>";
-                }
+                  }
 
 
 
@@ -424,6 +423,9 @@
               $sql = "
     SELECT 
         d.*, 
+        ci.deadline AS intern_deadline,
+        cs.deadline AS spons_deadline,
+        clc.deadline AS coop_deadline,
         ci.c_name AS intern_c_name, ci.c_phone AS intern_c_phone, ci.c_email AS intern_c_email, ci.intern_title AS intern_title,
         cs.c_name AS spons_c_name, cs.c_phone AS spons_c_phone, cs.c_email AS spons_c_email, cs.title AS spons_title,cs.sponsor_amount AS sponsor_amount,cs.sponsor_method AS spons_method,
         COALESCE(clc.c_name) AS coop_c_name,
@@ -441,11 +443,13 @@
         (d.u_permission = '企業' AND (ci.d_id IS NOT NULL OR cs.d_id IS NOT NULL))
         OR 
         (d.u_permission = '組織團體' AND clc.d_id IS NOT NULL)
-";
+  ";
             } elseif ($u_permission == '企業') {
               $sql = "
     SELECT 
         d.*, 
+        od.deadline AS donate_deadline,
+        cc.deadline AS coop_deadline,
         od.c_name AS donate_c_name, od.c_phone AS donate_c_phone, od.c_email AS donate_c_email, od.event_name AS donate_title,od.sponsor_method AS donate_method,
         COALESCE(cc.c_name) AS coop_c_name,
         COALESCE(cc.c_phone) AS coop_c_phone,
@@ -457,11 +461,16 @@
     LEFT JOIN org_donate od ON d.d_id = od.d_id
     LEFT JOIN corp_coop cc ON d.d_id = cc.d_id
     WHERE d.u_permission != ?
-";
+  ";
             } else {
               $sql = "
     SELECT 
         d.*, 
+        ci.deadline AS intern_deadline,
+        cs.deadline AS spons_deadline,
+        od.deadline AS donate_deadline,
+        clc.deadline AS coop_club_deadline,
+        cc.deadline AS coop_corp_deadline,
         ci.c_name AS intern_c_name, ci.c_phone AS intern_c_phone, ci.c_email AS intern_c_email, ci.title AS intern_title,
         cs.c_name AS spons_c_name, cs.c_phone AS spons_c_phone, cs.c_email AS spons_c_email, cs.title AS spons_title,
         od.c_name AS donate_c_name, od.c_phone AS donate_c_phone, od.c_email AS donate_c_email, od.title AS donate_title,
@@ -477,7 +486,7 @@
     LEFT JOIN cor_intern ci ON d.d_id = ci.d_id
     LEFT JOIN cor_spons cs ON d.d_id = cs.d_id
     WHERE d.u_permission != ?
-";
+  ";
             }
 
             // 使用 prepared statement，防止 SQL injection
@@ -545,8 +554,26 @@
               echo "</div>";
             }
             while ($row = mysqli_fetch_assoc($result)) {
-              if (!empty($row['deadline']) && $row['deadline'] < $today) {
-                continue; // ✅ 跳過已過期的文章
+              $tag = normalizeTag($row['tag']);
+              $rawDeadline = null;
+              switch ($tag) {
+                case '實習':
+                  $rawDeadline = $row['intern_deadline'] ?? null;
+                  break;
+                case '贊助':
+                  $rawDeadline = $row['spons_deadline'] ?? $row['donate_deadline'] ?? null;
+                  break;
+                case '合作':
+                  $rawDeadline = $row['coop_deadline'] ?? $row['coop_club_deadline'] ?? $row['coop_corp_deadline'] ?? null;
+                  break;
+                case '招募':
+                  $rawDeadline = $row['donate_deadline'] ?? null;
+                  break;
+              }
+
+              // echo "<pre>Deadline: $rawDeadline | Today: $today</pre>|";
+              if (!empty($rawDeadline) && strtotime($rawDeadline) < strtotime($today)) {
+                continue;
               }
               $displayTag = normalizeTag($row['tag']);
               if ($displayTag == 'spon') $displayTag = '贊助';
@@ -667,7 +694,7 @@
                 $iconClass = $saved ? 'bi-heart-fill saved' : 'bi-heart';
                 $iconStyle = $saved ? 'color:red;' : '';
 
-              echo "
+                echo "
               <span>👤 聯絡人：{$contact_name}</span>
               <span>📞 電話：{$contact_phone}</span>
               <span>✉️ Email：{$contact_email}</span>
@@ -1024,33 +1051,32 @@
 
       });
     });
-
   </script>
   <script>
-document.querySelectorAll('.favorite-icon').forEach(icon => {
-  icon.addEventListener('click', function(event) {
-    event.stopPropagation(); // 不讓點擊觸發 a 連結
-    event.preventDefault();
+    document.querySelectorAll('.favorite-icon').forEach(icon => {
+      icon.addEventListener('click', function(event) {
+        event.stopPropagation(); // 不讓點擊觸發 a 連結
+        event.preventDefault();
 
-    const isSaved = this.classList.contains('bi-heart-fill');
-    const dId = this.dataset.id;
+        const isSaved = this.classList.contains('bi-heart-fill');
+        const dId = this.dataset.id;
 
-    // 切換圖示與顏色
-    if (isSaved) {
-      this.classList.remove('bi-heart-fill', 'saved');
-      this.classList.add('bi-heart');
-      this.style.color = ''; // 取消紅色
-    } else {
-      this.classList.remove('bi-heart');
-      this.classList.add('bi-heart-fill', 'saved');
-      this.style.color = 'red';
-    }
+        // 切換圖示與顏色
+        if (isSaved) {
+          this.classList.remove('bi-heart-fill', 'saved');
+          this.classList.add('bi-heart');
+          this.style.color = ''; // 取消紅色
+        } else {
+          this.classList.remove('bi-heart');
+          this.classList.add('bi-heart-fill', 'saved');
+          this.style.color = 'red';
+        }
 
-    // 你可以在這裡觸發 AJAX 送出收藏狀態
-    // sendFavoriteStatus(dId, !isSaved);
-  });
-});
-</script>
+        // 你可以在這裡觸發 AJAX 送出收藏狀態
+        // sendFavoriteStatus(dId, !isSaved);
+      });
+    });
+  </script>
 
 
 
