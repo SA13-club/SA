@@ -101,6 +101,15 @@
       background-color: #f8f9fa;
       border-left: 4px solid rgb(18, 226, 36);
     }
+
+    .favorite-icon {
+      cursor: pointer;
+    }
+
+    .favorite-icon:hover {
+      color: red;
+    }
+
   </style>
 </head>
 
@@ -655,18 +664,19 @@
 
               echo "<div class='dcard-footer'>";
               if ($contact_name) {
-                echo "
-          <span>👤 聯絡人：{$contact_name}</span>
-          <span>📞 電話：{$contact_phone}</span>
-          <span>✉️ Email：{$contact_email}</span>
+                $iconClass = $saved ? 'bi-heart-fill saved' : 'bi-heart';
+                $iconStyle = $saved ? 'color:red;' : '';
 
-        
-                              
-            <i class='bi "
-                  . ($saved ? "bi-heart-fill saved" : "bi-heart")
-                  . "' data-id='{$d_id}' title='收藏'></i>
+              echo "
+              <span>👤 聯絡人：{$contact_name}</span>
+              <span>📞 電話：{$contact_phone}</span>
+              <span>✉️ Email：{$contact_email}</span>
 
-      ";
+              <i class='bi {$iconClass} favorite-icon' 
+                data-id='{$d_id}' 
+                title='收藏'
+                style='{$iconStyle}'></i>
+            ";
               } else {
                 echo "<span>尚無聯絡資料</span>";
               }
@@ -1014,7 +1024,34 @@
 
       });
     });
+
   </script>
+  <script>
+document.querySelectorAll('.favorite-icon').forEach(icon => {
+  icon.addEventListener('click', function(event) {
+    event.stopPropagation(); // 不讓點擊觸發 a 連結
+    event.preventDefault();
+
+    const isSaved = this.classList.contains('bi-heart-fill');
+    const dId = this.dataset.id;
+
+    // 切換圖示與顏色
+    if (isSaved) {
+      this.classList.remove('bi-heart-fill', 'saved');
+      this.classList.add('bi-heart');
+      this.style.color = ''; // 取消紅色
+    } else {
+      this.classList.remove('bi-heart');
+      this.classList.add('bi-heart-fill', 'saved');
+      this.style.color = 'red';
+    }
+
+    // 你可以在這裡觸發 AJAX 送出收藏狀態
+    // sendFavoriteStatus(dId, !isSaved);
+  });
+});
+</script>
+
 
 
 
