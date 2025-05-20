@@ -241,7 +241,7 @@ $current_perm      = $_SESSION['u_permission'] ?? '';
 $filter_enterprise = ($current_perm === '組織團體');
 
 // 提取標題與內容的 function
-function getDemandTitleContent($conn, $d_id, $tag, $permission) {
+function getDemandTitleContent($conn, $d_id, $tag, $permission ) {
     if ($tag === 'spon') {
         if ($permission === '組織團體') {
             $sql = "SELECT event_name AS title, event_description AS content FROM org_donate WHERE d_id = ?";
@@ -251,7 +251,7 @@ function getDemandTitleContent($conn, $d_id, $tag, $permission) {
             $sql = "SELECT title, content FROM cor_spons WHERE d_id = ?";
         }
     } elseif ($tag === '合作') {
-        if ($permission === '組織團體') {
+        if ($_SESSION['u_permission']=== '組織團體') {
             $sql = "SELECT coop_name AS title, coop_desc AS content FROM club_coop WHERE d_id = ?";
         } else {
             $sql = "SELECT coop_name AS title, coop_desc AS content FROM corp_coop WHERE d_id = ?";

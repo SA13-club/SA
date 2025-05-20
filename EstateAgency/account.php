@@ -1,7 +1,9 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
+    
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>CoLaB</title>
@@ -160,6 +162,7 @@
     </style>
 
 </head>
+
 
 <body class="starter-page-page" style="
   padding-top: 100px;background-image: url('./assets/img/bg2.png');
@@ -396,7 +399,7 @@ if ($currentUser) {
   $resFav = mysqli_query($conn, "
     SELECT d_id
       FROM user_favorites
-     WHERE user_email = '" . mysqli_real_escape_string($conn, $currentUser) . "'
+     WHERE user_email = '" . $currentUser . "'
   ");
   while ($fav = mysqli_fetch_assoc($resFav)) {
     $myFavs[] = (int)$fav['d_id'];
