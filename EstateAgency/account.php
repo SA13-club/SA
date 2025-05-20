@@ -739,9 +739,11 @@ if ($currentUser) {
                                                         <div>
                                                             
                                                             <div class='star-rating' data-rating='$feedbackScore' data-match-id='{$r['d_id']}'>";
+                                                            if($r['status']==='completed'){
                                                                 for ($i = 1; $i <= 5; $i++) {
                                                                     $selected = ($i <= $feedbackScore) ? "selected" : "";
                                                                     echo "<span class='star $selected' data-value='$i'>★</span>";
+                                                                }
                                                                 }
                                                 echo "
                                                             </div>
