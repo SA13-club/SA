@@ -198,20 +198,23 @@
               <div class="col-md-3">
                 <select class="form-select form-select-lg" name="type">
                   <?php
+                  $u_permission=$_SESSION['u_permission'];
                   $link = mysqli_connect('localhost', 'root', '', 'sa');
                   if (!$link) {
                     die('連線失敗: ' . mysqli_connect_error());
                   }
 
-                  $tag_sql = "SELECT DISTINCT tag FROM demanded WHERE tag IS NOT NULL AND tag != ''";
+                  $tag_sql = "SELECT DISTINCT tag FROM demanded WHERE tag IS NOT NULL AND tag != '' AND u_permission !='$u_permission'";
                   $tag_result = mysqli_query($link, $tag_sql);
+                echo '<option value="all">全部</option>'; // 預設加入「全部」選項
 
-                  while ($row = mysqli_fetch_assoc($tag_result)) {
+                while ($row = mysqli_fetch_assoc($tag_result)) {
                     $tag_value = htmlspecialchars($row['tag']);
                     $tag_display = $tag_value === 'spon' ? '贊助' : ($tag_value === 'intern' ? '實習' : $tag_value);
 
                     echo "<option value=\"$tag_value\">$tag_display</option>";
-                  }
+                }
+
 
 
                   session_start();

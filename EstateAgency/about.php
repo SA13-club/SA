@@ -122,16 +122,43 @@
 
           <div class="col-lg-6 content" data-aos="fade-up" data-aos-delay="100">
             <p class="who-we-are">天天開心</p>
-            <h3>遵命老闆</h3>
+            <h3>註冊與登入</h3>
             <p class="fst-italic">
               保證完成您的廣告需求 廣告找CoLaB 連結年輕無極限
             </p>
             <ul>
-              <li><i class="bi bi-check-circle"></i> <span>廣告找CoLaB 廣告觸及無設限</span></li>
-              <li><i class="bi bi-check-circle"></i> <span>廣告找CoLaB 廣告成效看得見</span></li>
+              <li><i class="bi bi-check-circle"></i> <span>註冊與登入</span></li>
+              <li><i class="bi bi-check-circle"></i> <span>填寫資訊建立基本資料</span></li>
               <li><i class="bi bi-check-circle"></i> <span>廣告找CoLaB 廣告聲量大無邊</span></li>
             </ul>
           </div>
+
+          <div class="col-lg-6 about-images" data-aos="fade-up" data-aos-delay="200">
+            <div class="row gy-4">
+              <div class="col-lg-6">
+                <img src="assets/img/about-company-1.jpg" class="img-fluid" alt="">
+              </div>
+              <div class="col-lg-6">
+                <div class="row gy-4">
+                  <div class="col-lg-10">
+                    <img src="assets/img/about-company-2.jpg" class="img-fluid" alt="">
+                  </div>
+                  <div class="col-lg-12">
+                    <img src="assets/img/about-company-3.jpg" class="img-fluid" alt="">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+
+
+        </div>
+
+        <br><br>
+        <div class="row gy-4">
+
 
           <div class="col-lg-6 about-images" data-aos="fade-up" data-aos-delay="200">
             <div class="row gy-4">
@@ -151,8 +178,23 @@
             </div>
 
           </div>
+          
+          <div class="col-lg-6 content" data-aos="fade-up" data-aos-delay="100">
+            <p class="who-we-are">天天開心</p>
+            <h3>遵命老闆</h3>
+            <p class="fst-italic">
+              保證完成您的廣告需求 廣告找CoLaB 連結年輕無極限
+            </p>
+            <ul>
+              <li><i class="bi bi-check-circle"></i> <span>廣告找CoLaB 廣告觸及無設限</span></li>
+              <li><i class="bi bi-check-circle"></i> <span>廣告找CoLaB 廣告成效看得見</span></li>
+              <li><i class="bi bi-check-circle"></i> <span>廣告找CoLaB 廣告聲量大無邊</span></li>
+            </ul>
+          </div>
 
         </div>
+
+      
 
       </div>
     </section><!-- /About Section -->
