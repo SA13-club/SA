@@ -321,7 +321,7 @@
                       $resFav = mysqli_query($link, "
     SELECT d_id
       FROM user_favorites
-     WHERE user_email = '" . mysqli_real_escape_string($link, $currentUser) . "'
+     WHERE user_email = '" . $currentUser . "'
   ");
                       while ($fav = mysqli_fetch_assoc($resFav)) {
                         $myFavs[] = (int)$fav['d_id'];

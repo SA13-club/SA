@@ -2,85 +2,88 @@
 session_start();
 $me = $_SESSION['u_email'] ?? '';
 if (!$me) {
-    echo json_encode(['status' => false, 'msg' => '未登入']);
-    exit;
+    echo json_encode(['status'=>false,'msg'=>'未登入']); exit;
 }
-
-$conn = new mysqli("localhost", "root", "", "sa");
+$conn = new mysqli("localhost","root","","sa");
 if ($conn->connect_error) {
-    echo json_encode(['status' => false, 'msg' => '資料庫連線失敗']);
-    exit;
+    echo json_encode(['status'=>false,'msg'=>'DB 連線失敗']); exit;
 }
 
-$d_id = $_POST['d_id'] ?? '';
+$d_id = intval($_POST['d_id'] ?? 0);
 $step = $_POST['step'] ?? '';
-
 if (!$d_id || !$step) {
-    echo json_encode(['status' => false, 'msg' => '缺少參數']);
-    exit;
+    echo json_encode(['status'=>false,'msg'=>'缺少參數']); exit;
 }
 
-// 先查出這筆合作資料
+// 先取出這筆合作
 $stmt = $conn->prepare("SELECT * FROM match_db WHERE d_id = ?");
-$stmt->bind_param("i", $d_id);
+$stmt->bind_param("i",$d_id);
 $stmt->execute();
-$result = $stmt->get_result();
-$row = $result->fetch_assoc();
+$row = $stmt->get_result()->fetch_assoc();
 $stmt->close();
-
 if (!$row) {
-    echo json_encode(['status' => false, 'msg' => '找不到合作資料']);
-    exit;
+    echo json_encode(['status'=>false,'msg'=>'找不到合作資料']); exit;
 }
 
+// 檢查身分
 $isA = $me === $row['a_u_email'];
 $isB = $me === $row['b_u_email'];
-
 if (!$isA && !$isB) {
-    echo json_encode(['status' => false, 'msg' => '你不是這筆合作的其中一方']);
-    exit;
+    echo json_encode(['status'=>false,'msg'=>'你不是此合作的任一方']); exit;
 }
-
 $who = $isA ? 'a' : 'b';
 
-// 處理按鈕行為
-if (in_array($step, ['agree', 'complete'])) {
+// 處理「同意」或「完成」
+if (in_array($step, ['agree','complete'])) {
+    // 更新單方 agree_x 或 complete_x
     $field = "{$step}_{$who}";
-    $sql = "UPDATE match_db SET $field = 1 WHERE d_id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $d_id);
-    $stmt->execute();
-    $stmt->close();
+    $upd = $conn->prepare("UPDATE match_db SET `$field` = 1 WHERE d_id = ?");
+    $upd->bind_param("i",$d_id);
+    $upd->execute();
+    $upd->close();
 
-    // 自動檢查是否雙方都完成同意同步 → 進入下一階段
-    if ($step === 'agree' && $row['agree_a'] && $row['agree_b']) {
+    // 重新撈最新欄位
+    $fresh = $conn->prepare("
+        SELECT agree_a, agree_b, complete_a, complete_b 
+          FROM match_db 
+         WHERE d_id = ?
+    ");
+    $fresh->bind_param("i",$d_id);
+    $fresh->execute();
+    $f = $fresh->get_result()->fetch_assoc();
+    $fresh->close();
+
+    // 雙方都同意 → 進入洽談中
+    if ($step === 'agree' && $f['agree_a'] && $f['agree_b']) {
         $conn->query("UPDATE match_db SET status = 'negotiating' WHERE d_id = $d_id");
-    } elseif ($step === 'complete' && $row['complete_a'] && $row['complete_b']) {
-        // 注意：不會立即完成合作，等 terminate 動作
+    }
+    // 雙方都完成 → 直接標記 completed
+    if ($step === 'complete' && $f['complete_a'] && $f['complete_b']) {
+        $conn->query("UPDATE match_db SET status = 'completed' WHERE d_id = $d_id");
     }
 
-    echo json_encode(['status' => true, 'msg' => '更新成功']);
-    exit;
+    echo json_encode(['status'=>true,'msg'=>'更新成功']); exit;
 }
 
+// 處理「終結」
 if ($step === 'terminate') {
-    $terminate_field = "terminate_{$who}";
-    $conn->query("UPDATE match_db SET $terminate_field = 1 WHERE d_id = $d_id");
+    $term = $conn->prepare("UPDATE match_db SET terminate_{$who} = 1 WHERE d_id = ?");
+    $term->bind_param("i",$d_id);
+    $term->execute();
+    $term->close();
 
-    // 再次取得最新資料檢查是否可以完成合作
-    $res = $conn->query("SELECT * FROM match_db WHERE d_id = $d_id");
-    $new = $res->fetch_assoc();
-
+    // 再次檢查所有旗標
+    $chk = $conn->query("SELECT agree_a,agree_b,complete_a,complete_b,terminate_a,terminate_b FROM match_db WHERE d_id = $d_id");
+    $n = $chk->fetch_assoc();
     if (
-        $new['agree_a'] == 1 && $new['agree_b'] == 1 &&
-        $new['complete_a'] == 1 && $new['complete_b'] == 1 &&
-        ($new['terminate_a'] == 1 || $new['terminate_b'] == 1)
+       $n['agree_a'] && $n['agree_b'] &&
+       $n['complete_a'] && $n['complete_b'] &&
+       ($n['terminate_a'] || $n['terminate_b'])
     ) {
         $conn->query("UPDATE match_db SET status = 'completed' WHERE d_id = $d_id");
     }
 
-    echo json_encode(['status' => true, 'msg' => '終結合作已處理']);
-    exit;
+    echo json_encode(['status'=>true,'msg'=>'終結合作已處理']); exit;
 }
 
-echo json_encode(['status' => false, 'msg' => '未知操作']);
+echo json_encode(['status'=>false,'msg'=>'未知操作']);

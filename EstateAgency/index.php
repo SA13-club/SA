@@ -214,10 +214,19 @@ $isLoggedIn = isset($_SESSION['u_email']);
 $filter_enterprise = ($current_perm === '企業');
 $permission = $filter_enterprise ? '企業' : '組織團體';
 
+<<<<<<< HEAD
 // 提取文章標題與內容
 function getDemandTitleContent($conn, $d_id, $tag, $permission) {
     if (!$permission) $permission = '組織團體'; // 防呆（未登入者）
 
+=======
+// 判斷使用者身分
+$current_perm      = $_SESSION['u_permission'] ?? '';
+$filter_enterprise = ($current_perm === '組織團體');
+
+// 提取標題與內容的 function
+function getDemandTitleContent($conn, $d_id, $tag, $permission ) {
+>>>>>>> 61d4e5887cae0c9f822f84295e4948a059ace731
     if ($tag === 'spon') {
         if ($permission === '組織團體') {
             $sql = "SELECT event_name AS title, event_description AS content FROM org_donate WHERE d_id = ?";
@@ -227,7 +236,13 @@ function getDemandTitleContent($conn, $d_id, $tag, $permission) {
             $sql = "SELECT title, content FROM cor_spons WHERE d_id = ?";
         }
     } elseif ($tag === '合作') {
+<<<<<<< HEAD
         if ($_SESSION['u_permission'] === '企業') {
+=======
+        if ($_SESSION['u_permission']=== '組織團體') {
+            $sql = "SELECT coop_name AS title, coop_desc AS content FROM club_coop WHERE d_id = ?";
+        } else {
+>>>>>>> 61d4e5887cae0c9f822f84295e4948a059ace731
             $sql = "SELECT coop_name AS title, coop_desc AS content FROM corp_coop WHERE d_id = ?";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param('i', $d_id);
