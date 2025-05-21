@@ -415,7 +415,7 @@ $savedSql = "
   LEFT JOIN org_donate o  ON d.d_id = o.d_id
   LEFT JOIN cor_spons c   ON d.d_id = c.d_id
   LEFT JOIN cor_intern i  ON d.d_id = i.d_id
-  LEFT JOIN org_coop co   ON d.d_id = co.d_id
+  LEFT JOIN club_coop co   ON d.d_id = co.d_id
   LEFT JOIN corp_coop co2 ON d.d_id = co2.d_id
   WHERE uf.user_email = ?
   ORDER BY d.d_date DESC
