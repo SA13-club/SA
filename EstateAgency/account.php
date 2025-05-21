@@ -159,6 +159,16 @@
         background: transparent !important;
         z-index: 1;
         }
+
+        .clamp-4 {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 4; /* 限制三行 */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.5em; /* 依你版面調整 */
+        max-height: 6em; /* 1.5em * 3行 */
+        }
     </style>
 
 </head>
@@ -348,19 +358,6 @@
         JOIN cor_intern i ON d.d_id = i.d_id 
         WHERE d.u_email = ?
     ) UNION (
-        SELECT d.d_id, d.tag, d.d_date,
-               NULL AS donate_title,
-               NULL AS spons_title,
-               NULL AS intern_title,
-               co.coop_name AS coop_title,
-               NULL AS donate_c_name, NULL AS donate_c_phone, NULL AS donate_c_email,
-               NULL AS spons_c_name, NULL AS spons_c_phone, NULL AS spons_c_email,
-               NULL AS intern_c_name, NULL AS intern_c_phone, NULL AS intern_c_email,
-               co.c_name AS coop_c_name, co.c_phone AS coop_c_phone, co.c_email AS coop_c_email
-        FROM demanded d 
-        JOIN org_coop co ON d.d_id = co.d_id 
-        WHERE d.u_email = ?
-    ) UNION (
     SELECT d.d_id, d.tag, d.d_date,
            NULL AS donate_title,
            NULL AS spons_title,
@@ -392,25 +389,10 @@
 
 
 
-        $stmt->bind_param("ssssss", $u_email, $u_email, $u_email, $u_email, $u_email, $u_email);
+        $stmt->bind_param("sssss", $u_email, $u_email, $u_email, $u_email, $u_email);
         $stmt->execute();
         $result = $stmt->get_result();
         ?>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 <?php
@@ -463,18 +445,6 @@ if ($currentUser) {
 }
 ?>
 
-
-
-
-
-
-
-
-
-
-
-
-
         <!-- Page Title -->
         <div class="page-title" data-aos="fade">
             <nav class="breadcrumbs">
@@ -514,8 +484,7 @@ if ($currentUser) {
                                             <p>📞 <strong>聯絡人電話：</strong><?= htmlspecialchars($data['e_phone']) ?></p>
                                         </li>
                                         <li>
-                                            <p>📜 <strong>公司簡介：</strong></p>
-                                            <p><?= nl2br(htmlspecialchars($data['u_content'])) ?></p>
+                                            <p class="clamp-4">📜 <strong>公司簡介：</strong><?= nl2br(htmlspecialchars($data['u_content'])) ?></p>
                                         </li>
                                     <?php elseif ($u_permission === '組織團體'): ?>
                                         <li>
@@ -534,7 +503,7 @@ if ($currentUser) {
                                             <p>📞 <strong>聯絡人電話：</strong><?= htmlspecialchars($data['s_phone']) ?></p>
                                         </li>
                                         <li>
-                                            <p>📜 <strong>組織簡介：</strong><?= nl2br(htmlspecialchars($data['u_content'])) ?></p>
+                                            <p class="clamp-4">📜 <strong>組織簡介：</strong><?= nl2br(htmlspecialchars($data['u_content'])) ?></p>
                                         </li>
                                     <?php endif; ?>
                                 </ul>
@@ -648,7 +617,7 @@ if ($currentUser) {
 
                                         <label>平台會員訊息</label>
                                         <div class='col-md-5'><input type='email' class='form-control' name='u_email' value="<?= $data['u_email'] ?>" placeholder='Email' required></div>
-                                        <div class='col-md-5'><input type='text' class='form-control' name='u_password' value="<?= $account['u_password'] ?>" placeholder='密碼' required></div>
+                                        <div class='col-md-5'><input type='text' class='form-control' name='u_password' value="<?= $account['u_password'] ?>" placeholder='密碼' readonly></div>
                                         <div class='col-md-12'><textarea class='form-control' name='u_content' rows='5' placeholder='公司簡介' required><?= htmlspecialchars($account['u_content']) ?></textarea></div>
 
                                         <div class='col-md-12 text-center'><button type='submit'>更改</button></div>
@@ -881,11 +850,11 @@ if ($currentUser) {
                                                 <span>✉️ Email：<?= htmlspecialchars($contact_email) ?></span>
 
                                                 <?php 
-  echo "<i class=\"bi {$iconClass} favorite-icon\" "
-     . "data-id=\"{$d_id}\" "
-     . "title=\"收藏\" "
-     . "style=\"{$iconStyle}\"></i>";
-?>
+                                                    echo "<i class=\"bi {$iconClass} favorite-icon\" "
+                                                        . "data-id=\"{$d_id}\" "
+                                                        . "title=\"收藏\" "
+                                                        . "style=\"{$iconStyle}\"></i>";
+                                                ?>
 
                                             </div>
                                               
@@ -1113,14 +1082,6 @@ if ($currentUser) {
             }
         });
     </script>
-
-
-
-
-
-
-
-
 
   <!-- 儲存文章 -->
 
