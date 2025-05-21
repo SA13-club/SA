@@ -479,9 +479,9 @@
               // Step 4：輸出結果
               if (!empty($foundDemands)) {
                   if (!$hasPermission) {
-                      echo "<p>目前為訪客模式，以下為近期可媒合需求：</p>";
+                      echo '<h3 data-aos="fade-up" data-aos-delay="150">以下為推薦的文章</h3>';
                   } else {
-                      echo "<h3>選定文章列表</h3>";
+                      echo '<h3 data-aos="fade-up" data-aos-delay="150">選定文章列表</h3>';
                   }
 
                   foreach ($foundDemands as $d) {
