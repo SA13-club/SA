@@ -169,6 +169,63 @@
         line-height: 1.5em; /* 依你版面調整 */
         max-height: 6em; /* 1.5em * 3行 */
         }
+
+        .progress-steps {
+            display: flex;
+            align-items: center;
+            margin-top: 8px;
+        }
+
+        .step {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            color: #ccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            background-color: white;
+            z-index: 1;
+        }
+
+        .step.active {
+            border-color: #28c76f; /* 主色綠色 */
+            color: #28c76f;
+            font-weight: bold;
+        }
+
+        .step.waiting {
+            border-color: orange;
+            color: orange;
+            font-weight: bold;
+        }
+        .step.not-accepted {
+            border-color: red;
+            color: red;
+            font-weight: bold;
+        }
+        .step.active {
+            border-color: #28c76f;
+            color: #28c76f;
+            font-weight: bold;
+        }
+        .connector {
+            flex: 1;
+            height: 2px;
+            background-color: #ccc;
+            margin: 0 5px;
+            z-index: 0;
+        }
+        .connector.active-green {
+            background-color: #28c76f;
+        }
+        .connector.active-orange {
+            background-color: orange;
+        }
+
+
     </style>
 
 </head>
@@ -688,63 +745,146 @@ if ($currentUser) {
                                         }
 
                                         // Render Block
+
                                         function renderBlock($title, $rows, $step, $label, $me, $conn) {
                                             if (empty($rows)) return;
                                             echo "<h3>$title</h3>";
                                             foreach ($rows as $r) {
-                                                // 取 partner
-                                                $partner = ($r['a_u_email']===$me)? $r['b_u_email']:$r['a_u_email'];
-                                                // 取 tag
+                                                $partner = ($r['a_u_email'] === $me) ? $r['b_u_email'] : $r['a_u_email'];
+
                                                 $t = $conn->prepare("SELECT tag FROM demanded WHERE d_id=?");
-                                                $t->bind_param("s",$r['demanded_id']
-                                            );
-                                                
+                                                $t->bind_param("s", $r['demanded_id']);
                                                 $t->execute();
                                                 $tag = htmlspecialchars($t->get_result()->fetch_assoc()['tag'] ?? '');
                                                 $t->close();
-                                                // 取專案標題
+
                                                 switch ($tag) {
                                                     case '企業合作': $tbl='corp_coop';  $key='coop_name'; break;
                                                     case '社團合作': $tbl='club_coop';  $key='coop_name'; break;
-                                                    case 'spon':      $tbl='org_donate'; $key='event_name';    $tag='贊助'; break;
-                                                    case '贊助':      $tbl='cor_spons';  $key='title';    break;
+                                                    case 'spon':      $tbl='org_donate'; $key='event_name'; $tag='贊助'; break;
+                                                    case '贊助':      $tbl='cor_spons';  $key='title'; break;
                                                     case '實習':      $tbl='cor_intern'; $key='intern_title'; break;
-                                                    default:          $tbl=''; $key='';             break;
+                                                    default:          $tbl=''; $key=''; break;
                                                 }
+
                                                 $proj = '';
                                                 if ($tbl) {
                                                     $u = $conn->prepare("SELECT $key FROM $tbl WHERE d_id=?");
-                                                    $u->bind_param("s",$r['demanded_id']);
+                                                    $u->bind_param("s", $r['demanded_id']);
                                                     $u->execute();
                                                     $proj = htmlspecialchars($u->get_result()->fetch_assoc()[$key] ?? '');
                                                     $u->close();
                                                 }
-                                                // 決定按鈕文字
-                                                $who = ($r['a_u_email']===$me)?'a':'b';
-                                                $confirmed = $r["{$step}_{$who}"];
-                                                // 如果我已經按過，就顯示「等待對方 + 標籤」，否則「我 + 標籤」
-                                                
-                                                $btnText = $confirmed
-                                                        ? "等待對方$label"
-                                                        : "我$label";
-                                                // 卡片
-                                                // 假設 $me 是目前登入者 email，已經有：$me = $_SESSION['email'];
-                                                $feedbackScore = 0;
-                                                $isA = $me === $r['a_u_email'];
 
-                                                if ($isA) {
+                                                $who = ($r['a_u_email'] === $me) ? 'a' : 'b';
+                                                $confirmed = $r["{$step}_{$who}"];
+                                                $btnText = $confirmed ? "等待對方$label" : "我$label";
+
+                                                $feedbackScore = 0;
+                                                if ($me === $r['a_u_email']) {
                                                     $feedbackScore = $r['a_feedback'];
                                                 } elseif ($me === $r['b_u_email']) {
                                                     $feedbackScore = $r['b_feedback'];
                                                 }
 
+                                                // 判斷進度階段
+                                                $stepIndex = 1;
+                                                if ($r['status'] === 'pending') {
+                                                    $stepIndex = 1;
+                                                } elseif ($r['status'] === 'negotiating') {
+                                                    $stepIndex = 2;
+                                                } elseif ($r['status'] === 'completed') {
+                                                    $stepIndex = 3;
+                                                }
+
+                                                // 第一階段狀態判斷
+                                                $isWaitingStep1 = false;
+                                                $isNotAcceptedStep1 = false;
+                                                $waitingText1 = '';
+
+                                                // 第二階段狀態判斷
+                                                $isWaitingStep2 = false;
+                                                $isNotAcceptedStep2 = false;
+                                                $waitingText2 = '';
+
+                                                if ($r['status'] === 'pending') {
+                                                    if ($r['agree_a'] == 1 && $r['agree_b'] == 0) {
+                                                        if ($me === $r['a_u_email']) {
+                                                            $isWaitingStep1 = true;
+                                                            $waitingText1 = "你已發出合作，等待對方接受";
+                                                        } elseif ($me === $r['b_u_email']) {
+                                                            $isNotAcceptedStep1 = true;
+                                                            $waitingText1 = "你尚未接受對方合作邀請";
+                                                        }
+                                                    } elseif ($r['agree_b'] == 1 && $r['agree_a'] == 0) {
+                                                        if ($me === $r['b_u_email']) {
+                                                            $isWaitingStep1 = true;
+                                                            $waitingText1 = "你已發出合作，等待對方接受";
+                                                        } elseif ($me === $r['a_u_email']) {
+                                                            $isNotAcceptedStep1 = true;
+                                                            $waitingText1 = "你尚未接受對方合作邀請";
+                                                        }
+                                                    }
+                                                } elseif ($r['status'] === 'negotiating') {
+                                                    $meIsA = ($me === $r['a_u_email']);
+                                                    $meIsB = ($me === $r['b_u_email']);
+
+                                                    $meCompleteFlag = $meIsA ? $r['complete_a'] : ($meIsB ? $r['complete_b'] : 0);
+                                                    $otherCompleteFlag = $meIsA ? $r['complete_b'] : ($meIsB ? $r['complete_a'] : 0);
+
+                                                    if ($meCompleteFlag == 1 && $otherCompleteFlag == 0) {
+                                                        $isWaitingStep2 = true;
+                                                        $waitingText2 = "你已完成洽談，等待對方完成";
+                                                    } elseif ($meCompleteFlag == 0) {
+                                                        $isNotAcceptedStep2 = true;
+                                                        $waitingText2 = "你尚未完成洽談";
+                                                    }
+                                                }
+
+                                                // Step 顏色 class
+                                                $step1Class = $isWaitingStep1 ? 'waiting' : ($isNotAcceptedStep1 ? 'not-accepted' : (($stepIndex >= 1) ? 'active' : ''));
+                                                $step2Class = $isWaitingStep2 ? 'waiting' : ($isNotAcceptedStep2 ? 'not-accepted' : (($stepIndex >= 2) ? 'active' : ''));
+                                                $step3Class = ($stepIndex >= 3) ? 'active' : '';
+
+                                                // 連接線顏色判斷 (符合你的需求)
+                                                $connector1Class = '';
+                                                $connector2Class = '';
+
+                                                if ($stepIndex == 1) {
+                                                    // 進度在1：第一條線橘色，第二條線灰色
+                                                    $connector1Class = 'active-orange';
+                                                    $connector2Class = '';
+                                                } elseif ($stepIndex == 2) {
+                                                    // 進度在1到2：第一條線綠色，第二條線橘色
+                                                    $connector1Class = 'active-green';
+                                                    $connector2Class = 'active-orange';
+                                                } elseif ($stepIndex >= 3) {
+                                                    // 進度3以上：兩條線綠色
+                                                    $connector1Class = 'active-green';
+                                                    $connector2Class = 'active-green';
+                                                }
+
                                                 echo "
                                                 <div class='dcard-post'>
                                                     <div class='dcard-header'><span class='dcard-tag'>#$tag</span></div>
+                                                    <div class='progress-steps' style='margin-bottom: 15px;'>
+                                                        <div class='step $step1Class'>1</div>
+                                                        <div class='connector $connector1Class'></div>
+                                                        <div class='step $step2Class'>2</div>
+                                                        <div class='connector $connector2Class'></div>
+                                                        <div class='step $step3Class'>3</div>
+                                                    </div>";
+
+                                                if ($isWaitingStep2 || $isNotAcceptedStep2) {
+                                                    echo "<p style='color:" . ($isWaitingStep2 ? 'orange' : 'red') . "; font-weight: bold; margin-top: 5px;'>$waitingText2</p>";
+                                                } elseif ($isWaitingStep1 || $isNotAcceptedStep1) {
+                                                    echo "<p style='color:" . ($isWaitingStep1 ? 'orange' : 'red') . "; font-weight: bold; margin-top: 5px;'>$waitingText1</p>";
+                                                }
+
+                                                echo "
                                                     <div class='dcard-body'>
                                                         <p><strong>合作夥伴：</strong>$partner</p>
-                                                       <p><strong>專案名稱：</strong><a href='./property-single.php?id={$r['demanded_id']}'>$proj</a></p>
-
+                                                        <p><strong>專案名稱：</strong><a href='./property-single.php?id={$r['demanded_id']}'>$proj</a></p>
                                                         <p><strong>開始日期：</strong>{$r['d_date']}</p>
                                                         <p><strong>狀態：</strong>$title</p>
                                                     </div>
@@ -756,40 +896,32 @@ if ($currentUser) {
                                                                     data-step='$step'>
                                                                 $btnText
                                                             </button>
-                                                            
-
-
-
                                                         </div>
                                                         <div>
-                                                            
                                                             <div class='star-rating' data-rating='$feedbackScore' data-match-id='{$r['d_id']}'>";
-                                                            if($r['status']==='completed'){
+                                                            if ($r['status'] === 'completed') {
                                                                 for ($i = 1; $i <= 5; $i++) {
                                                                     $selected = ($i <= $feedbackScore) ? "selected" : "";
                                                                     echo "<span class='star $selected' data-value='$i'>★</span>";
                                                                 }
-                                                                }
-                                                echo "
-                                                            </div>
+                                                            }
+                                                echo "</div>
                                                             <a class='btn chat-button' style='background-color:#28c76f;color:white; margin-left: 10px; border-radius: 100%;'
-                                                            href='./chat/public/index .php?u_email=".urlencode($me)."&receiver=".urlencode($partner)."' 
+                                                            href='./chat/public/index.php?u_email=" . urlencode($me) . "&receiver=" . urlencode($partner) . "' 
                                                             target='_blank'><i class='bi bi-chat-dots-fill'></i></a>
                                                         </div>
                                                     </div>
                                                 </div>";
-
                                             }
                                         }
-
                                         // 輸出
                                         renderBlock('同意申請',   $pending,     'agree',    '同意',     $me, $conn);
                                         renderBlock('洽談中',     $negotiating, 'complete', '同意完成',     $me, $conn);
                                         renderBlock('已完成合作', $completed,   'terminate','已完成合作', $me, $conn);
 
                                         $conn->close();
-                                        ?>
-                            </div>
+                                    ?>
+                        </div>
 
                         <div id="saved-section" class="section-content">
                             
