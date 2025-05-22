@@ -360,6 +360,8 @@
             $stmt = $conn->prepare("SELECT * FROM Corporation_Registrations WHERE u_email = ?");
         } else if ($u_permission == '組織團體') {
             $stmt = $conn->prepare("SELECT * FROM Organization_Registrations WHERE u_email = ?");
+        }else if ($u_permission == '管理者') {
+            $stmt = $conn->prepare("SELECT * FROM user_account WHERE u_email = ?");
         } else {
             die("無效的使用者權限");
         }
@@ -375,80 +377,156 @@
         $result_user = $stmt_user->get_result();
         $account = $result_user->fetch_assoc();
 
-        $stmt = $conn->prepare("(
-        SELECT d.d_id, d.tag, d.d_date,
-               o.event_name AS donate_title,
-               NULL AS spons_title,
-               NULL AS intern_title,
-               NULL AS coop_title,
-               o.c_name AS donate_c_name, o.c_phone AS donate_c_phone, o.c_email AS donate_c_email,
-               NULL AS spons_c_name, NULL AS spons_c_phone, NULL AS spons_c_email,
-               NULL AS intern_c_name, NULL AS intern_c_phone, NULL AS intern_c_email,
-               NULL AS coop_c_name, NULL AS coop_c_phone, NULL AS coop_c_email
-        FROM demanded d 
-        JOIN org_donate o ON d.d_id = o.d_id 
-        WHERE d.u_email = ?
-    ) UNION (
-        SELECT d.d_id, d.tag, d.d_date,
-               NULL AS donate_title,
-               c.title AS spons_title,
-               NULL AS intern_title,
-               NULL AS coop_title,
-               NULL AS donate_c_name, NULL AS donate_c_phone, NULL AS donate_c_email,
-               c.c_name AS spons_c_name, c.c_phone AS spons_c_phone, c.c_email AS spons_c_email,
-               NULL AS intern_c_name, NULL AS intern_c_phone, NULL AS intern_c_email,
-               NULL AS coop_c_name, NULL AS coop_c_phone, NULL AS coop_c_email
-        FROM demanded d 
-        JOIN cor_spons c ON d.d_id = c.d_id 
-        WHERE d.u_email = ?
-    ) UNION (
-        SELECT d.d_id, d.tag, d.d_date,
-               NULL AS donate_title,
-               NULL AS spons_title,
-               i.intern_title AS intern_title,
-               NULL AS coop_title,
-               NULL AS donate_c_name, NULL AS donate_c_phone, NULL AS donate_c_email,
-               NULL AS spons_c_name, NULL AS spons_c_phone, NULL AS spons_c_email,
-               i.c_name AS intern_c_name, i.c_phone AS intern_c_phone, i.c_email AS intern_c_email,
-               NULL AS coop_c_name, NULL AS coop_c_phone, NULL AS coop_c_email
-        FROM demanded d 
-        JOIN cor_intern i ON d.d_id = i.d_id 
-        WHERE d.u_email = ?
-    ) UNION (
-    SELECT d.d_id, d.tag, d.d_date,
-           NULL AS donate_title,
-           NULL AS spons_title,
-           NULL AS intern_title,
-           co.coop_name AS coop_title,
-           NULL AS donate_c_name, NULL AS donate_c_phone, NULL AS donate_c_email,
-           NULL AS spons_c_name, NULL AS spons_c_phone, NULL AS spons_c_email,
-           NULL AS intern_c_name, NULL AS intern_c_phone, NULL AS intern_c_email,
-           co.c_name AS coop_c_name, co.c_phone AS coop_c_phone, co.c_email AS coop_c_email
-    FROM demanded d 
-    JOIN corp_coop co ON d.d_id = co.d_id 
-    WHERE d.u_email = ?
-) UNION (
-    SELECT d.d_id, d.tag, d.d_date,
-           NULL AS donate_title,
-           NULL AS spons_title,
-           NULL AS intern_title,
-           co.coop_name AS coop_title,
-           NULL AS donate_c_name, NULL AS donate_c_phone, NULL AS donate_c_email,
-           NULL AS spons_c_name, NULL AS spons_c_phone, NULL AS spons_c_email,
-           NULL AS intern_c_name, NULL AS intern_c_phone, NULL AS intern_c_email,
-           co.c_name AS coop_c_name, co.c_phone AS coop_c_phone, co.c_email AS coop_c_email
-    FROM demanded d 
-    JOIN club_coop co ON d.d_id = co.d_id 
-    WHERE d.u_email = ?
-)
-    ORDER BY d_date DESC
-    ");
-
-
-
-        $stmt->bind_param("sssss", $u_email, $u_email, $u_email, $u_email, $u_email);
-        $stmt->execute();
-        $result = $stmt->get_result();
+        if ($u_permission === '管理者') {
+            // 管理者：查詢被檢舉次數 >= 3
+            $sql = "(
+                SELECT d.d_id, d.tag, d.d_date,
+                       o.event_name AS donate_title,
+                       NULL AS spons_title,
+                       NULL AS intern_title,
+                       NULL AS coop_title,
+                       o.c_name AS donate_c_name, o.c_phone AS donate_c_phone, o.c_email AS donate_c_email,
+                       NULL AS spons_c_name, NULL AS spons_c_phone, NULL AS spons_c_email,
+                       NULL AS intern_c_name, NULL AS intern_c_phone, NULL AS intern_c_email,
+                       NULL AS coop_c_name, NULL AS coop_c_phone, NULL AS coop_c_email
+                FROM demanded d 
+                JOIN org_donate o ON d.d_id = o.d_id 
+                WHERE d.d_ban >= 3
+            ) UNION (
+                SELECT d.d_id, d.tag, d.d_date,
+                       NULL AS donate_title,
+                       c.title AS spons_title,
+                       NULL AS intern_title,
+                       NULL AS coop_title,
+                       NULL AS donate_c_name, NULL AS donate_c_phone, NULL AS donate_c_email,
+                       c.c_name AS spons_c_name, c.c_phone AS spons_c_phone, c.c_email AS spons_c_email,
+                       NULL AS intern_c_name, NULL AS intern_c_phone, NULL AS intern_c_email,
+                       NULL AS coop_c_name, NULL AS coop_c_phone, NULL AS coop_c_email
+                FROM demanded d 
+                JOIN cor_spons c ON d.d_id = c.d_id 
+                WHERE d.d_ban >= 3
+            ) UNION (
+                SELECT d.d_id, d.tag, d.d_date,
+                       NULL AS donate_title,
+                       NULL AS spons_title,
+                       i.intern_title AS intern_title,
+                       NULL AS coop_title,
+                       NULL AS donate_c_name, NULL AS donate_c_phone, NULL AS donate_c_email,
+                       NULL AS spons_c_name, NULL AS spons_c_phone, NULL AS spons_c_email,
+                       i.c_name AS intern_c_name, i.c_phone AS intern_c_phone, i.c_email AS intern_c_email,
+                       NULL AS coop_c_name, NULL AS coop_c_phone, NULL AS coop_c_email
+                FROM demanded d 
+                JOIN cor_intern i ON d.d_id = i.d_id 
+                WHERE d.d_ban >= 3
+            ) UNION (
+                SELECT d.d_id, d.tag, d.d_date,
+                       NULL AS donate_title,
+                       NULL AS spons_title,
+                       NULL AS intern_title,
+                       co.coop_name AS coop_title,
+                       NULL AS donate_c_name, NULL AS donate_c_phone, NULL AS donate_c_email,
+                       NULL AS spons_c_name, NULL AS spons_c_phone, NULL AS spons_c_email,
+                       NULL AS intern_c_name, NULL AS intern_c_phone, NULL AS intern_c_email,
+                       co.c_name AS coop_c_name, co.c_phone AS coop_c_phone, co.c_email AS coop_c_email
+                FROM demanded d 
+                JOIN corp_coop co ON d.d_id = co.d_id 
+                WHERE d.d_ban >= 3
+            ) UNION (
+                SELECT d.d_id, d.tag, d.d_date,
+                       NULL AS donate_title,
+                       NULL AS spons_title,
+                       NULL AS intern_title,
+                       co.coop_name AS coop_title,
+                       NULL AS donate_c_name, NULL AS donate_c_phone, NULL AS donate_c_email,
+                       NULL AS spons_c_name, NULL AS spons_c_phone, NULL AS spons_c_email,
+                       NULL AS intern_c_name, NULL AS intern_c_phone, NULL AS intern_c_email,
+                       co.c_name AS coop_c_name, co.c_phone AS coop_c_phone, co.c_email AS coop_c_email
+                FROM demanded d 
+                JOIN club_coop co ON d.d_id = co.d_id 
+                WHERE d.d_ban >= 3
+            )
+            ORDER BY d_date DESC";
+        
+            $stmt = $conn->prepare($sql);
+            $stmt->execute();
+            $result = $stmt->get_result();
+        
+        } else {
+            // 一般用戶：查詢自己的資料
+            $sql = "(
+                SELECT d.d_id, d.tag, d.d_date,
+                       o.event_name AS donate_title,
+                       NULL AS spons_title,
+                       NULL AS intern_title,
+                       NULL AS coop_title,
+                       o.c_name AS donate_c_name, o.c_phone AS donate_c_phone, o.c_email AS donate_c_email,
+                       NULL AS spons_c_name, NULL AS spons_c_phone, NULL AS spons_c_email,
+                       NULL AS intern_c_name, NULL AS intern_c_phone, NULL AS intern_c_email,
+                       NULL AS coop_c_name, NULL AS coop_c_phone, NULL AS coop_c_email
+                FROM demanded d 
+                JOIN org_donate o ON d.d_id = o.d_id 
+                WHERE d.u_email = ?
+            ) UNION (
+                SELECT d.d_id, d.tag, d.d_date,
+                       NULL AS donate_title,
+                       c.title AS spons_title,
+                       NULL AS intern_title,
+                       NULL AS coop_title,
+                       NULL AS donate_c_name, NULL AS donate_c_phone, NULL AS donate_c_email,
+                       c.c_name AS spons_c_name, c.c_phone AS spons_c_phone, c.c_email AS spons_c_email,
+                       NULL AS intern_c_name, NULL AS intern_c_phone, NULL AS intern_c_email,
+                       NULL AS coop_c_name, NULL AS coop_c_phone, NULL AS coop_c_email
+                FROM demanded d 
+                JOIN cor_spons c ON d.d_id = c.d_id 
+                WHERE d.u_email = ?
+            ) UNION (
+                SELECT d.d_id, d.tag, d.d_date,
+                       NULL AS donate_title,
+                       NULL AS spons_title,
+                       i.intern_title AS intern_title,
+                       NULL AS coop_title,
+                       NULL AS donate_c_name, NULL AS donate_c_phone, NULL AS donate_c_email,
+                       NULL AS spons_c_name, NULL AS spons_c_phone, NULL AS spons_c_email,
+                       i.c_name AS intern_c_name, i.c_phone AS intern_c_phone, i.c_email AS intern_c_email,
+                       NULL AS coop_c_name, NULL AS coop_c_phone, NULL AS coop_c_email
+                FROM demanded d 
+                JOIN cor_intern i ON d.d_id = i.d_id 
+                WHERE d.u_email = ?
+            ) UNION (
+                SELECT d.d_id, d.tag, d.d_date,
+                       NULL AS donate_title,
+                       NULL AS spons_title,
+                       NULL AS intern_title,
+                       co.coop_name AS coop_title,
+                       NULL AS donate_c_name, NULL AS donate_c_phone, NULL AS donate_c_email,
+                       NULL AS spons_c_name, NULL AS spons_c_phone, NULL AS spons_c_email,
+                       NULL AS intern_c_name, NULL AS intern_c_phone, NULL AS intern_c_email,
+                       co.c_name AS coop_c_name, co.c_phone AS coop_c_phone, co.c_email AS coop_c_email
+                FROM demanded d 
+                JOIN corp_coop co ON d.d_id = co.d_id 
+                WHERE d.u_email = ?
+            ) UNION (
+                SELECT d.d_id, d.tag, d.d_date,
+                       NULL AS donate_title,
+                       NULL AS spons_title,
+                       NULL AS intern_title,
+                       co.coop_name AS coop_title,
+                       NULL AS donate_c_name, NULL AS donate_c_phone, NULL AS donate_c_email,
+                       NULL AS spons_c_name, NULL AS spons_c_phone, NULL AS spons_c_email,
+                       NULL AS intern_c_name, NULL AS intern_c_phone, NULL AS intern_c_email,
+                       co.c_name AS coop_c_name, co.c_phone AS coop_c_phone, co.c_email AS coop_c_email
+                FROM demanded d 
+                JOIN club_coop co ON d.d_id = co.d_id 
+                WHERE d.u_email = ?
+            )
+            ORDER BY d_date DESC";
+        
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("sssss", $u_email, $u_email, $u_email, $u_email, $u_email);
+            $stmt->execute();
+            $result = $stmt->get_result();
+        }
+        
         ?>
 
 
@@ -477,6 +555,7 @@ $savedSql = "
   WHERE uf.user_email = ?
   ORDER BY d.d_date DESC
 ";
+
 
 // 2. 執行查詢
 $stmt = $conn->prepare($savedSql);
@@ -562,10 +641,26 @@ if ($currentUser) {
                                         <li>
                                             <p class="clamp-4">📜 <strong>組織簡介：</strong><?= nl2br(htmlspecialchars($data['u_content'])) ?></p>
                                         </li>
+                                    <?php elseif ($u_permission === '管理者'): ?>
+                                        <li>
+                                            <p>📧 <strong>管理者Email：</strong><?= htmlspecialchars($data['u_email']) ?></p>
+                                        </li>
+                                        <li>
+                                            <p class="clamp-4">📜 <strong>管理者簡介：</strong><?= nl2br(htmlspecialchars($data['u_content'])) ?></p>
+                                        </li>
                                     <?php endif; ?>
                                 </ul>
                             </div>
                         </div>
+                        <?php if ($u_permission === '管理者'): ?>
+                            <div>
+                                <h3 class="hover-underline" id="nav-banpro" onclick="showSection('banpro')"><a href="#">被檢舉文章</a></h3>
+                            </div>
+                            <div>
+                                <h3 class="hover-underline" id="nav-banac" onclick="showSection('banac')"><a href="#">被檢舉帳號</a></h3>
+                            </div> 
+
+                        <?php else:?>
                         <div>
                             <h3 class="hover-underline" id="nav-published" onclick="showSection('published')"><a href="#">已發佈的文章</a></h3>
                         </div>
@@ -576,6 +671,8 @@ if ($currentUser) {
                         <div>
                             <h3 class="hover-underline" id="nav-saved" onclick="showSection('saved')"><a href="#">收藏的文章</a></h3>
                         </div>
+                        <?php endif; ?>
+                        
                     </div>
 
                     <!-- 右側顯示區域 -->
@@ -702,6 +799,20 @@ if ($currentUser) {
                                         <div class='col-md-6'><input type='tel' class='form-control' name='s_phone' value="<?= $data['s_phone'] ?>" placeholder='聯絡人手機號碼' required></div>
 
                                         <label>平台會員訊息</label>
+                                        <div class="col-md-6"><input type="email" class="form-control" name="u_email" value="<?= $data['u_email'] ?>" placeholder="Email" readonly></div>
+                                        <div class="col-md-6"><input type="text" class="form-control" name="u_password" value="<?= $account['u_password'] ?>" placeholder="密碼" required></div>
+                                        <div class="col-md-12"><textarea class="form-control" name="u_content" rows="5" placeholder="組織簡介" required><?= htmlspecialchars($account['u_content']) ?></textarea></div>
+
+                                        <div class="col-md-12 text-center">
+                                            <button type="submit">更改</button>
+                                        </div>
+
+                                    </div>
+                                    <?php elseif ($u_permission === '管理者'): ?>
+                            <div id="form-section" class="contact section-content" style="display: none;">
+                                <form action="accountdb.php" method="post" class="php-email-form" data-aos="fade-up" data-aos-delay="200">
+                                    <div class="row gy-4">
+                                        <label>管理者訊息</label>
                                         <div class="col-md-6"><input type="email" class="form-control" name="u_email" value="<?= $data['u_email'] ?>" placeholder="Email" readonly></div>
                                         <div class="col-md-6"><input type="text" class="form-control" name="u_password" value="<?= $account['u_password'] ?>" placeholder="密碼" required></div>
                                         <div class="col-md-12"><textarea class="form-control" name="u_content" rows="5" placeholder="組織簡介" required><?= htmlspecialchars($account['u_content']) ?></textarea></div>
@@ -931,7 +1042,8 @@ if ($currentUser) {
                                     $saved = in_array($d_id, $myFavs);
                                 
                                        $iconClass = $saved ? 'bi-heart-fill saved' : 'bi-heart';
-                $iconStyle = $saved ? 'color:red;' : '';
+                                        $iconStyle = $saved ? 'color:red;' : '';
+
 
                                 $contact_name = $row['donate_c_name'] ?? $row['spons_c_name'] ?? $row['intern_c_name'] ?? $row['coop_c_name'] ?? '無資料';
                                 $contact_phone = $row['donate_c_phone'] ?? $row['spons_c_phone'] ?? $row['intern_c_phone'] ?? $row['coop_c_phone'] ?? '無資料';
@@ -961,7 +1073,8 @@ if ($currentUser) {
                                         $label = '✏️ 標題：';
                                         break;
                                 }
-                                ?>
+                                ?>                            
+                        
                                 <div class='dcard-post'>
                                      <a href="./property-single.php?id=<?=$row['d_id']?>">
                                         <div class='dcard-header'>
@@ -996,7 +1109,72 @@ if ($currentUser) {
                                    
                                     </a>
                                 </div>
+
+                                
                             <?php endwhile; ?>
+                        </div>
+
+                        <div id="banpro-section" class="section-content">
+                            
+                        <?php while ($row = $result->fetch_assoc()): ?>
+    <?php
+        $d_id  = (int)$row['d_id'];
+        $saved = in_array($d_id, $myFavs);
+        $iconClass = $saved ? 'bi-heart-fill saved' : 'bi-heart';
+        $iconStyle = $saved ? 'color:red;' : '';
+
+        $contact_name = $row['donate_c_name'] ?? $row['spons_c_name'] ?? $row['intern_c_name'] ?? $row['coop_c_name'] ?? '無資料';
+        $contact_phone = $row['donate_c_phone'] ?? $row['spons_c_phone'] ?? $row['intern_c_phone'] ?? $row['coop_c_phone'] ?? '無資料';
+        $contact_email = $row['donate_c_email'] ?? $row['spons_c_email'] ?? $row['intern_c_email'] ?? $row['coop_c_email'] ?? '無資料';
+
+        // 主標題處理
+        $title = '';
+        switch ($row['tag']) {
+            case '合作':
+                $title = $row['coop_title'] ?? '';
+                $label = '✏️ 合作標題：';
+                break;
+            case '贊助':
+                $title = $row['spons_title'] ?? '';
+                $label = '✏️ 活動標題：';
+                break;
+            case '實習':
+                $title = $row['intern_title'] ?? '';
+                $label = '✏️ 職缺標題：';
+                break;
+            case 'spon':
+                $title = $row['donate_title'] ?? '';
+                $label = '✏️ 活動標題：';
+                break;
+            default:
+                $title = $row['title'] ?? '';
+                $label = '✏️ 標題：';
+                break;
+        }
+    ?>                            
+
+    <div class='dcard-post'>
+        <a href="./property-single.php?id=<?=$row['d_id']?>">
+            <div class='dcard-header'>
+                <span class='dcard-tag'>🚨 被檢舉 #<?= htmlspecialchars($row['tag']) ?></span>
+            </div>
+
+            <div class='dcard-body'>
+                <p><strong>⚠️ 此文章已被檢舉 <?= (int)$row['d_ban'] ?> 次</strong></p>
+                <p><strong><?= $label ?></strong> <?= !empty($title) ? htmlspecialchars($title) : '無標題' ?></p>
+            </div>
+
+            <div class='dcard-footer'>
+                <div>
+                    <span>👤 聯絡人：<?= htmlspecialchars($contact_name) ?></span>
+                    <span>📞 電話：<?= htmlspecialchars($contact_phone) ?></span>
+                    <span>✉️ Email：<?= htmlspecialchars($contact_email) ?></span>
+                </div>
+            </div>
+        </a>
+    </div>
+<?php endwhile; ?>
+
                         </div>
                         </div>
                     </div>
@@ -1008,7 +1186,7 @@ if ($currentUser) {
 
             <script>
                 function showSection(section) {
-                    const sections = ['form', 'published', 'projects','saved'];
+                    const sections = ['form', 'published', 'projects','saved','banpro','banac'];
                    
                         
                        

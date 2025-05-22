@@ -73,7 +73,7 @@
             <div class="card shadow-lg rounded-4 p-4">
               <!-- 添加網站標誌或圖標 -->
               <div class="text-center mb-3">
-                <h1 class="sitename" style="font-size: 1.8rem;">Co<span style="color: #4CAF50;">LaB</span></h1>
+                <h1 class="sitename" style="font-size: 1.8rem;">Co<span style="color: #2eca6a;">LaB</span></h1>
               </div>
 
               <!-- 使用較大字體和適當間距 -->
