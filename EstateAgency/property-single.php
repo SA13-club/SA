@@ -1,6 +1,6 @@
 <?php
-
-?>
+      session_start();
+  ?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -98,6 +98,27 @@
   </header>
 
   <main class="main">
+  
+  <?php 
+  $u_permission = $_SESSION['u_permission'];
+  $servername = "localhost";
+  $username = "root";
+  $password = "";
+  $dbname = "sa";
+  $conn = new mysqli($servername, $username, $password, $dbname); 
+  $sql = "(SELECT d_ban FROM demaned; )";//問題一
+  if ($u_permission == '企業') {
+            $stmt = $conn->prepare("SELECT * FROM Corporation_Registrations WHERE u_email = ?");
+        } else if ($u_permission == '組織團體') {
+            $stmt = $conn->prepare("SELECT * FROM Organization_Registrations WHERE u_email = ?");
+        }else if ($u_permission == '管理者') {
+            $stmt = $conn->prepare("SELECT * FROM user_account WHERE u_email = ?");
+        } else {
+            die("無效的使用者權限");
+        }
+  ?>
+  
+
     <!-- 註冊選擇權限的模態框 -->
     <div class="modal fade" id="SignInPermission" tabindex="-1" aria-labelledby="SignInPermissionLabel"
       aria-hidden="true">
@@ -343,6 +364,7 @@
               </div>
             </div>
           </div>
+          <?php if ($u_permission !== '管理者'): ?>
 
           <div class="col-lg-3" data-aos="fade-up" data-aos-delay="100">
             <div class="portfolio-info">
@@ -389,9 +411,42 @@
                     我想合作
                   </button>
                 </li>
+                <li 
               </ul>
             </div>
           </div>
+          <?php endif; ?>
+
+          <?php if ($u_permission === '管理者'): ?>
+            <div class="col-lg-3" data-aos="fade-up" data-aos-delay="100">
+            <div class="portfolio-info">
+            <h3>基本資料</h3>
+              <ul>
+                <?php
+                // 顯示公司資訊
+                echo "<li><p>🏢 <strong>公司名稱：</strong><a href='profile.php?d_id=" . htmlspecialchars($d_id) . "'> " . 
+                  htmlspecialchars($content_row['c_name'] ?? '無資料') . "</a></p></li>
+                  <li><p>📧 <strong>聯絡信箱：</strong> " . 
+                  htmlspecialchars($content_row['c_email'] ?? '無資料') . "</p></li>
+                  <li><p>📞 <strong>聯絡電話：</strong> " . 
+                  htmlspecialchars($content_row['c_phone'] ?? '無資料') . "</p></li>";
+                  ?>
+              </ul> <!-- 問題一 -->
+              <div class='dcard-body'>
+                <p><strong>⚠️ 此文章已被檢舉 <?= (int)$row['d_ban'] ?> 次</strong></p> 
+              </div>                                               
+
+            <div class="my-2">
+              <a href='deletepost.php?id=<?= htmlspecialchars($row['d_id']) ?>'
+                class='btn btn-sm btn-danger'
+                onclick="return confirm('確定要刪除這篇文章嗎？')">
+                <i class='bi bi-trash'></i> 刪除文章
+              </a>
+            </div>
+          <?php endif; ?>
+          </div>
+          </div>
+
 
         </div>
       </div>
