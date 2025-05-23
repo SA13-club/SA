@@ -1,6 +1,6 @@
 <?php
-      session_start();
-  ?>
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -54,6 +54,7 @@
     }
   </style>
 </head>
+
 <body class="properties-page" style="
   background-image: url('./assets/img/bg2.png');
   background-size: cover;
@@ -98,26 +99,30 @@
   </header>
 
   <main class="main">
-  
-  <?php 
-  $u_permission = $_SESSION['u_permission'];
-  $servername = "localhost";
-  $username = "root";
-  $password = "";
-  $dbname = "sa";
-  $conn = new mysqli($servername, $username, $password, $dbname); 
-  $sql = "(SELECT d_ban FROM demaned; )";//問題一
-  if ($u_permission == '企業') {
-            $stmt = $conn->prepare("SELECT * FROM Corporation_Registrations WHERE u_email = ?");
-        } else if ($u_permission == '組織團體') {
-            $stmt = $conn->prepare("SELECT * FROM Organization_Registrations WHERE u_email = ?");
-        }else if ($u_permission == '管理者') {
-            $stmt = $conn->prepare("SELECT * FROM user_account WHERE u_email = ?");
-        } else {
-            die("無效的使用者權限");
-        }
-  ?>
-  
+
+    <?php
+    $u_permission = $_SESSION['u_permission'];
+    $servername = "localhost";
+    $username = "root";
+    $password = "";
+    $dbname = "sa";
+    $conn = new mysqli($servername, $username, $password, $dbname);
+    $sql = "SELECT d_ban FROM demanded WHERE d_id = '$d_id'; "; //問題一
+    $result = mysqli_query($conn, $sql);
+    $row = mysqli_fetch_assoc($result);
+    // if ($u_permission == '管理者') {
+    //   $stmt = $conn->prepare("SELECT * FROM user_account WHERE u_email = ?");
+    // }
+    // if ($u_permission == '企業') {
+    //           $stmt = $conn->prepare("SELECT * FROM Corporation_Registrations WHERE u_email = ?");
+    //       } else if ($u_permission == '組織團體') {
+    //           $stmt = $conn->prepare("SELECT * FROM Organization_Registrations WHERE u_email = ?");
+    //       else 
+    //       } else {
+    //           die("無效的使用者權限");
+    //       }
+    ?>
+
 
     <!-- 註冊選擇權限的模態框 -->
     <div class="modal fade" id="SignInPermission" tabindex="-1" aria-labelledby="SignInPermissionLabel"
@@ -148,11 +153,11 @@
         </div>
       </nav>
     </div><!-- End Page Title -->
-      
+
 
     <!-- Real Estate 2 Section -->
     <section id="real-estate-2" class="real-estate-2 section">
-        
+
       <!-- Section Title -->
       <div class="container section-title" data-aos="fade-up">
         <h2>最新專案</h2>
@@ -262,9 +267,9 @@
                 $product_methods = json_decode($content_row['product_methods'], true) ?: [];
               }
 
-              $deadline = isset($content_row['deadline']) && $content_row['deadline'] !== '0000-00-00' 
-                  ? htmlspecialchars($content_row['deadline']) 
-                  : '無截止日期';
+              $deadline = isset($content_row['deadline']) && $content_row['deadline'] !== '0000-00-00'
+                ? htmlspecialchars($content_row['deadline'])
+                : '無截止日期';
 
               // 顯示內容
               echo "
@@ -284,11 +289,11 @@
                   <p>📝 <strong>合作說明：</strong> " . htmlspecialchars($content_row['coop_desc'] ?? '無資料') . "</p>
                   <p>📂 <strong>合作類型：</strong> " . htmlspecialchars($content_row['coop_type'] ?? '無資料') . "</p>
                   <p>📝 <strong>預期效益：</strong> " . htmlspecialchars($content_row['benefit'] ?? '無資料') . "</p>
-                  <p>📂 <strong>活動地址：</strong> " . 
-                  ((!empty($content_row['city']) ? htmlspecialchars($content_row['city']) : '無資料') . 
-                  (!empty($content_row['district']) ? " " . htmlspecialchars($content_row['district']) : '') . 
-                  (!empty($content_row['address']) ? " " . htmlspecialchars($content_row['address']) : '')) . 
-                  "</p>";
+                  <p>📂 <strong>活動地址：</strong> " .
+                    ((!empty($content_row['city']) ? htmlspecialchars($content_row['city']) : '無資料') .
+                      (!empty($content_row['district']) ? " " . htmlspecialchars($content_row['district']) : '') .
+                      (!empty($content_row['address']) ? " " . htmlspecialchars($content_row['address']) : '')) .
+                    "</p>";
 
                   if (!empty($content_row['coop_benefit'])) {
                     $coop_benefit = json_decode($content_row['coop_benefit'], true) ?: [];
@@ -366,86 +371,85 @@
           </div>
           <?php if ($u_permission !== '管理者'): ?>
 
-          <div class="col-lg-3" data-aos="fade-up" data-aos-delay="100">
-            <div class="portfolio-info">
-              <h3>基本資料</h3>
-              <ul>
-                <?php
-                // 顯示公司資訊
-                echo "<li><p>🏢 <strong>公司名稱：</strong><a href='profile.php?d_id=" . htmlspecialchars($d_id) . "'> " . 
-                  htmlspecialchars($content_row['c_name'] ?? '無資料') . "</a></p></li>
-                  <li><p>📧 <strong>聯絡信箱：</strong> " . 
-                  htmlspecialchars($content_row['c_email'] ?? '無資料') . "</p></li>
-                  <li><p>📞 <strong>聯絡電話：</strong> " . 
-                  htmlspecialchars($content_row['c_phone'] ?? '無資料') . "</p></li>";
+            <div class="col-lg-3" data-aos="fade-up" data-aos-delay="100">
+              <div class="portfolio-info">
+                <h3>基本資料</h3>
+                <ul>
+                  <?php
+                  // 顯示公司資訊
+                  echo "<li><p>🏢 <strong>公司名稱：</strong><a href='profile.php?d_id=" . htmlspecialchars($d_id) . "'> " .
+                    htmlspecialchars($content_row['c_name'] ?? '無資料') . "</a></p></li>
+                  <li><p>📧 <strong>聯絡信箱：</strong> " .
+                    htmlspecialchars($content_row['c_email'] ?? '無資料') . "</p></li>
+                  <li><p>📞 <strong>聯絡電話：</strong> " .
+                    htmlspecialchars($content_row['c_phone'] ?? '無資料') . "</p></li>";
 
-                // 聊天功能
-                $receiver_query = "SELECT u_email FROM demanded WHERE d_id = '" . mysqli_real_escape_string($link, $d_id) . "'";
-                $receiver_result = mysqli_query($link, $receiver_query);
-                
-                if ($receiver_result) {
-                  $receiver_row = mysqli_fetch_assoc($receiver_result);
-                  $receiver_email = $receiver_row['u_email'] ?? '';
-                  
-                  // 獲取當前用戶的電子郵件（如果已登錄）
-                  $u_email = isset($_SESSION['u_email']) ? $_SESSION['u_email'] : '';
-                  
-                  // 安全編碼 URL 參數
-                  $safe_email = urlencode($u_email);
-                  $safe_receiver = urlencode($receiver_email);
-                  
-                  // 根據登錄狀態顯示適當的聊天按鈕
-                  if (isset($_SESSION['u_permission']) && $_SESSION['u_permission']) {
-                    echo '<li><a class="btn" style="background-color: #28c76f; color: white;" href="./chat/public/index .php?u_email=' . 
-                      $safe_email . '&receiver=' . $safe_receiver . '" target="_blank">聊天室</a></li>';
+                  // 聊天功能
+                  $receiver_query = "SELECT u_email FROM demanded WHERE d_id = '" . mysqli_real_escape_string($link, $d_id) . "'";
+                  $receiver_result = mysqli_query($link, $receiver_query);
+
+                  if ($receiver_result) {
+                    $receiver_row = mysqli_fetch_assoc($receiver_result);
+                    $receiver_email = $receiver_row['u_email'] ?? '';
+
+                    // 獲取當前用戶的電子郵件（如果已登錄）
+                    $u_email = isset($_SESSION['u_email']) ? $_SESSION['u_email'] : '';
+
+                    // 安全編碼 URL 參數
+                    $safe_email = urlencode($u_email);
+                    $safe_receiver = urlencode($receiver_email);
+
+                    // 根據登錄狀態顯示適當的聊天按鈕
+                    if (isset($_SESSION['u_permission']) && $_SESSION['u_permission']) {
+                      echo '<li><a class="btn" style="background-color: #28c76f; color: white;" href="./chat/public/index .php?u_email=' .
+                        $safe_email . '&receiver=' . $safe_receiver . '" target="_blank">聊天室</a></li>';
+                    } else {
+                      echo '<li><a href="#" onclick="alert(\'請先登錄再進行洽談\'); return false;" class="btn" style="background-color: #28c76f; color: white;">聊天室</a></li>';
+                    }
                   } else {
-                    echo '<li><a href="#" onclick="alert(\'請先登錄再進行洽談\'); return false;" class="btn">聊天室</a></li>';
+                    echo '<li>無法獲取聯絡資訊</li>';
                   }
-                } else {
-                  echo '<li>無法獲取聯絡資訊</li>';
-                }
-                ?>
-                <li class="my-2">
-                  <button class="btn" style="background-color: #28c76f; color: white;"
-                    onclick="if(confirm('確認是否申請合作？')) { window.location.href='submitdb.php?d_id=<?= htmlspecialchars($d_id) ?>'; }">
-                    我想合作
-                  </button>
-                </li>
-                <li 
-              </ul>
+                  ?>
+                  <li class="my-2">
+                    <button class="btn" style="background-color: #28c76f; color: white;"
+                      onclick="if(confirm('確認是否申請合作？')) { window.location.href='submitdb.php?d_id=<?= htmlspecialchars($d_id) ?>'; }">
+                      我想合作
+                    </button>
+                  </li>
+                </ul>
+              </div>
             </div>
-          </div>
           <?php endif; ?>
 
           <?php if ($u_permission === '管理者'): ?>
             <div class="col-lg-3" data-aos="fade-up" data-aos-delay="100">
-            <div class="portfolio-info">
-            <h3>基本資料</h3>
-              <ul>
-                <?php
-                // 顯示公司資訊
-                echo "<li><p>🏢 <strong>公司名稱：</strong><a href='profile.php?d_id=" . htmlspecialchars($d_id) . "'> " . 
-                  htmlspecialchars($content_row['c_name'] ?? '無資料') . "</a></p></li>
-                  <li><p>📧 <strong>聯絡信箱：</strong> " . 
-                  htmlspecialchars($content_row['c_email'] ?? '無資料') . "</p></li>
-                  <li><p>📞 <strong>聯絡電話：</strong> " . 
-                  htmlspecialchars($content_row['c_phone'] ?? '無資料') . "</p></li>";
+              <div class="portfolio-info">
+                <h3>基本資料</h3>
+                <ul>
+                  <?php
+                  // 顯示公司資訊
+                  echo "<li><p>🏢 <strong>公司名稱：</strong><a href='profile.php?d_id=" . htmlspecialchars($d_id) . "'> " .
+                    htmlspecialchars($content_row['c_name'] ?? '無資料') . "</a></p></li>
+                  <li><p>📧 <strong>聯絡信箱：</strong> " .
+                    htmlspecialchars($content_row['c_email'] ?? '無資料') . "</p></li>
+                  <li><p>📞 <strong>聯絡電話：</strong> " .
+                    htmlspecialchars($content_row['c_phone'] ?? '無資料') . "</p></li>";
                   ?>
-              </ul> <!-- 問題一 -->
-              <div class='dcard-body'>
-                <p><strong>⚠️ 此文章已被檢舉 <?= (int)$row['d_ban'] ?> 次</strong></p> 
-              </div>                                               
+                </ul> <!-- 問題一 -->
+                <div class='dcard-body'>
+                  <p><strong>⚠️ 此文章已被檢舉 <?= (int)($row['d_ban']) ?> 次</strong></p>
+                </div>
 
-            <div class="my-2">
-              <a href='deletepost.php?id=<?= htmlspecialchars($row['d_id']) ?>'
-                class='btn btn-sm btn-danger'
-                onclick="return confirm('確定要刪除這篇文章嗎？')">
-                <i class='bi bi-trash'></i> 刪除文章
-              </a>
+                <div class="my-2">
+                  <a href='deletepost.php?id=<?= htmlspecialchars($row['d_id']) ?>'
+                    class='btn btn-sm btn-danger'
+                    onclick="return confirm('確定要刪除這篇文章嗎？')">
+                    <i class='bi bi-trash'></i> 刪除文章
+                  </a>
+                </div>
+              <?php endif; ?>
+              </div>
             </div>
-          <?php endif; ?>
-          </div>
-          </div>
 
 
         </div>
