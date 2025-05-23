@@ -101,15 +101,16 @@ session_start();
   <main class="main">
 
     <?php
+    $d_id1 = htmlspecialchars($_GET['id'] ?? '未接收');
     $u_permission = $_SESSION['u_permission'];
     $servername = "localhost";
     $username = "root";
     $password = "";
     $dbname = "sa";
     $conn = new mysqli($servername, $username, $password, $dbname);
-    $sql = "SELECT d_ban FROM demanded WHERE d_id = '$d_id'; "; //問題一
-    $result = mysqli_query($conn, $sql);
-    $row = mysqli_fetch_assoc($result);
+    $sql1 = "SELECT d_ban FROM demanded WHERE d_id = '$d_id1'; "; //問題一
+    $result1 = mysqli_query($conn, $sql1);
+    $row1 = mysqli_fetch_assoc($result1);
     // if ($u_permission == '管理者') {
     //   $stmt = $conn->prepare("SELECT * FROM user_account WHERE u_email = ?");
     // }
@@ -437,7 +438,7 @@ session_start();
                   ?>
                 </ul> <!-- 問題一 -->
                 <div class='dcard-body'>
-                  <p><strong>⚠️ 此文章已被檢舉 <?= (int)($row['d_ban']) ?> 次</strong></p>
+                  <p><strong>⚠️ 此文章已被檢舉 <?= (int)($row1['d_ban']) ?> 次</strong></p>
                 </div>
 
                 <div class="my-2">
