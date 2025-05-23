@@ -380,7 +380,7 @@
         if ($u_permission === '管理者') {
             // 管理者：查詢被檢舉次數 >= 3
             $sql = "(
-                SELECT d.d_id, d.tag, d.d_date,
+                SELECT d.d_id, d.tag, d.d_date, d.d_ban,
                        o.event_name AS donate_title,
                        NULL AS spons_title,
                        NULL AS intern_title,
@@ -388,12 +388,16 @@
                        o.c_name AS donate_c_name, o.c_phone AS donate_c_phone, o.c_email AS donate_c_email,
                        NULL AS spons_c_name, NULL AS spons_c_phone, NULL AS spons_c_email,
                        NULL AS intern_c_name, NULL AS intern_c_phone, NULL AS intern_c_email,
-                       NULL AS coop_c_name, NULL AS coop_c_phone, NULL AS coop_c_email
+                       NULL AS coop_c_name, NULL AS coop_c_phone, NULL AS coop_c_email,
+                       ua.u_email AS user_email,
+                       ua.u_permission AS user_permission,
+                       ua.banac AS user_banac
                 FROM demanded d 
                 JOIN org_donate o ON d.d_id = o.d_id 
+                LEFT JOIN User_Account ua ON o.c_email = ua.u_email
                 WHERE d.d_ban >= 3
             ) UNION (
-                SELECT d.d_id, d.tag, d.d_date,
+                SELECT d.d_id, d.tag, d.d_date, d.d_ban,
                        NULL AS donate_title,
                        c.title AS spons_title,
                        NULL AS intern_title,
@@ -401,12 +405,16 @@
                        NULL AS donate_c_name, NULL AS donate_c_phone, NULL AS donate_c_email,
                        c.c_name AS spons_c_name, c.c_phone AS spons_c_phone, c.c_email AS spons_c_email,
                        NULL AS intern_c_name, NULL AS intern_c_phone, NULL AS intern_c_email,
-                       NULL AS coop_c_name, NULL AS coop_c_phone, NULL AS coop_c_email
+                       NULL AS coop_c_name, NULL AS coop_c_phone, NULL AS coop_c_email,
+                       ua.u_email AS user_email,
+                       ua.u_permission AS user_permission,
+                       ua.banac AS user_banac
                 FROM demanded d 
                 JOIN cor_spons c ON d.d_id = c.d_id 
+                LEFT JOIN User_Account ua ON c.c_email = ua.u_email
                 WHERE d.d_ban >= 3
             ) UNION (
-                SELECT d.d_id, d.tag, d.d_date,
+                SELECT d.d_id, d.tag, d.d_date, d.d_ban,
                        NULL AS donate_title,
                        NULL AS spons_title,
                        i.intern_title AS intern_title,
@@ -414,12 +422,16 @@
                        NULL AS donate_c_name, NULL AS donate_c_phone, NULL AS donate_c_email,
                        NULL AS spons_c_name, NULL AS spons_c_phone, NULL AS spons_c_email,
                        i.c_name AS intern_c_name, i.c_phone AS intern_c_phone, i.c_email AS intern_c_email,
-                       NULL AS coop_c_name, NULL AS coop_c_phone, NULL AS coop_c_email
+                       NULL AS coop_c_name, NULL AS coop_c_phone, NULL AS coop_c_email,
+                       ua.u_email AS user_email,
+                       ua.u_permission AS user_permission,
+                       ua.banac AS user_banac
                 FROM demanded d 
                 JOIN cor_intern i ON d.d_id = i.d_id 
+                LEFT JOIN User_Account ua ON i.c_email = ua.u_email
                 WHERE d.d_ban >= 3
             ) UNION (
-                SELECT d.d_id, d.tag, d.d_date,
+                SELECT d.d_id, d.tag, d.d_date, d.d_ban,
                        NULL AS donate_title,
                        NULL AS spons_title,
                        NULL AS intern_title,
@@ -427,12 +439,16 @@
                        NULL AS donate_c_name, NULL AS donate_c_phone, NULL AS donate_c_email,
                        NULL AS spons_c_name, NULL AS spons_c_phone, NULL AS spons_c_email,
                        NULL AS intern_c_name, NULL AS intern_c_phone, NULL AS intern_c_email,
-                       co.c_name AS coop_c_name, co.c_phone AS coop_c_phone, co.c_email AS coop_c_email
+                       co.c_name AS coop_c_name, co.c_phone AS coop_c_phone, co.c_email AS coop_c_email,
+                       ua.u_email AS user_email,
+                       ua.u_permission AS user_permission,
+                       ua.banac AS user_banac
                 FROM demanded d 
                 JOIN corp_coop co ON d.d_id = co.d_id 
+                LEFT JOIN User_Account ua ON co.c_email = ua.u_email
                 WHERE d.d_ban >= 3
             ) UNION (
-                SELECT d.d_id, d.tag, d.d_date,
+                SELECT d.d_id, d.tag, d.d_date, d.d_ban,
                        NULL AS donate_title,
                        NULL AS spons_title,
                        NULL AS intern_title,
@@ -440,17 +456,23 @@
                        NULL AS donate_c_name, NULL AS donate_c_phone, NULL AS donate_c_email,
                        NULL AS spons_c_name, NULL AS spons_c_phone, NULL AS spons_c_email,
                        NULL AS intern_c_name, NULL AS intern_c_phone, NULL AS intern_c_email,
-                       co.c_name AS coop_c_name, co.c_phone AS coop_c_phone, co.c_email AS coop_c_email
+                       co.c_name AS coop_c_name, co.c_phone AS coop_c_phone, co.c_email AS coop_c_email,
+                       ua.u_email AS user_email,
+                       ua.u_permission AS user_permission,
+                       ua.banac AS user_banac
                 FROM demanded d 
                 JOIN club_coop co ON d.d_id = co.d_id 
+                LEFT JOIN User_Account ua ON co.c_email = ua.u_email
                 WHERE d.d_ban >= 3
             )
             ORDER BY d_date DESC";
-        
+            
+            
             $stmt = $conn->prepare($sql);
             $stmt->execute();
             $result = $stmt->get_result();
-        
+            
+            
         } else {
             // 一般用戶：查詢自己的資料
             $sql = "(
@@ -675,8 +697,11 @@ if ($currentUser) {
                         
                     </div>
 
+                    
+
                     <!-- 右側顯示區域 -->
                     <div class="col-lg-9" id="right-section">
+                        <?php if ($u_permission !== '管理者'): ?>
                         <!-- 預設內容：已發佈的文章 -->
                         <div id="published-section" class="section-content">
                             <?php while ($row = $result->fetch_assoc()): ?>
@@ -739,6 +764,7 @@ if ($currentUser) {
                                     </div>
                                 </div>
                             <?php endwhile; ?>
+                            <?php endif; ?>
                         </div>
 
 
@@ -1114,67 +1140,103 @@ if ($currentUser) {
                             <?php endwhile; ?>
                         </div>
 
-                        <div id="banpro-section" class="section-content">
+                        <div id="banac-section" class="section-content">
+                        <?php var_dump($row); ?>
+
+                            <?php
+                            $row = $result->fetch_assoc();
+                            echo "查詢筆數：" . $result->num_rows;
+
+                                // 依據你的 SQL 結果欄位，抓聯絡資訊
+                                // 這邊範例是你 SQL 裡不同來源欄位合併了，要判斷用哪個非 NULL
+                                $contact_name = $row['donate_c_name'] ?? $row['spons_c_name'] ?? $row['intern_c_name'] ?? $row['coop_c_name'] ?? '無聯絡人';
+                                $contact_phone = $row['donate_c_phone'] ?? $row['spons_c_phone'] ?? $row['intern_c_phone'] ?? $row['coop_c_phone'] ?? '無電話';
+                                $contact_email = $row['donate_c_email'] ?? $row['spons_c_email'] ?? $row['intern_c_email'] ?? $row['coop_c_email'] ?? '無Email';
+                            ?>
+                            <a href="./profile.php?user_email=<?= htmlspecialchars($row['user_email']) ?>">
+                                <div class='dcard-header'>
+                                    <span class='dcard-tag'>🚨 被檢舉帳號： <?= htmlspecialchars($row['tag']) ?></span>
+                                </div>
+                                <div class='dcard-body'>
+                                    <p><strong>⚠️ 此帳號已被檢舉 <?= (int)$row['user_banac'] ?> 次</strong></p>
+                                    <p><strong>📛 身份：<?= htmlspecialchars($row['user_permission']) ?></strong></p>
+                                </div>
+                                <div class='dcard-footer'>
+                                    <div>
+                                        <span>👤 聯絡人：<?= htmlspecialchars($contact_name) ?></span>
+                                        <span>📞 電話：<?= htmlspecialchars($contact_phone) ?></span>
+                                        <span>✉️ Email：<?= htmlspecialchars($contact_email) ?></span>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+
+
+
+                    <div id="banpro-section" class="section-content">
+
                             
                         <?php while ($row = $result->fetch_assoc()): ?>
-    <?php
-        $d_id  = (int)$row['d_id'];
-        $saved = in_array($d_id, $myFavs);
-        $iconClass = $saved ? 'bi-heart-fill saved' : 'bi-heart';
-        $iconStyle = $saved ? 'color:red;' : '';
+                            <?php
+                                $d_id  = (int)$row['d_id'];
+                                $saved = in_array($d_id, $myFavs);
+                                $iconClass = $saved ? 'bi-heart-fill saved' : 'bi-heart';
+                                $iconStyle = $saved ? 'color:red;' : '';
 
-        $contact_name = $row['donate_c_name'] ?? $row['spons_c_name'] ?? $row['intern_c_name'] ?? $row['coop_c_name'] ?? '無資料';
-        $contact_phone = $row['donate_c_phone'] ?? $row['spons_c_phone'] ?? $row['intern_c_phone'] ?? $row['coop_c_phone'] ?? '無資料';
-        $contact_email = $row['donate_c_email'] ?? $row['spons_c_email'] ?? $row['intern_c_email'] ?? $row['coop_c_email'] ?? '無資料';
+                                $contact_name = $row['donate_c_name'] ?? $row['spons_c_name'] ?? $row['intern_c_name'] ?? $row['coop_c_name'] ?? '無資料';
+                                $contact_phone = $row['donate_c_phone'] ?? $row['spons_c_phone'] ?? $row['intern_c_phone'] ?? $row['coop_c_phone'] ?? '無資料';
+                                $contact_email = $row['donate_c_email'] ?? $row['spons_c_email'] ?? $row['intern_c_email'] ?? $row['coop_c_email'] ?? '無資料';
+                            
 
-        // 主標題處理
-        $title = '';
-        switch ($row['tag']) {
-            case '合作':
-                $title = $row['coop_title'] ?? '';
-                $label = '✏️ 合作標題：';
-                break;
-            case '贊助':
-                $title = $row['spons_title'] ?? '';
-                $label = '✏️ 活動標題：';
-                break;
-            case '實習':
-                $title = $row['intern_title'] ?? '';
-                $label = '✏️ 職缺標題：';
-                break;
-            case 'spon':
-                $title = $row['donate_title'] ?? '';
-                $label = '✏️ 活動標題：';
-                break;
-            default:
-                $title = $row['title'] ?? '';
-                $label = '✏️ 標題：';
-                break;
-        }
-    ?>                            
 
-    <div class='dcard-post'>
-        <a href="./property-single.php?id=<?=$row['d_id']?>">
-            <div class='dcard-header'>
-                <span class='dcard-tag'>🚨 被檢舉 #<?= htmlspecialchars($row['tag']) ?></span>
-            </div>
+                                // 主標題處理
+                                $title = '';
+                                switch ($row['tag']) {
+                                    case '合作':
+                                        $title = $row['coop_title'] ?? '';
+                                        $label = '✏️ 合作標題：';
+                                        break;
+                                    case '贊助':
+                                        $title = $row['spons_title'] ?? '';
+                                        $label = '✏️ 活動標題：';
+                                        break;
+                                    case '實習':
+                                        $title = $row['intern_title'] ?? '';
+                                        $label = '✏️ 職缺標題：';
+                                        break;
+                                    case 'spon':
+                                        $title = $row['donate_title'] ?? '';
+                                        $label = '✏️ 活動標題：';
+                                        break;
+                                    default:
+                                        $title = $row['title'] ?? '';
+                                        $label = '✏️ 標題：';
+                                        break;
+                                }
+                            ?>                            
 
-            <div class='dcard-body'>
-                <p><strong>⚠️ 此文章已被檢舉 <?= (int)$row['d_ban'] ?> 次</strong></p>
-                <p><strong><?= $label ?></strong> <?= !empty($title) ? htmlspecialchars($title) : '無標題' ?></p>
-            </div>
+                            <div class='dcard-post'> 
+                                <a href="./property-single.php?id=<?=$row['d_id']?>">
+                                    <div class='dcard-header'>
+                                        <span class='dcard-tag'>🚨 被檢舉 #<?= htmlspecialchars($row['tag']) ?></span>
+                                    </div>
 
-            <div class='dcard-footer'>
-                <div>
-                    <span>👤 聯絡人：<?= htmlspecialchars($contact_name) ?></span>
-                    <span>📞 電話：<?= htmlspecialchars($contact_phone) ?></span>
-                    <span>✉️ Email：<?= htmlspecialchars($contact_email) ?></span>
-                </div>
-            </div>
-        </a>
-    </div>
-<?php endwhile; ?>
+                                    <div class='dcard-body'>
+                                        <p><strong>⚠️ 此文章已被檢舉 <?= (int)$row['d_ban'] ?> 次</strong></p>
+                                        <p><strong><?= $label ?></strong> <?= !empty($title) ? htmlspecialchars($title) : '無標題' ?></p>
+                                    </div>
 
+                                    <div class='dcard-footer'>
+                                        <div>
+                                            <span>👤 聯絡人：<?= htmlspecialchars($contact_name) ?></span>
+                                            <span>📞 電話：<?= htmlspecialchars($contact_phone) ?></span>
+                                            <span>✉️ Email：<?= htmlspecialchars($contact_email) ?></span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        <?php endwhile; ?>
+                        </div>
                         </div>
                         </div>
                     </div>
