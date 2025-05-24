@@ -1,4 +1,91 @@
-<style>
+<?php
+session_start(); // 如果有使用 session，請開啟
+
+// 資料庫連線資訊
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "sa";
+
+// 建立連線
+$conn = new mysqli($servername, $username, $password, $dbname);
+if ($conn->connect_error) {
+    die("連線失敗: " . $conn->connect_error);
+}
+
+// 初始化
+$account_info = null;
+$source = null;
+$email = null;
+
+// 取得參數
+$d_id = isset($_GET['d_id']) ? intval($_GET['d_id']) : 0;
+$user_email = isset($_GET['user_email']) ? trim($_GET['user_email']) : '';
+
+// 依優先順序取得 email
+if ($d_id > 0) {
+    // 用 d_id 查 demanded 找 email
+    $stmt = $conn->prepare("SELECT u_email FROM demanded WHERE d_id = ?");
+    $stmt->bind_param("i", $d_id);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    if ($row = $res->fetch_assoc()) {
+        $email = $row['u_email'];
+    }
+    $stmt->close();
+} elseif (!empty($user_email)) {
+    $email = $user_email;
+}
+
+// 若有 email，查找帳號資訊（organization 或 corporation）
+if ($email) {
+    // 先查 organization_registrations
+    $stmt = $conn->prepare("SELECT * FROM organization_registrations WHERE u_email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $org_result = $stmt->get_result();
+
+    if ($account_info = $org_result->fetch_assoc()) {
+        $source = 'organization';
+    } else {
+        // 再查 corporation_registrations
+        $stmt = $conn->prepare("SELECT * FROM corporation_registrations WHERE u_email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $corp_result = $stmt->get_result();
+
+        if ($account_info = $corp_result->fetch_assoc()) {
+            $source = 'corporation';
+        }
+    }
+    $stmt->close();
+}
+
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>CoLaB</title>
+    <!-- Favicons -->
+    <link href="assets/img/favicon.png" rel="icon" />
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon" />
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Raleway:wght@100;200;300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
+    <!-- Vendor CSS Files -->
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet" />
+    <link href="assets/vendor/aos/aos.css" rel="stylesheet" />
+    <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" />
+    <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet" />
+    <!-- Main CSS File -->
+    <link href="assets/css/main.css" rel="stylesheet" />
+    <style>
         .dcard-post {
             border: 1px solid #ddd;
             border-radius: 10px;
@@ -24,7 +111,6 @@
 
         .dcard-tag {
             color: #2eca6a;
-            ;
         }
 
         .dcard-body {
@@ -43,7 +129,7 @@
             align-items: center;
         }
 
-        .filter-bar py-3 border-bottom bg-light {
+        .filter-bar.py-3.border-bottom.bg-light {
             background-color: white;
         }
 
@@ -96,129 +182,44 @@
         }
 
         .star-rating {
-        display: inline-block;
-        font-size: 2em;
-        color: #ccc;
-        cursor: pointer;
+            display: inline-block;
+            font-size: 2em;
+            color: #ccc;
+            cursor: pointer;
         }
-
 
         .star-rating .star:hover,
         .star-rating .star.hovered,
         .star-rating .star.selected {
-        color: gold;
+            color: gold;
         }
 
+        section,
+        .container,
+        .your-other-blocks {
+            background-color: transparent !important;
+        }
+
+        .page-title,
+        .page-title .container,
+        .breadcrumbs {
+            background: transparent !important;
+            z-index: 1;
+        }
     </style>
-
-<?php
-// 資料庫連線資訊
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "sa";
-
-// 建立連線
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// 檢查連線是否成功
-if ($conn->connect_error) {
-    die("連線失敗: " . $conn->connect_error);
-}
-
-// 從網址取得 d_id
-$d_id = isset($_GET['d_id']) ? intval($_GET['d_id']) : 0;
-
-// 初始化
-$account_info = null;
-$source = null;
-
-if ($d_id > 0) {
-    // 從 demanded 找 u_email
-    $stmt = $conn->prepare("SELECT u_email FROM demanded WHERE d_id = ?");
-    $stmt->bind_param("i", $d_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($row = $result->fetch_assoc()) {
-        $u_email = $row['u_email'];
-
-        // 先找 organization_registrations
-        $stmt = $conn->prepare("SELECT * FROM organization_registrations WHERE u_email = ?");
-        $stmt->bind_param("s", $u_email);
-        $stmt->execute();
-        $org_result = $stmt->get_result();
-
-        if ($account_info = $org_result->fetch_assoc()) {
-            $source = 'organization';
-        } else {
-            // 再找 corporation_registrations
-            $stmt = $conn->prepare("SELECT * FROM corporation_registrations WHERE u_email = ?");
-            $stmt->bind_param("s", $u_email);
-            $stmt->execute();
-            $corp_result = $stmt->get_result();
-
-            if ($account_info = $corp_result->fetch_assoc()) {
-                $source = 'corporation';
-            }
-        }
-    }
-}
-
-// 關閉連線
-$conn->close();
-?>
-
-
-
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>CoLaB</title>
-    <meta name="description" content="">
-    <meta name="keywords" content="">
-    <!-- Favicons -->
-    <link href="assets/img/favicon.png" rel="icon">
-    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com" rel="preconnect">
-    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Raleway:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <!-- Vendor CSS Files -->
-    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-    <link href="assets/vendor/aos/aos.css" rel="stylesheet">
-    <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
-    <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
-    <!-- Main CSS File -->
-    <link href="assets/css/main.css" rel="stylesheet">
 </head>
-<style>
-                section,
-                .container,
-                .your-other-blocks {
-                background-color: transparent !important;
-                }
-                .page-title,
-                .page-title .container,
-                .breadcrumbs {
-                background: transparent !important;
-                z-index: 1;
-                }
-                </style>
 
 <body class="starter-page-page" style="
-  padding-top: 100px;background-image: url('./assets/img/bg2.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  min-height: 100vh;
-  margin: 0;">
+      padding-top: 100px;
+      background-image: url('./assets/img/bg2.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      min-height: 100vh;
+      margin: 0;">
     <header id="header" class="header d-flex align-items-center fixed-top">
-        <div class="container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
+        <div
+            class="container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
             <a href="index.php" class="logo d-flex align-items-center">
                 <h1 class="sitename">Co<span>LaB</span></h1>
             </a>
@@ -232,7 +233,7 @@ $conn->close();
                     <li><a href="agents.php" class="active">合作單位</a></li>
                     <li><a href="contact.php">聯絡我們</a></li>
                     <?php
-                    if ($_SESSION['u_email']) {
+                    if (isset($_SESSION['u_email']) && $_SESSION['u_email']) {
                         echo "<li><a href='Logout.php'>登出</a></li>";
                         echo "<li><a href='account.php'>帳號管理</a></li>";
                     } else {
@@ -240,9 +241,6 @@ $conn->close();
                         echo "<li><a href='#' data-bs-toggle='modal' data-bs-target='#SignInPermission'>註冊</a></li>";
                     }
                     ?>
-                    <!-- <li><a href="LogIn.html">登入</a></li>
-          <li><a href="#" data-bs-toggle="modal" data-bs-target="#SignInPermission">註冊</a></li> -->
-
                 </ul>
                 <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
             </nav>
@@ -251,210 +249,133 @@ $conn->close();
 
     <main id="main" class="main">
         <div class="container my-5">
-        <h2><span style="color: #2F4F4F;">帳號資訊</span></h2>
-        <?php if ($account_info):
-                ob_start(); // 開始輸出緩衝
-            ?>
-                <div class="card p-4 shadow-sm" style="border: 3px solid #6495ED;">
-                    <h2 class="mb-4">
-                        <i class="bi bi-building"></i>
-                        <strong>
-                            <?= htmlspecialchars($source === 'organization' ? $account_info['o_name'] : $account_info['c_name']) ?>
-                        </strong>
-                    </h2>
+            <h2><span style="color: #2F4F4F;">帳號資訊</span></h2>
 
-                    <div class="mb-3">
-                        <i class="bi bi-tags"></i>
-                        <strong><?= $source === 'organization' ? '組織類型：' : '公司類型：' ?></strong>
-                        <?= htmlspecialchars($source === 'organization' ? $account_info['o_type'] : $account_info['c_type']) ?>
-                    </div>
+            <?php if ($account_info): ?>
+            <div class="card p-4 shadow-sm" style="border: 3px solid #6495ED;">
+                <h2 class="mb-4">
+                    <i class="bi bi-building"></i>
+                    <strong>
+                        <?= htmlspecialchars($source === 'organization' ? $account_info['o_name'] : $account_info['c_name']) ?>
+                    </strong>
+                </h2>
 
-                    <?php if ($source === 'corporation'): ?>
-                        <div class="mb-3">
-                            <i class="bi bi-diagram-3"></i>
-                            <strong>產業類別：</strong>
-                            <?= htmlspecialchars($account_info['c_industry']) ?>
-                        </div>
-                        <div class="mb-3">
-                            <i class="bi bi-geo-alt"></i>
-                            <strong>公司地址：</strong>
-                            <?= htmlspecialchars($account_info['c_address']) ?>
-                        </div>
-                    <?php endif; ?>
-
-                    <div class="mb-3">
-                        <i class="bi bi-person"></i>
-                        <strong>聯絡人姓名：</strong>
-                        <?= htmlspecialchars($source === 'organization' ? $account_info['s_name'] : $account_info['e_name']) ?>
-                    </div>
-
-                    <div class="mb-3">
-                        <i class="bi bi-briefcase"></i>
-                        <strong>聯絡人職稱：</strong>
-                        <?= htmlspecialchars($source === 'organization' ? $account_info['s_type'] : $account_info['e_type']) ?>
-                    </div>
-
-                    <div class="mb-3">
-                        <i class="bi bi-envelope"></i>
-                        <strong>聯絡人 Email：</strong>
-                        <?= htmlspecialchars($source === 'organization' ? $account_info['s_email'] : $account_info['e_email']) ?>
-                    </div>
-
-                    <div class="mb-3">
-                        <i class="bi bi-telephone"></i>
-                        <strong>聯絡人電話：</strong>
-                        <?= htmlspecialchars($source === 'organization' ? $account_info['s_phone'] : $account_info['e_phone']) ?>
-                    </div>
-
-                    <div class="mb-3">
-                        <i class="bi bi-card-text"></i>
-                        <strong><?= $source === 'organization' ? '組織簡介：' : '公司簡介：' ?></strong><br>
-                        <div style="border: 1px solid #ccc; padding: 10px; margin-top: 5px; border-radius: 5px; background-color: #f9f9f9;">
-                            <?= nl2br(htmlspecialchars($account_info['u_content'])) ?>
-                        </div>
-                    </div>
-                    
-
+                <div class="mb-3">
+                    <i class="bi bi-tags"></i>
+                    <strong><?= $source === 'organization' ? '組織類型：' : '公司類型：' ?></strong>
+                    <?= htmlspecialchars($source === 'organization' ? $account_info['o_type'] : $account_info['c_type']) ?>
                 </div>
-                <br>
-                    <br>
-                    
-                    <?php
-// 預設輸出容器
-echo "<div class='container'><h3>合作評價紀錄</h3>";
 
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "sa";
-$conn = new mysqli($servername, $username, $password, $dbname);
+                <?php if ($source === 'corporation'): ?>
+                <div class="mb-3">
+                    <i class="bi bi-diagram-3"></i>
+                    <strong>產業類別：</strong>
+                    <?= htmlspecialchars($account_info['c_industry']) ?>
+                </div>
+                <div class="mb-3">
+                    <i class="bi bi-geo-alt"></i>
+                    <strong>公司地址：</strong>
+                    <?= htmlspecialchars($account_info['c_address']) ?>
+                </div>
+                <?php endif; ?>
 
-if ($conn->connect_error) die("連線失敗: " . $conn->connect_error);
+                <div class="mb-3">
+                    <i class="bi bi-person"></i>
+                    <strong>聯絡人姓名：</strong>
+                    <?= htmlspecialchars($source === 'organization' ? $account_info['s_name'] : $account_info['e_name']) ?>
+                </div>
 
-if (isset($_GET['d_id'])) {
-    $d_id = intval($_GET['d_id']);
+                <div class="mb-3">
+                    <i class="bi bi-briefcase"></i>
+                    <strong>聯絡人職稱：</strong>
+                    <?= htmlspecialchars($source === 'organization' ? $account_info['s_type'] : $account_info['e_type']) ?>
+                </div>
 
-    // 查詢目標 email
-    $stmt = $conn->prepare("SELECT u_email FROM demanded WHERE d_id = ?");
-    $stmt->bind_param("i", $d_id);
-    $stmt->execute();
-    $res = $stmt->get_result();
-    $email = ($row = $res->fetch_assoc()) ? $row['u_email'] : null;
-    $stmt->close();
+                <div class="mb-3">
+                    <i class="bi bi-envelope"></i>
+                    <strong>聯絡人 Email：</strong>
+                    <?= htmlspecialchars($source === 'organization' ? $account_info['s_email'] : $account_info['e_email']) ?>
+                </div>
 
-    if ($email) {
-        $sql = "
-            SELECT b_u_email AS other_email, b_feedback AS feedback, status, d_date AS cooperation_time
-            FROM match_db
-            WHERE status = 'completed' AND a_u_email = ? AND b_feedback <> 0
-            UNION
-            SELECT a_u_email AS other_email, a_feedback AS feedback, status, d_date AS cooperation_time
-            FROM match_db
-            WHERE status = 'completed' AND b_u_email = ? AND a_feedback <> 0
-        ";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ss", $email, $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
+                <div class="mb-3">
+                    <i class="bi bi-telephone"></i>
+                    <strong>聯絡人電話：</strong>
+                    <?= htmlspecialchars($source === 'organization' ? $account_info['s_phone'] : $account_info['e_phone']) ?>
+                </div>
 
-        $count = 0;
-        $total = 0;
-
-        while ($r = $result->fetch_assoc()) {
-            $count++;
-            $total += $r['feedback'];
-            echo "<div class='dcard-post'>
-                    <div class='dcard-body'>
-                        <p><strong>合作夥伴：</strong> {$r['other_email']}</p>
-                        <p><strong>合作時間：</strong> {$r['cooperation_time']}</p>
-                        <p><strong>狀態：</strong> {$r['status']}</p>
-                        <p><strong>評分：</strong> {$r['feedback']} ★</p>
+                <div class="mb-3">
+                    <i class="bi bi-card-text"></i>
+                    <strong><?= $source === 'organization' ? '組織簡介：' : '公司簡介：' ?></strong><br />
+                    <div style="border: 1px solid #ccc; padding: 10px; margin-top: 5px; border-radius: 5px; background-color: #f9f9f9;">
+                        <?= nl2br(htmlspecialchars($account_info['u_content'] ?? '無簡介資料')) ?>
                     </div>
-                  </div>";
-        }
+                </div>
 
-        if ($count === 0) {
-            echo "<div class='alert alert-secondary'>尚無收到評價紀錄。</div>";
-        } else {
-            $avg = round($total / $count, 2);
-            echo "<div class='alert alert-info'>平均評分：<strong>{$avg}</strong> / 5，共 {$count} 筆</div>";
-        }
-        $stmt->close();
-    } else {
-        echo "<div class='alert alert-warning'>查無使用者 email。</div>";
-    }
-}
+            </div>
+            <?php else: ?>
+            <div class="alert alert-warning">查無該帳號資料，請確認網址參數。</div>
+            <?php endif; ?>
+        </div>
+        
 
-echo "</div>";
-?>
-
-
+        <div class="container my-5">
+            <h3><span style="color: #2F4F4F;">合作評價紀錄</span></h3>
 
             <?php
-                ob_end_flush();
-            else: ?>
-                <div class="alert alert-warning">找不到該帳號資訊。</div>
-            <?php endif; ?>
+            if (!$email) {
+                echo "<div class='alert alert-danger'>缺少有效的查詢參數 (d_id 或 user_email)</div>";
+            } else {
+                // 查詢評價
+                $sql = "
+                    SELECT b_u_email AS other_email, b_feedback AS feedback, status, d_date AS cooperation_time
+                    FROM match_db
+                    WHERE status = 'completed' AND a_u_email = ? AND b_feedback <> 0
+                    UNION
+                    SELECT a_u_email AS other_email, a_feedback AS feedback, status, d_date AS cooperation_time
+                    FROM match_db
+                    WHERE status = 'completed' AND b_u_email = ? AND a_feedback <> 0
+                    ORDER BY cooperation_time DESC
+                ";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("ss", $email, $email);
+                $stmt->execute();
+                $result = $stmt->get_result();
+
+                $count = 0;
+                $total = 0;
+                while ($row = $result->fetch_assoc()) {
+                    $count++;
+                    $total += $row['feedback'];
+
+                    echo '<div class="dcard-post">';
+                    echo '<div class="dcard-body">';
+                    echo '<p><strong>合作夥伴：</strong> ' . htmlspecialchars($row['other_email']) . '</p>';
+                    echo '<p><strong>合作時間：</strong> ' . htmlspecialchars($row['cooperation_time']) . '</p>';
+                    echo '<p><strong>狀態：</strong> ' . htmlspecialchars($row['status']) . '</p>';
+                    echo '<p><strong>評分：</strong> ' . htmlspecialchars($row['feedback']) . ' ★</p>';
+                    echo '</div>';
+                    echo '</div>';
+                }
+
+                if ($count === 0) {
+                    echo '<div class="alert alert-secondary">尚無收到評價紀錄。</div>';
+                } else {
+                    $avg = round($total / $count, 2);
+                    echo '<div class="alert alert-info">平均評分：<strong>' . $avg . '</strong> / 5，共 ' . $count . ' 筆</div>';
+                }
+
+                $stmt->close();
+            }
+
+            $conn->close();
+            ?>
         </div>
     </main>
 
-
-
-
-    <footer id="footer" class="footer light-background">
-        <div class="container">
-            <div class="row gy-3">
-                <div class="col-lg-3 col-md-6 d-flex">
-                    <i class="bi bi-geo-alt icon"></i>
-                    <div class="address">
-                        <h4>Address</h4>
-                        <p>A108 Adam Street</p>
-                        <p>New York, NY 535022</p>
-                    </div>
-                </div>
-
-                <div class="col-lg-3 col-md-6 d-flex">
-                    <i class="bi bi-telephone icon"></i>
-                    <div>
-                        <h4>Contact</h4>
-                        <p>
-                            <strong>Phone:</strong> <span>+1 5589 55488 55</span><br>
-                            <strong>Email:</strong> <span>info@example.com</span><br>
-                        </p>
-                    </div>
-                </div>
-
-                <div class="col-lg-3 col-md-6 d-flex">
-                    <i class="bi bi-clock icon"></i>
-                    <div>
-                        <h4>Opening Hours</h4>
-                        <p>
-                            <strong>Mon-Sat:</strong> <span>11AM - 23PM</span><br>
-                            <strong>Sunday:</strong> <span>Closed</span>
-                        </p>
-                    </div>
-                </div>
-
-                <div class="col-lg-3 col-md-6">
-                    <h4>Follow Us</h4>
-                    <div class="social-links d-flex">
-                        <a href="#" class="twitter"><i class="bi bi-twitter-x"></i></a>
-                        <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
-                        <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
-                        <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="container copyright text-center mt-4">
-            <p>© <span>Copyright</span> <strong class="px-1 sitename">EstateAgency</strong> <span>All Rights Reserved</span></p>
-            <div class="credits">
-                Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
-            </div>
-        </div>
-    </footer>
-
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/aos/aos.js"></script>
+    <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+    <script src="assets/js/main.js"></script>
 </body>
 
 </html>

@@ -378,7 +378,7 @@
         $account = $result_user->fetch_assoc();
 
         if ($u_permission === '管理者') {
-            // 管理者：查詢被檢舉次數 >= 3
+            // 被檢舉文章的SQL（你原本的 UNION 多表查詢）-- 被檢舉文章的SQL（管理者專用）
             $sql = "(
                 SELECT d.d_id, d.tag, d.d_date, d.d_ban,
                        o.event_name AS donate_title,
@@ -395,8 +395,10 @@
                 FROM demanded d 
                 JOIN org_donate o ON d.d_id = o.d_id 
                 LEFT JOIN User_Account ua ON o.c_email = ua.u_email
-                WHERE d.d_ban >= 3
-            ) UNION (
+                WHERE d.d_ban >= 1
+            )
+            UNION
+            (
                 SELECT d.d_id, d.tag, d.d_date, d.d_ban,
                        NULL AS donate_title,
                        c.title AS spons_title,
@@ -412,8 +414,10 @@
                 FROM demanded d 
                 JOIN cor_spons c ON d.d_id = c.d_id 
                 LEFT JOIN User_Account ua ON c.c_email = ua.u_email
-                WHERE d.d_ban >= 3
-            ) UNION (
+                WHERE d.d_ban >= 1
+            )
+            UNION
+            (
                 SELECT d.d_id, d.tag, d.d_date, d.d_ban,
                        NULL AS donate_title,
                        NULL AS spons_title,
@@ -429,8 +433,10 @@
                 FROM demanded d 
                 JOIN cor_intern i ON d.d_id = i.d_id 
                 LEFT JOIN User_Account ua ON i.c_email = ua.u_email
-                WHERE d.d_ban >= 3
-            ) UNION (
+                WHERE d.d_ban >= 1
+            )
+            UNION
+            (
                 SELECT d.d_id, d.tag, d.d_date, d.d_ban,
                        NULL AS donate_title,
                        NULL AS spons_title,
@@ -446,8 +452,10 @@
                 FROM demanded d 
                 JOIN corp_coop co ON d.d_id = co.d_id 
                 LEFT JOIN User_Account ua ON co.c_email = ua.u_email
-                WHERE d.d_ban >= 3
-            ) UNION (
+                WHERE d.d_ban >= 1
+            )
+            UNION
+            (
                 SELECT d.d_id, d.tag, d.d_date, d.d_ban,
                        NULL AS donate_title,
                        NULL AS spons_title,
@@ -463,18 +471,44 @@
                 FROM demanded d 
                 JOIN club_coop co ON d.d_id = co.d_id 
                 LEFT JOIN User_Account ua ON co.c_email = ua.u_email
-                WHERE d.d_ban >= 3
+                WHERE d.d_ban >= 1
             )
             ORDER BY d_date DESC";
             
-            
+        
+            // 執行文章查詢
             $stmt = $conn->prepare($sql);
             $stmt->execute();
-            $result = $stmt->get_result();
-            
-            
+            $result = $stmt->get_result();  // 用於被檢舉文章列表 (banpro-section)
+        
+            // 被檢舉帳號查詢（新的SQL）
+            $sql_banned_users = "
+SELECT 
+    ua.u_email AS user_email,
+    ua.u_permission AS user_permission,
+    ua.banac AS user_banac,
+    COALESCE(c.e_name, o.s_name, '無資料') AS contact_name,
+    COALESCE(c.e_phone, o.s_phone, '無資料') AS contact_phone
+FROM User_Account ua
+LEFT JOIN corporation_registrations c ON ua.u_email = c.u_email
+LEFT JOIN organization_registrations o ON ua.u_email = o.u_email
+WHERE ua.banac >= 1
+ORDER BY ua.banac DESC;
+        
+          ";
+        
+            $stmt2 = $conn->prepare($sql_banned_users);
+            $stmt2->execute();
+            $result_banned = $stmt2->get_result();
+        
+            // 將 $result_banned 轉成陣列，方便foreach用
+            $rows = [];
+            while ($row = $result_banned->fetch_assoc()) {
+                $rows[] = $row;
+            }
+        
         } else {
-            // 一般用戶：查詢自己的資料
+            // 一般使用者查詢自己文章 (不含帳號檢舉)
             $sql = "(
                 SELECT d.d_id, d.tag, d.d_date,
                        o.event_name AS donate_title,
@@ -547,7 +581,10 @@
             $stmt->bind_param("sssss", $u_email, $u_email, $u_email, $u_email, $u_email);
             $stmt->execute();
             $result = $stmt->get_result();
+        
+            $rows = []; // 沒有帳號被檢舉資料
         }
+        
         
         ?>
 
@@ -1144,35 +1181,26 @@ if ($currentUser) {
                         </div>
 
                         <div id="banac-section" class="section-content">
-                        <?php var_dump($row); ?>
-
-                            <?php
-                            $row = $result->fetch_assoc();
-                            echo "查詢筆數：" . $result->num_rows;
-
-                                // 依據你的 SQL 結果欄位，抓聯絡資訊
-                                // 這邊範例是你 SQL 裡不同來源欄位合併了，要判斷用哪個非 NULL
-                                $contact_name = $row['donate_c_name'] ?? $row['spons_c_name'] ?? $row['intern_c_name'] ?? $row['coop_c_name'] ?? '無聯絡人';
-                                $contact_phone = $row['donate_c_phone'] ?? $row['spons_c_phone'] ?? $row['intern_c_phone'] ?? $row['coop_c_phone'] ?? '無電話';
-                                $contact_email = $row['donate_c_email'] ?? $row['spons_c_email'] ?? $row['intern_c_email'] ?? $row['coop_c_email'] ?? '無Email';
-                            ?>
-                            <a href="./profile.php?user_email=<?= htmlspecialchars($row['user_email']) ?>">
-                                <div class='dcard-header'>
-                                    <span class='dcard-tag'>🚨 被檢舉帳號： <?= htmlspecialchars($row['tag']) ?></span>
-                                </div>
-                                <div class='dcard-body'>
-                                    <p><strong>⚠️ 此帳號已被檢舉 <?= (int)$row['user_banac'] ?> 次</strong></p>
-                                    <p><strong>📛 身份：<?= htmlspecialchars($row['user_permission']) ?></strong></p>
-                                </div>
-                                <div class='dcard-footer'>
-                                    <div>
-                                        <span>👤 聯絡人：<?= htmlspecialchars($contact_name) ?></span>
-                                        <span>📞 電話：<?= htmlspecialchars($contact_phone) ?></span>
-                                        <span>✉️ Email：<?= htmlspecialchars($contact_email) ?></span>
+                            <?php foreach ($rows as $row): ?>
+                                <a href="./profile.php?user_email=<?= htmlspecialchars($row['user_email']) ?>">
+                                    <div class="dcard-post">
+                                        <div class='dcard-header'>
+                                            <span class='dcard-tag'>🚨 被檢舉帳號</span>
+                                        </div>
+                                        <div class='dcard-body'>
+                                            <p><strong>⚠️ 此帳號已被檢舉 <?= (int)$row['user_banac'] ?> 次</strong></p>
+                                            <p><strong>📛 身份：</strong><?= htmlspecialchars($row['user_permission']) ?></p>
+                                            <p><strong>✉️ Email：</strong><?= htmlspecialchars($row['user_email']) ?></p>
+                                            <p><strong>👤 負責人：</strong><?= htmlspecialchars($row['contact_name']) ?></p>
+                                            <p><strong>📞 電話：</strong><?= htmlspecialchars($row['contact_phone']) ?></p>
+                                        </div>
                                     </div>
-                                </div>
-                            </a>
+                                </a>
+                            <?php endforeach; ?>
                         </div>
+
+
+
 
 
 
