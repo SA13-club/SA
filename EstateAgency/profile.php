@@ -1,5 +1,5 @@
 <?php
-session_start(); // 如果有使用 session，請開啟
+
 
 // 資料庫連線資訊
 $servername = "localhost";

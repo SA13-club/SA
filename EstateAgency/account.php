@@ -1081,6 +1081,8 @@ if ($currentUser) {
                                                                     $selected = ($i <= $feedbackScore) ? "selected" : "";
                                                                     echo "<span class='star $selected' data-value='$i'>★</span>";
                                                                 }
+                                                               echo '<a href="./complete_feedback.php?match_id=' . $r['d_id'] . '">點我給評</a>';
+
                                                             }
                                                 echo "</div>
                                                             <a class='btn chat-button' style='background-color:#28c76f;color:white; margin-left: 10px; border-radius: 100%;'
