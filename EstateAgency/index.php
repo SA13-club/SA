@@ -237,7 +237,7 @@
                           } else {
                               return ['title' => '（無法顯示）', 'content' => '此合作文章不是對企業發出的，無法顯示'];
                           }
-                      } else {
+                      } elseif ($_SESSION['u_permission'] === '組織團體') {
                           // 組織團體或未登入者
                           $sql1 = "SELECT coop_name AS title, coop_desc AS content FROM club_coop WHERE d_id = ?";
                           $stmt = $conn->prepare($sql1);
@@ -248,9 +248,19 @@
                           if ($row = $result->fetch_assoc()) {
                               return ['title' => $row['title'], 'content' => $row['content']];
                           }
-
-                          $sql2 = "SELECT coop_name AS title, coop_desc AS content FROM corp_coop WHERE d_id = ?";
+                      } else {
+                          $sql2 = "SELECT coop_name AS title, coop_desc AS content FROM club_coop WHERE d_id = ?";
                           $stmt = $conn->prepare($sql2);
+                          $stmt->bind_param('i', $d_id);
+                          $stmt->execute();
+                          $result = $stmt->get_result();
+                          $stmt->close();
+                          if ($row = $result->fetch_assoc()) {
+                              return ['title' => $row['title'], 'content' => $row['content']];
+                          }
+
+                          $sql3 = "SELECT coop_name AS title, coop_desc AS content FROM corp_coop WHERE d_id = ?";
+                          $stmt = $conn->prepare($sql3);
                           $stmt->bind_param('i', $d_id);
                           $stmt->execute();
                           $result = $stmt->get_result();
