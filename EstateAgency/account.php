@@ -834,7 +834,10 @@ if ($currentUser) {
                                         </div>
 
                                     </div>
-                                    <?php elseif ($u_permission === '管理者'): ?>
+                                </form>
+                            </div>
+                            <?php elseif ($u_permission === '管理者'): ?>
+                                    
                             <div id="form-section" class="contact section-content" style="display: none;">
                                 <form action="accountdb.php" method="post" class="php-email-form" data-aos="fade-up" data-aos-delay="200">
                                     <div class="row gy-4">
