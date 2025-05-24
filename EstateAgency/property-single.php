@@ -442,11 +442,15 @@ session_start();
                 </div>
 
                 <div class="my-2">
-                  <a href='deletepost.php?id=<?= htmlspecialchars($row['d_id']) ?>'
-                    class='btn btn-sm btn-danger'
-                    onclick="return confirm('確定要刪除這篇文章嗎？')">
-                    <i class='bi bi-trash'></i> 刪除文章
+                 <a
+                    href="deletepost.php?id=<?php echo urlencode($d_id); ?>"
+                    class="btn btn-sm btn-danger"
+                    onclick="return confirm('確定要刪除這篇文章嗎？')"
+                  >
+                    <i class="bi bi-trash"></i> 刪除文章
                   </a>
+
+
                 </div>
               <?php endif; ?>
               </div>
@@ -513,7 +517,7 @@ session_start();
         <!-- You can delete the links only if you've purchased the pro version. -->
         <!-- Licensing information: https://bootstrapmade.com/license/ -->
         <!-- Purchase the pro version with working PHP/AJAX contact form: [buy-url] -->
-        Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+        <!-- Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a> -->
       </div>
     </div>
   </footer>

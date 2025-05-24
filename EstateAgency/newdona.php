@@ -274,11 +274,11 @@
                                                 </div>
 
                                                 <div class="col-md-8">
-                                                    <input type="text" class="form-control" name="coop_name" placeholder="合作項目名稱" >
+                                                    <input type="text" class="form-control" name="coop_nameg" placeholder="合作項目名稱" >
                                                 </div>
                                         
                                                 <div class="col-md-12">
-                                                    <textarea class="form-control" name="coop_desc" rows="3" placeholder="詳細合作內容描述" ></textarea>
+                                                    <textarea class="form-control" name="coop_descg" rows="3" placeholder="詳細合作內容描述" ></textarea>
                                                 </div>
 
                                                 <div class="col-md-12">
@@ -323,10 +323,10 @@
                                                     <label>合作時間</label>
                                                     <div class="row">
                                                         <div class="col-md-4">
-                                                            <input type="date" class="form-control" name="coop_start" placeholder="開始日期" >
+                                                            <input type="date" class="form-control" name="coop_startg" placeholder="開始日期" >
                                                         </div>
                                                         <div class="col-md-4">
-                                                            <input type="date" class="form-control" name="coop_end" placeholder="結束日期" >
+                                                            <input type="date" class="form-control" name="coop_endg" placeholder="結束日期" >
                                                         </div>
                                                     </div>
                                                 </div>
