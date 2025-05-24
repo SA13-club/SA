@@ -80,6 +80,7 @@
             justify-content: space-between;
             align-items: center;
         }
+        
 
         .filter-bar py-3 border-bottom bg-light {
             background-color: white;
@@ -1194,8 +1195,8 @@ if ($currentUser) {
                                         </div>
                                         <div class='dcard-footer'>
                                         <div>
-                                            <span>👤 負責人：</strong><?= htmlspecialchars($row['contact_name']) ?></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                            <span>📞 電話：</strong><?= htmlspecialchars($row['contact_phone']) ?></span>
+                                            <span>👤 <strong>負責人：</strong><?= htmlspecialchars($row['contact_name']) ?></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                                            <span>📞 <strong>電話：</strong><?= htmlspecialchars($row['contact_phone']) ?></span>
                                         </div>
                                         <div>
                                             <a href='deletepost.php?id=<?= $row['d_id'] ?>' class='btn btn-sm btn-danger' onclick="return confirm('確定要刪除這個帳號嗎？')">
@@ -1213,10 +1214,7 @@ if ($currentUser) {
 
 
 
-                    <div id="banpro-section" class="section-content">
-
-                            
-                        <?php while ($row = $result->fetch_assoc()): ?>
+                    <div id="banpro-section" class="section-content">   <?php while ($row = $result->fetch_assoc()): ?>
                             <?php
                                 $d_id  = (int)$row['d_id'];
                                 $saved = in_array($d_id, $myFavs);
@@ -1256,7 +1254,8 @@ if ($currentUser) {
                             ?>                            
 
                             <div class='dcard-post'> 
-                                <a href="./property-single.php?id=<?=$row['d_id']?>">
+                                <!-- 不要把整個卡片都包在 a 裡 -->
+                                <a href="./property-single.php?id=<?= $row['d_id'] ?>" class="dcard-link">
                                     <div class='dcard-header'>
                                         <span class='dcard-tag'>🚨 被檢舉 #<?= htmlspecialchars($row['tag']) ?></span>
                                     </div>
@@ -1265,16 +1264,22 @@ if ($currentUser) {
                                         <p><strong>⚠️ 此文章已被檢舉 <?= (int)$row['d_ban'] ?> 次</strong></p>
                                         <p><strong><?= $label ?></strong> <?= !empty($title) ? htmlspecialchars($title) : '無標題' ?></p>
                                     </div>
-
-                                    <div class='dcard-footer'>
-                                        <div>
-                                            <span>👤 聯絡人：<?= htmlspecialchars($contact_name) ?></span>
-                                            <span>📞 電話：<?= htmlspecialchars($contact_phone) ?></span>
-                                            <span>✉️ Email：<?= htmlspecialchars($contact_email) ?></span>
-                                        </div>
-                                    </div>
                                 </a>
+
+                                <div class='dcard-footer'>
+                                    <div class="footer-left">
+                                        <span>👤 聯絡人：<?= htmlspecialchars($contact_name) ?></span>&nbsp;&nbsp;
+                                        <span>📞 電話：<?= htmlspecialchars($contact_phone) ?></span>&nbsp;&nbsp;
+                                        <span>✉️ Email：<?= htmlspecialchars($contact_email) ?></span>
+                                    </div>
+                                    <div class="footer-right">
+                                        <a href='deletepost.php?id=<?= $row['d_id'] ?>' class='btn btn-sm btn-danger' onclick="return confirm('確定要刪除這個文章嗎？')">
+                                            <i class='bi bi-trash'></i> 刪除文章
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
+
                         <?php endwhile; ?>
                         </div>
                         </div>
