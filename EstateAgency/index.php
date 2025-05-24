@@ -209,8 +209,8 @@
 
               // 使用者身份判斷
               $current_perm = $_SESSION['u_permission'] ?? '';
-              $hasPermission = !empty($current_perm); // 判斷是否有權限（等同是否登入且有身份）
-              $permission = ($hasPermission && $current_perm === '企業') ? '企業' : '組織團體';
+              $hasPermission = !empty($current_perm);
+              $permission = ($current_perm === '企業') ? '組織團體' : '企業';
 
               // 提取文章標題與內容
               function getDemandTitleContent($conn, $d_id, $tag, $permission) {
@@ -235,7 +235,7 @@
                           if ($row = $result->fetch_assoc()) {
                               return ['title' => $row['title'], 'content' => $row['content']];
                           } else {
-                              return ['title' => '（合作對象非企業）', 'content' => '此合作文章不是對企業發出的，無法顯示'];
+                              return ['title' => '（無法顯示）', 'content' => '此合作文章不是對企業發出的，無法顯示'];
                           }
                       } else {
                           // 組織團體或未登入者
@@ -259,16 +259,16 @@
                               return ['title' => $row['title'], 'content' => $row['content']];
                           }
 
-                          return ['title' => '（找不到對應資料）', 'content' => '這篇合作文章無法對應到資料表'];
+                          return ['title' => '（無法顯示）', 'content' => '這篇合作文章無法對應到資料表'];
                       }
                   } elseif ($tag === '實習') {
                       if ($permission === '企業') {
                           $sql = "SELECT intern_title AS title, intern_detail AS content FROM cor_intern WHERE d_id = ?";
                       } else {
-                          return ['title' => '（此實習文章無對應資料）', 'content' => '非企業帳號的實習文章無法顯示'];
+                          return ['title' => '（無法顯示）', 'content' => '非企業帳號的實習文章無法顯示'];
                       }
                   } else {
-                      return ['title' => '（未知分類）', 'content' => '這篇文章的分類不明，無法顯示內容'];
+                      return ['title' => '（無法顯示）', 'content' => '這篇文章的分類不明，無法顯示內容'];
                   }
 
                   if (!isset($sql)) return ['title' => '（無法顯示）', 'content' => '不符合條件'];
@@ -282,7 +282,7 @@
                   if ($row = $result->fetch_assoc()) {
                       return ['title' => $row['title'], 'content' => $row['content']];
                   } else {
-                      return ['title' => '（找不到對應資料）', 'content' => '這篇文章無法對應到資料表'];
+                      return ['title' => '（無法顯示）', 'content' => '這篇文章無法對應到資料表'];
                   }
               }
 
@@ -397,7 +397,11 @@
                               $tag = $row1['tag'];
                               $u_permission = $row1['u_permission'];
                               $titleContent = getDemandTitleContent($conn, $d_id, $tag, $u_permission);
-                              if ($permission === '企業' && $titleContent['title'] === '（合作對象非企業）') continue;
+
+                              if (
+                                  str_starts_with($titleContent['title'], '（') &&
+                                  str_contains($titleContent['title'], '無法顯示')
+                              ) continue;
 
                               $foundDemands[] = [
                                   'd_id'      => $d_id,
@@ -462,7 +466,12 @@
                           $tag = $row['tag'];
                           $u_permission = $row['u_permission'];
                           $titleContent = getDemandTitleContent($conn, $d_id, $tag, $u_permission);
-                          if ($permission === '企業' && $titleContent['title'] === '（合作對象非企業）') continue;
+
+
+                          if (
+                              str_starts_with($titleContent['title'], '（') &&
+                              str_contains($titleContent['title'], '無法顯示')
+                          ) continue;
 
                           $foundDemands[] = [
                               'd_id'      => $d_id,
