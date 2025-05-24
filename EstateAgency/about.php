@@ -235,38 +235,51 @@
   padding-right: 12rem; /* 保留右側空間 */
 
 }
+
+section,
+    .container,
+    .your-other-blocks {
+      background-color: transparent !important;
+    }
+    .page-title,
+    .page-title .container,
+    .breadcrumbs {
+      background: transparent !important;
+      z-index: 1;
+    }
 </style>
 
-<body class="about-page">
+<body class="index-page"style="
+  background-image: url('/SA/EstateAgency/assets/img/bg2.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  margin: 0;
+">
 
   <header id="header" class="header d-flex align-items-center fixed-top">
     <div class="container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
 
       <a href="index.php" class="logo d-flex align-items-center">
-        <!-- Uncomment the line below if you also wish to use an image logo -->
-        <!-- <img src="assets/img/logo.png" alt=""> -->
         <h1 class="sitename">Co<span>LaB</span></h1>
       </a>
 
       <nav id="navmenu" class="navmenu">
         <ul>
           <li><a href="index.php">主頁</a></li>
-          <li><a href="about.php" class="active">關於</a></li>
-          <li><a href="services.php">服務</a></li>
-          <li><a href="propertiesdemo.php">最新專案</a></li>
-          <li><a href="agents.php">合作單位</a></li>
+          <li><a href="about.php" class="active">操作指南</a></li>
+          <li><a href="propertiesdemo.php">專案總覽</a></li>
           <li><a href="contact.php">聯絡我們</a></li>
           <?php
           if ($_SESSION['u_email']) {
             echo "<li><a href='Logout.php'>登出</a></li>";
-            echo "<li><a href='account.php'>帳號管理</a></li>";
+            echo "<li><a href='account.php'>帳號中心</a></li>";
           } else {
             echo "<li><a href='LogIn.html'>登入</a></li>";
             echo "<li><a href='#' data-bs-toggle='modal' data-bs-target='#SignInPermission'>註冊</a></li>";
           }
           ?>
-          <!-- <li><a href="LogIn.html">登入</a></li>
-          <li><a href="#" data-bs-toggle="modal" data-bs-target="#SignInPermission">註冊</a></li> -->
 
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
@@ -292,23 +305,14 @@
         </div>
       </div>
     </div>
+
     <!-- Page Title -->
     <div class="page-title" data-aos="fade">
-      <div class="heading">
-        <div class="container">
-          <div class="row d-flex justify-content-center text-center">
-            <div class="col-lg-8">
-              <h1>大標題</h1>
-              <p class="mb-0">內文博</p>
-            </div>
-          </div>
-        </div>
-      </div>
       <nav class="breadcrumbs">
-        <div class="container">
+        <div class="container" style="padding: 85px 0 0 0;">
           <ol>
-            <li><a href="index.php">回首頁</a></li>
-            <li class="current">杞人憂天</li>
+            <li><a href="index.php">首頁</a></li>
+            <li class="current">操作指南</li>
           </ol>
         </div>
       </nav>
@@ -316,6 +320,11 @@
 
     <!-- About Section -->
     <section id="about" class="about section">
+
+      <div class="container section-title" data-aos="fade-up">
+          <h2>操作指南</h2>
+          <p class="mb-0">你不會，我教你</p>
+      </div>
 
       <div class="container">
 
@@ -447,10 +456,6 @@
           
 
         </div>
-         
-
-          
-          
 
         </div>
 
@@ -572,9 +577,9 @@
         <div class="col-lg-3 col-md-6 d-flex">
           <i class="bi bi-geo-alt icon"></i>
           <div class="address">
-            <h4>Address</h4>
-            <p>A108 Adam Street</p>
-            <p>New York, NY 535022</p>
+            <h4>地址</h4>
+            <p>輔仁大學</p>
+            <p>新北市 新莊區</p>
             <p></p>
           </div>
 
@@ -583,10 +588,10 @@
         <div class="col-lg-3 col-md-6 d-flex">
           <i class="bi bi-telephone icon"></i>
           <div>
-            <h4>Contact</h4>
+            <h4>聯絡</h4>
             <p>
-              <strong>Phone:</strong> <span>+1 5589 55488 55</span><br>
-              <strong>Email:</strong> <span>info@example.com</span><br>
+              <strong>電話：</strong> <span>0979822638</span><br>
+              <strong>Email：</strong> <span>dennis.940822@gmail.com</span><br>
             </p>
           </div>
         </div>
@@ -594,10 +599,10 @@
         <div class="col-lg-3 col-md-6 d-flex">
           <i class="bi bi-clock icon"></i>
           <div>
-            <h4>Opening Hours</h4>
+            <h4>客服時間</h4>
             <p>
-              <strong>Mon-Sat:</strong> <span>11AM - 23PM</span><br>
-              <strong>Sunday</strong>: <span>Closed</span>
+              <strong>星期一～星期六：</strong> <span>11AM - 23PM</span><br>
+              <strong>星期天：</strong> <span>公休</span>
             </p>
           </div>
         </div>
@@ -605,10 +610,8 @@
         <div class="col-lg-3 col-md-6">
           <h4>Follow Us</h4>
           <div class="social-links d-flex">
-            <a href="#" class="twitter"><i class="bi bi-twitter-x"></i></a>
-            <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
-            <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
-            <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
+            <a href="https://www.instagram.com/kamt1n/" target="_blank" class="instagram"><i class="bi bi-instagram"></i></a>
+            <a href="https://discord.gg/qCmPcxba" target="_blank" class="linkedin"><i class="bi bi-discord"></i></a>
           </div>
         </div>
 
@@ -616,7 +619,8 @@
     </div>
 
     <div class="container copyright text-center mt-4">
-      <p>© <span>Copyright</span> <strong class="px-1 sitename">EstateAgency</strong> <span>All Rights Reserved</span></p>
+      <p>© <span>Copyright</span> <strong class="px-1 sitename">EstateAgency</strong> <span>All Rights Reserved</span>
+      </p>
       <div class="credits">
         <!-- All the links in the footer should remain intact. -->
         <!-- You can delete the links only if you've purchased the pro version. -->

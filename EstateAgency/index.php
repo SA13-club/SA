@@ -38,33 +38,20 @@
   ======================================================== -->
   <style>
     section,
-                .container,
-                .your-other-blocks {
-                background-color: transparent !important;
-                }
-                .page-title,
-                .page-title .container,
-                .breadcrumbs {
-                background: transparent !important;
-                z-index: 1;
-                }
-    .chat-button {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background-color: #0084ff;
-      color: white;
-      padding: 12px 18px;
-      border-radius: 30px;
-      text-decoration: none;
-      font-weight: bold;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-      z-index: 999;
-      transition: background-color 0.3s;
+    .container,
+    .your-other-blocks {
+      background-color: transparent !important;
     }
-
-    .chat-button:hover {
-      background-color: #006bbf;
+    .page-title,
+    .page-title .container,
+    .breadcrumbs {
+      background: transparent !important;
+      z-index: 1;
+    }
+    .member .pic img {
+      width: 100%;
+      height: 400px; /* 可依需求調整 */
+      object-fit: cover; /* 保持圖片比例並填滿容器 */
     }
   </style>
 
@@ -82,30 +69,24 @@
     <div class="container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
 
       <a href="index.php" class="logo d-flex align-items-center">
-        <!-- Uncomment the line below if you also wish to use an image logo -->
-        <!-- <img src="assets/img/logo.png" alt=""> -->
         <h1 class="sitename">Co<span>LaB</span></h1>
       </a>
 
       <nav id="navmenu" class="navmenu">
         <ul>
           <li><a href="index.php" class="active">主頁</a></li>
-          <li><a href="about.php">關於</a></li>
-          <li><a href="services.php">服務</a></li>
-          <li><a href="propertiesdemo.php">最新專案</a></li>
-          <li><a href="agents.php">合作單位</a></li>
+          <li><a href="about.php">操作指南</a></li>
+          <li><a href="propertiesdemo.php">專案總覽</a></li>
           <li><a href="contact.php">聯絡我們</a></li>
           <?php
           if ($_SESSION['u_email']) {
             echo "<li><a href='Logout.php'>登出</a></li>";
-            echo "<li><a href='account.php'>帳號管理</a></li>";
+            echo "<li><a href='account.php'>帳號中心</a></li>";
           } else {
             echo "<li><a href='LogIn.html'>登入</a></li>";
             echo "<li><a href='#' data-bs-toggle='modal' data-bs-target='#SignInPermission'>註冊</a></li>";
           }
           ?>
-          <!-- <li><a href="LogIn.html">登入</a></li>
-          <li><a href="#" data-bs-toggle="modal" data-bs-target="#SignInPermission">註冊</a></li> -->
 
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
@@ -122,7 +103,7 @@
       <div id="hero-carousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
 
         <div class="carousel-item active">
-          <img src="assets/img/hero-carousel/hero-carousel-1.jpg" alt="">
+          <img src="assets/img/party.jpg" alt="">
           <div class="carousel-container">
             <div>
               <!-- <p>Organization</p> -->
@@ -150,22 +131,11 @@
         </div>
 
         <div class="carousel-item">
-          <img src="assets/img/hero-carousel/hero-carousel-2.jpg" alt="">
+          <img src="assets/img/company.jpg" alt="">
           <div class="carousel-container">
             <div>
               <!-- <p>Doral, Florida</p> -->
               <h2><span>企業 </span> Business</h2>
-            </div>
-          </div>
-        </div><!-- End Carousel Item -->
-
-        <div class="carousel-item">
-          <img src="assets/img/hero-carousel/hero-carousel-3.jpg" alt="">
-          <div class="carousel-container">
-            <div>
-              <!-- <p>Doral, Florida</p> -->
-              <h2><span>個人 </span>Person</h2>
-              <a href="property-single.php" class="btn-get-started">rent | $ 3.000</a>
             </div>
           </div>
         </div><!-- End Carousel Item -->
@@ -536,57 +506,61 @@
 
       <!-- Section Title -->
       <div class="container section-title" data-aos="fade-up">
-        <h2>最鐵贊助商</h2>
-        <p>贊助排行榜</p>
+        <h2>我們的團隊</h2>
+        <p>CoLaB成員</p>
       </div><!-- End Section Title -->
 
       <div class="container">
 
         <div class="row gy-5">
 
-          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+          <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="100">
             <div class="member">
-              <div class="pic"><img src="assets/img/team/team-1.jpg" class="img-fluid" alt=""></div>
+              <div class="pic"><img src="assets/img/kamt1n.jpg" class="img-fluid" alt=""></div>
               <div class="member-info">
-                <h4>黃經理</h4>
-                <span>已贊助50+社團與組織</span>
+                <h4>許建廷</h4>
+                <span>美編及程式設計</span>
                 <div class="social">
-                  <a href=""><i class="bi bi-twitter-x"></i></a>
-                  <a href=""><i class="bi bi-facebook"></i></a>
-                  <a href=""><i class="bi bi-instagram"></i></a>
-                  <a href=""><i class="bi bi-linkedin"></i></a>
+                  <a href="https://www.instagram.com/kamt1n/" target="_blank"><i class="bi bi-instagram"></i></a>
                 </div>
               </div>
             </div>
           </div><!-- End Team Member -->
 
-          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+          <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
             <div class="member">
-              <div class="pic"><img src="assets/img/team/team-2.jpg" class="img-fluid" alt=""></div>
+              <div class="pic"><img src="assets/img/lgc.jpg" class="img-fluid" alt=""></div>
               <div class="member-info">
-                <h4>林董事</h4>
-                <span>已贊助50k+</span>
+                <h4>林國丞</h4>
+                <span>領導及程式設計</span>
                 <div class="social">
-                  <a href=""><i class="bi bi-twitter-x"></i></a>
-                  <a href=""><i class="bi bi-facebook"></i></a>
-                  <a href=""><i class="bi bi-instagram"></i></a>
-                  <a href=""><i class="bi bi-linkedin"></i></a>
+                  <a href="https://www.instagram.com/lgc_731/" target="_blank"><i class="bi bi-instagram"></i></a>
                 </div>
               </div>
             </div>
           </div><!-- End Team Member -->
 
-          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+          <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
             <div class="member">
-              <div class="pic"><img src="assets/img/team/team-3.jpg" class="img-fluid" alt=""></div>
+              <div class="pic"><img src="assets/img/waffle.jpg" class="img-fluid" alt=""></div>
               <div class="member-info">
-                <h4>張經理</h4>
-                <span>已促成多次職涯講座<br></span>
+                <h4>張文謙</h4>
+                <span>程式設計主力<br></span>
                 <div class="social">
-                  <a href=""><i class="bi bi-twitter-x"></i></a>
-                  <a href=""><i class="bi bi-facebook"></i></a>
-                  <a href=""><i class="bi bi-instagram"></i></a>
-                  <a href=""><i class="bi bi-linkedin"></i></a>
+                  <a href="#" target="_blank"><i class="bi bi-discord"></i></a>
+                </div>
+              </div>
+            </div>
+          </div><!-- End Team Member -->
+
+          <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="400">
+            <div class="member">
+              <div class="pic"><img src="assets/img/cheng.jpg" class="img-fluid" alt=""></div>
+              <div class="member-info">
+                <h4>陳冠丞</h4>
+                <span>文件處理及測試員</span>
+                <div class="social">
+                  <a href="https://www.instagram.com/_cheng._905/" target="_blank"><i class="bi bi-instagram"></i></a>
                 </div>
               </div>
             </div>
@@ -598,139 +572,6 @@
 
     </section><!-- /Agents Section -->
 
-    <!-- Testimonials Section -->
-    <section id="testimonials" class="testimonials section">
-
-      <!-- Section Title -->
-      <div class="container section-title" data-aos="fade-up">
-        <h2>用戶回饋</h2>
-        <p>最真實的用戶反應</p>
-      </div><!-- End Section Title -->
-
-      <div class="container" data-aos="fade-up" data-aos-delay="100">
-
-        <div class="swiper init-swiper">
-          <script type="application/json" class="swiper-config">
-            {
-              "loop": true,
-              "speed": 600,
-              "autoplay": {
-                "delay": 5000
-              },
-              "slidesPerView": "auto",
-              "pagination": {
-                "el": ".swiper-pagination",
-                "type": "bullets",
-                "clickable": true
-              },
-              "breakpoints": {
-                "320": {
-                  "slidesPerView": 1,
-                  "spaceBetween": 40
-                },
-                "1200": {
-                  "slidesPerView": 3,
-                  "spaceBetween": 1
-                }
-              }
-            }
-          </script>
-          <div class="swiper-wrapper">
-
-
-
-            <div class="swiper-slide">
-              <div class="testimonial-item">
-                <div class="stars">
-                  <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i
-                    class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                </div>
-                <p>
-                  評論一
-                </p>
-                <div class="profile mt-auto">
-                  <img src="assets/img/testimonials/testimonials-2.jpg" class="testimonial-img" alt="">
-                  <h3>用戶一</h3>
-                  <h4>身份</h4>
-                </div>
-              </div>
-            </div><!-- End testimonial item -->
-
-            <div class="swiper-slide">
-              <div class="testimonial-item">
-                <div class="stars">
-                  <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i
-                    class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                </div>
-                <p>
-                  評論二
-                </p>
-                <div class="profile mt-auto">
-                  <img src="assets/img/testimonials/testimonials-3.jpg" class="testimonial-img" alt="">
-                  <h3>用戶二</h3>
-                  <h4>身份</h4>
-                </div>
-              </div>
-            </div><!-- End testimonial item -->
-
-            <div class="swiper-slide">
-              <div class="testimonial-item">
-                <div class="stars">
-                  <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i
-                    class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                </div>
-                <p>
-                  評論三
-                </p>
-                <div class="profile mt-auto">
-                  <img src="assets/img/testimonials/testimonials-4.jpg" class="testimonial-img" alt="">
-                  <h3>用戶三</h3>
-                  <h4>身份</h4>
-                </div>
-              </div>
-            </div><!-- End testimonial item -->
-
-            <div class="swiper-slide">
-              <div class="testimonial-item">
-                <div class="stars">
-                  <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i
-                    class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                </div>
-                <p>
-                  評論四
-                </p>
-                <div class="profile mt-auto">
-                  <img src="assets/img/testimonials/testimonials-5.jpg" class="testimonial-img" alt="">
-                  <h3>用戶四</h3>
-                  <h4>身份</h4>
-                </div>
-              </div>
-            </div><!-- End testimonial item -->
-            <div class="swiper-slide">
-              <div class="testimonial-item">
-                <div class="stars">
-                  <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i
-                    class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                </div>
-                <p>
-                  評論五
-                </p>
-                <div class="profile mt-auto">
-                  <img src="assets/img/testimonials/testimonials-1.jpg" class="testimonial-img" alt="">
-                  <h3>用戶五</h3>
-                  <h4>身份</h4>
-                </div>
-              </div>
-            </div><!-- End testimonial item -->
-
-          </div>
-          <div class="swiper-pagination"></div>
-        </div>
-
-      </div>
-
-    </section><!-- /Testimonials Section -->
-
   </main>
 
   <footer id="footer" class="footer light-background">
@@ -740,9 +581,9 @@
         <div class="col-lg-3 col-md-6 d-flex">
           <i class="bi bi-geo-alt icon"></i>
           <div class="address">
-            <h4>Address</h4>
-            <p>A108 Adam Street</p>
-            <p>New York, NY 535022</p>
+            <h4>地址</h4>
+            <p>輔仁大學</p>
+            <p>新北市 新莊區</p>
             <p></p>
           </div>
 
@@ -751,10 +592,10 @@
         <div class="col-lg-3 col-md-6 d-flex">
           <i class="bi bi-telephone icon"></i>
           <div>
-            <h4>Contact</h4>
+            <h4>聯絡</h4>
             <p>
-              <strong>Phone:</strong> <span>+1 5589 55488 55</span><br>
-              <strong>Email:</strong> <span>info@example.com</span><br>
+              <strong>電話：</strong> <span>0979822638</span><br>
+              <strong>Email：</strong> <span>dennis.940822@gmail.com</span><br>
             </p>
           </div>
         </div>
@@ -762,10 +603,10 @@
         <div class="col-lg-3 col-md-6 d-flex">
           <i class="bi bi-clock icon"></i>
           <div>
-            <h4>Opening Hours</h4>
+            <h4>客服時間</h4>
             <p>
-              <strong>Mon-Sat:</strong> <span>11AM - 23PM</span><br>
-              <strong>Sunday</strong>: <span>Closed</span>
+              <strong>星期一～星期六：</strong> <span>11AM - 23PM</span><br>
+              <strong>星期天：</strong> <span>公休</span>
             </p>
           </div>
         </div>
@@ -773,10 +614,8 @@
         <div class="col-lg-3 col-md-6">
           <h4>Follow Us</h4>
           <div class="social-links d-flex">
-            <a href="#" class="twitter"><i class="bi bi-twitter-x"></i></a>
-            <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
-            <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
-            <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
+            <a href="https://www.instagram.com/kamt1n/" target="_blank" class="instagram"><i class="bi bi-instagram"></i></a>
+            <a href="https://discord.gg/qCmPcxba" target="_blank" class="linkedin"><i class="bi bi-discord"></i></a>
           </div>
         </div>
 
@@ -813,15 +652,6 @@
 
   <!-- Main JS File -->
   <script src="assets/js/main.js"></script>
- 
-  <?php
-
- $u_email = $_SESSION['u_email'] ?? '';
- $safe_email = urlencode($u_email); // 確保網址安全
- if ($_SESSION['u_permission']) {
-   echo '<a href="./chat/public/index .php?u_email=' . $safe_email . '" target="_blank" class="chat-button">聊天室</a>';
- }
- ?>
 
 
 </body>
