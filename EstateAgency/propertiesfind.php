@@ -84,7 +84,14 @@
   </style>
 </head>
 
-<body class="properties-page">
+<body class="properties-page" 　style="
+  background-image: url('./assets/img/bg2.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  margin: 0;
+">
 
   <header id="header" class="header d-flex align-items-center fixed-top">
     <div class="container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
@@ -146,55 +153,54 @@
 
       <div class='container'>
 
-                          <!-- 搜尋區塊 -->
-                <section class="search-bar py-4 bg-light">
-                  <div class="container">
-                    <form action="./propertiesfind.php" method="GET" class="row g-2 align-items-center justify-content-center">
+        <!-- 搜尋區塊 -->
+        <section class="search-bar py-4 bg-light">
+          <div class="container">
+            <form action="./propertiesfind.php" method="GET" class="row g-2 align-items-center justify-content-center">
 
-                      <!-- 第一個下拉框：選擇類型 -->
-                      <div class="col-md-3">
-                  <select class="form-select form-select-lg" name="type">
-                    <option value="all" selected>全部</option>
-                    <?php
-                    $link = mysqli_connect('localhost', 'root', '', 'sa');
-                    if (!$link) {
-                        die('連線失敗: ' . mysqli_connect_error());
-                    }
+              <!-- 第一個下拉框：選擇類型 -->
+              <div class="col-md-3">
+                <select class="form-select form-select-lg" name="type">
+                  <option value="all" selected>全部</option>
+                  <?php
+                  $link = mysqli_connect('localhost', 'root', '', 'sa');
+                  if (!$link) {
+                    die('連線失敗: ' . mysqli_connect_error());
+                  }
 
-                    $tag_sql = "SELECT DISTINCT tag FROM demanded WHERE tag IS NOT NULL AND tag != ''";
-                    $tag_result = mysqli_query($link, $tag_sql);
+                  $tag_sql = "SELECT DISTINCT tag FROM demanded WHERE tag IS NOT NULL AND tag != ''";
+                  $tag_result = mysqli_query($link, $tag_sql);
 
-                    while ($row = mysqli_fetch_assoc($tag_result)) {
-                        $tag_value = htmlspecialchars($row['tag']);
-                        $tag_display = $tag_value === 'spon' ? '贊助' :
-                                      ($tag_value === 'intern' ? '實習' : $tag_value);
-                        echo "<option value=\"$tag_value\">$tag_display</option>";
-                    }
-                    ?>
-                  </select>
-
+                  while ($row = mysqli_fetch_assoc($tag_result)) {
+                    $tag_value = htmlspecialchars($row['tag']);
+                    $tag_display = $tag_value === 'spon' ? '贊助' : ($tag_value === 'intern' ? '實習' : $tag_value);
+                    echo "<option value=\"$tag_value\">$tag_display</option>";
+                  }
+                  ?>
+                </select>
 
 
-                  
-</div>
 
 
-      <!-- 第二個輸入框：關鍵字搜尋 -->
-      <div class="col-md-5">
-        <input type="text" class="form-control form-control-lg" name="keyword" placeholder="請輸入關鍵字搜尋...">
-      </div>
+              </div>
 
-      <!-- 搜尋按鈕 -->
-      <div class="col-md-2">
-        <button type="submit" class="btn btn-primary btn-lg w-100">
-          <i class="bi bi-search me-2"></i>搜尋
-        </button>
-      </div>
 
-    </form>
-  </div>
-</section>
-<section class="filter-bar py-3 bg-light">
+              <!-- 第二個輸入框：關鍵字搜尋 -->
+              <div class="col-md-5">
+                <input type="text" class="form-control form-control-lg" name="keyword" placeholder="請輸入關鍵字搜尋...">
+              </div>
+
+              <!-- 搜尋按鈕 -->
+              <div class="col-md-2">
+                <button type="submit" class="btn btn-primary btn-lg w-100">
+                  <i class="bi bi-search me-2"></i>搜尋
+                </button>
+              </div>
+
+            </form>
+          </div>
+        </section>
+        <section class="filter-bar py-3 bg-light">
           <div class="container">
             <div class="row justify-content-center align-items-center">
               <div class="row justify-content-center align-items-center">
@@ -285,7 +291,7 @@
               </div>
             </div>
         </section>
-       
+
 
 
 
@@ -302,7 +308,7 @@
               $u_permission = $_SESSION['u_permission'];
               $type = $_GET['type'] ?? 'all';
               $keyword = $_GET['keyword'] ?? '';
-              
+
 
               $tagQuery = "SELECT DISTINCT d.tag FROM demanded d 
   LEFT JOIN org_donate od ON d.d_id = od.d_id
@@ -316,7 +322,7 @@ WHERE d.tag IS NOT NULL AND d.tag != '' AND d.u_permission != '$u_permission'";
 
               while ($row = mysqli_fetch_assoc($tagResult)) {
                 $tag = $row['tag']; // <-- 注意這裡取 'tag'
-              
+
                 // echo "<button type='button' class='btn btn-outline-primary filter-button' data-filter='{$tag}'>{$tag}</button>";
               }
               ?>
@@ -343,22 +349,22 @@ WHERE d.tag IS NOT NULL AND d.tag != '' AND d.u_permission != '$u_permission'";
             </div>
             <?php
 
-$link = mysqli_connect('localhost', 'root', '', 'sa');
-if (!$link) {
-    die('連線失敗: ' . mysqli_connect_error());
-}
+            $link = mysqli_connect('localhost', 'root', '', 'sa');
+            if (!$link) {
+              die('連線失敗: ' . mysqli_connect_error());
+            }
 
-$type = $_GET['type'] ?? 'all';
-$keyword = $_GET['keyword'] ?? '';
-$u_permission = $_SESSION['u_permission'] ?? '';
+            $type = $_GET['type'] ?? 'all';
+            $keyword = $_GET['keyword'] ?? '';
+            $u_permission = $_SESSION['u_permission'] ?? '';
 
 
-// 組基本SQL
-$params = [];
-$types = '';
+            // 組基本SQL
+            $params = [];
+            $types = '';
 
-if ($u_permission === '組織團體') {
-    $sql = "
+            if ($u_permission === '組織團體') {
+              $sql = "
         SELECT d.*,
                ci.c_name AS intern_c_name, ci.c_phone AS intern_c_phone, ci.c_email AS intern_c_email, ci.intern_title AS intern_title, ci.intern_detail AS intern_content,
                cs.c_name AS spons_c_name, cs.c_phone AS spons_c_phone, cs.c_email AS spons_c_email, cs.title AS spons_title, cs.content AS spons_content,
@@ -372,8 +378,8 @@ if ($u_permission === '組織團體') {
         LEFT JOIN club_coop clc ON d.d_id = clc.d_id 
         WHERE d.u_permission != ?
     ";
-} elseif ($u_permission === '企業') {
-  $sql = "
+            } elseif ($u_permission === '企業') {
+              $sql = "
   SELECT d.*,
          od.c_name AS donate_c_name,
          od.c_phone AS donate_c_phone,
@@ -391,76 +397,75 @@ if ($u_permission === '組織團體') {
   LEFT JOIN corp_coop cc ON d.d_id = cc.d_id
   WHERE d.u_permission != ?
 ";
+            } else {
+              die('權限錯誤');
+            }
 
-} else {
-    die('權限錯誤');
-}
+            // 綁第一個參數
+            $params[] = &$u_permission;
+            $types .= 's';
 
-// 綁第一個參數
-$params[] = &$u_permission;
-$types .= 's';
+            // 加 type 篩選
+            if ($type !== 'all') {
+              $sql .= " AND d.tag = ?";
+              $params[] = &$type;
+              $types .= 's';
+            }
 
-// 加 type 篩選
-if ($type !== 'all') {
-    $sql .= " AND d.tag = ?";
-    $params[] = &$type;
-    $types .= 's';
-}
-
-// 加 keyword 搜尋條件
-$keyword_like = "%$keyword%";
-if (!empty($keyword)) {
-    if ($u_permission === '組織團體') {
-        $sql .= " AND (
+            // 加 keyword 搜尋條件
+            $keyword_like = "%$keyword%";
+            if (!empty($keyword)) {
+              if ($u_permission === '組織團體') {
+                $sql .= " AND (
             (ci.intern_title LIKE ? OR ci.intern_detail LIKE ?) OR
             (cs.title LIKE ? OR cs.content LIKE ?)
             OR
             (clc.coop_name LIKE ? OR clc.coop_desc LIKE ?)
         )";
-    } elseif ($u_permission === '企業') {
-        $sql .= " AND (
+              } elseif ($u_permission === '企業') {
+                $sql .= " AND (
             (od.event_name LIKE ? OR od.event_description LIKE ?) OR
             (cc.coop_name LIKE ? OR cc.coop_desc LIKE ?)
          
         )";
-    }
-if (!empty($keyword)) {
-    if ($u_permission === '組織團體') {
-        // SQL 已经有 6 个 LIKE ?，下面就绑定 6 个
-        for ($i = 0; $i < 6; $i++) {
-            $params[] = &$keyword_like;
-            $types  .= 's';
-        }
-    }
-    elseif ($u_permission === '企業') {
-        // 企业分支只有 4 个 LIKE ? 
-        for ($i = 0; $i < 4; $i++) {
-            $params[] = &$keyword_like;
-            $types  .= 's';
-        }
-    }
-}
+              }
+              if (!empty($keyword)) {
+                if ($u_permission === '組織團體') {
+                  // SQL 已经有 6 个 LIKE ?，下面就绑定 6 个
+                  for ($i = 0; $i < 6; $i++) {
+                    $params[] = &$keyword_like;
+                    $types  .= 's';
+                  }
+                } elseif ($u_permission === '企業') {
+                  // 企业分支只有 4 个 LIKE ? 
+                  for ($i = 0; $i < 4; $i++) {
+                    $params[] = &$keyword_like;
+                    $types  .= 's';
+                  }
+                }
+              }
+            }
 
-}
+            // 準備和綁定參數
+            $stmt = mysqli_prepare($link, $sql);
+            if (!$stmt) {
+              die('Prepare failed: ' . mysqli_error($link));
+            }
 
-// 準備和綁定參數
-$stmt = mysqli_prepare($link, $sql);
-if (!$stmt) {
-    die('Prepare failed: ' . mysqli_error($link));
-}
+            array_unshift($params, $types);
+            call_user_func_array([$stmt, 'bind_param'], $params);
 
-array_unshift($params, $types);
-call_user_func_array([$stmt, 'bind_param'], $params);
+            // 執行
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
 
-// 執行
-mysqli_stmt_execute($stmt);
-$result = mysqli_stmt_get_result($stmt);
-
-// 顯示結果
-while ($row = mysqli_fetch_assoc($result)) {
-  $tag=$row['tag'];
-  if($tag=='spon'){$tag='贊助';}
-    echo "
+            // 顯示結果
+            while ($row = mysqli_fetch_assoc($result)) {
+              $tag = $row['tag'];
+              if ($tag == 'spon') {
+                $tag = '贊助';
+              }
+              echo "
     <div class='dcard-post' data-category='" . htmlspecialchars($tag) . "'>
         <a href='property-single.php?id=" . htmlspecialchars($row['d_id']) . "'>
             <div class='dcard-header'>
@@ -469,54 +474,53 @@ while ($row = mysqli_fetch_assoc($result)) {
             <div class='dcard-footer'>
     ";
 
-    if ($u_permission === '組織團體') {
-        if (!empty($row['intern_c_name'])) {
-            echo "
+              if ($u_permission === '組織團體') {
+                if (!empty($row['intern_c_name'])) {
+                  echo "
                 <span>聯絡人：" . htmlspecialchars($row['intern_c_name']) . "</span>
                 <span>電話：" . htmlspecialchars($row['intern_c_phone']) . "</span>
                 <span>Email：" . htmlspecialchars($row['intern_c_email']) . "</span>
             ";
-        } elseif (!empty($row['spons_c_name'])) {
-            echo "
+                } elseif (!empty($row['spons_c_name'])) {
+                  echo "
                 <span>聯絡人：" . htmlspecialchars($row['spons_c_name']) . "</span>
                 <span>電話：" . htmlspecialchars($row['spons_c_phone']) . "</span>
                 <span>Email：" . htmlspecialchars($row['spons_c_email']) . "</span>
             ";
-        } 
-        elseif (!empty($row['club_c_name'])) {
-          echo "
+                } elseif (!empty($row['club_c_name'])) {
+                  echo "
               <span>聯絡人：" . htmlspecialchars($row['club_c_name']) . "</span>
               <span>電話：" . htmlspecialchars($row['club_c_phone']) . "</span>
               <span>Email：" . htmlspecialchars($row['club_c_email']) . "</span>
           ";
-      }else {
-            echo "<span>尚無聯絡資料</span>";
-        }
-    } elseif ($u_permission === '企業') {
-        if (!empty($row['donate_c_name'])) {
-            echo "
+                } else {
+                  echo "<span>尚無聯絡資料</span>";
+                }
+              } elseif ($u_permission === '企業') {
+                if (!empty($row['donate_c_name'])) {
+                  echo "
                 <span>聯絡人：" . htmlspecialchars($row['donate_c_name']) . "</span>
                 <span>電話：" . htmlspecialchars($row['donate_c_phone']) . "</span>
                 <span>Email：" . htmlspecialchars($row['donate_c_email']) . "</span>
             ";
-        } elseif (!empty($row['coop_c_name'])) {
-            echo "
+                } elseif (!empty($row['coop_c_name'])) {
+                  echo "
                 <span>聯絡人：" . htmlspecialchars($row['coop_c_name']) . "</span>
                 <span>電話：" . htmlspecialchars($row['coop_c_phone']) . "</span>
                 <span>Email：" . htmlspecialchars($row['coop_c_email']) . "</span>
             ";
-        } else {
-            echo "<span>尚無聯絡資料</span>";
-        }
-    }
+                } else {
+                  echo "<span>尚無聯絡資料</span>";
+                }
+              }
 
-    echo "
+              echo "
             </div>
         </a>
     </div>
     ";
-}
-?>
+            }
+            ?>
 
 
 
@@ -602,17 +606,20 @@ while ($row = mysqli_fetch_assoc($result)) {
     });
 
     clearButton.addEventListener('click', () => {
-      buttons.forEach(btn => btn.classList.remove('active'));
-      updateVisibleCards();
+      const urlParams = new URLSearchParams(window.location.search);
+      const type = urlParams.get('type') || 'all';
+      const keyword = urlParams.get('keyword') || '';
+      window.location.href = `propertiesfind.php?type=${encodeURIComponent(type)}&keyword=${encodeURIComponent(keyword)}`;
     });
+
 
     updateVisibleCards(); // 初始顯示全部卡片
   </script>
 
 
 
-<!-- 篩選java -->
- 
+  <!-- 篩選java -->
+
   <script>
     const fieldOptions = {
       '合作': ['合作方式', '合作地點', '合作效益'],
@@ -686,6 +693,7 @@ while ($row = mysqli_fetch_assoc($result)) {
         label: '5萬以上'
       }
     ];
+    const userPermission = "<?php echo in_array($_SESSION['u_permission'], ['企業', '組織團體']) ? $_SESSION['u_permission'] : ''; ?>";
 
     document.getElementById('applyFilters').addEventListener('click', function() {
       const tag = document.getElementById('tagSelect').value;
