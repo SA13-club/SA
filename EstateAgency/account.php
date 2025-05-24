@@ -1190,10 +1190,19 @@ if ($currentUser) {
                                         <div class='dcard-body'>
                                             <p><strong>⚠️ 此帳號已被檢舉 <?= (int)$row['user_banac'] ?> 次</strong></p>
                                             <p><strong>📛 身份：</strong><?= htmlspecialchars($row['user_permission']) ?></p>
-                                            <p><strong>✉️ Email：</strong><?= htmlspecialchars($row['user_email']) ?></p>
-                                            <p><strong>👤 負責人：</strong><?= htmlspecialchars($row['contact_name']) ?></p>
-                                            <p><strong>📞 電話：</strong><?= htmlspecialchars($row['contact_phone']) ?></p>
+                                            <p><strong>✉️ 會員Email：</strong><?= htmlspecialchars($row['user_email']) ?></p>
                                         </div>
+                                        <div class='dcard-footer'>
+                                        <div>
+                                            <span>👤 負責人：</strong><?= htmlspecialchars($row['contact_name']) ?></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                            <span>📞 電話：</strong><?= htmlspecialchars($row['contact_phone']) ?></span>
+                                        </div>
+                                        <div>
+                                            <a href='deletepost.php?id=<?= $row['d_id'] ?>' class='btn btn-sm btn-danger' onclick="return confirm('確定要刪除這個帳號嗎？')">
+                                                    <i class='bi bi-trash'></i> 刪除帳號
+                                            </a>
+                                        </div>
+                                    </div>
                                     </div>
                                 </a>
                             <?php endforeach; ?>
