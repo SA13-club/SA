@@ -269,7 +269,39 @@
               $foundDemands = [];
 
               if (!$hasPermission) {
-                  // 未登入或無身份 → 撈最新未媒合的6筆文章
+              $foundDemands = [];
+
+              // Step 1: 找出有評分的文章，且未完成/終止，依評分高→低排序
+              $sql = "
+                  SELECT 
+              d.d_id, d.d_date, d.tag, d.u_permission,
+              COALESCE(m.a_feedback, 0) + COALESCE(m.b_feedback, 0) AS total_feedback
+          FROM demanded d
+          JOIN match_db m ON d.d_id = m.demanded_id
+          WHERE (m.a_feedback IS NOT NULL OR m.b_feedback IS NOT NULL)
+          GROUP BY d.d_id
+          ORDER BY total_feedback DESC
+          LIMIT 6
+
+              ";
+              $stmt = $conn->prepare($sql);
+              $stmt->execute();
+              $res = $stmt->get_result();
+
+              while ($row = $res->fetch_assoc()) {
+                  $d_id = (int)$row['d_id'];
+                  $titleContent = getDemandTitleContent($conn, $d_id, $row['tag'], $row['u_permission']);
+                  $foundDemands[] = [
+                      'd_id'      => $d_id,
+                      'd_date'    => $row['d_date'],
+                      'd_title'   => $titleContent['title'],
+                      'd_content' => $titleContent['content']
+                  ];
+              }
+              $stmt->close();
+
+              // Step 2: 若不足6筆 → 撈尚未媒合過的文章，按發佈時間遞減排序補滿
+              if (count($foundDemands) < 6) {
                   $sql = "SELECT d_id, d_date, tag, u_permission FROM demanded ORDER BY d_id DESC";
                   $stmt = $conn->prepare($sql);
                   $stmt->execute();
@@ -278,11 +310,15 @@
                   $checkStmt = $conn->prepare("
                       SELECT COUNT(*) 
                       FROM match_db
-                      WHERE demanded_id = ? AND status IN ('completed','terminated')
+                      WHERE demanded_id = ? AND status IN ('completed','terminated','pending','negotiating')
                   ");
 
                   while (count($foundDemands) < 6 && ($row = $res->fetch_assoc())) {
                       $d_id = (int)$row['d_id'];
+
+                      // 如果這筆文章已經在前面加入過了，就跳過
+                      $alreadyAdded = array_filter($foundDemands, fn($d) => $d['d_id'] === $d_id);
+                      if ($alreadyAdded) continue;
 
                       $checkStmt->bind_param('i', $d_id);
                       $checkStmt->execute();
@@ -303,8 +339,10 @@
 
                   $checkStmt->close();
                   $stmt->close();
+              }
 
-              } else {
+              // 最終 $foundDemands 陣列裡就是你要顯示的資料
+          } else {
                   // Step 1：計算 top users
                   $ratings = [];
                   $sql = "
@@ -332,6 +370,86 @@
                   }
                   arsort($averages);
                   $topUsers = array_keys($averages);
+
+                  // Step 1 後立即加入這段
+                  foreach ($topUsers as $email) {
+                      $sql = "
+                          SELECT DISTINCT demanded_id
+                          FROM match_db
+                          WHERE status = 'completed'
+                            AND demanded_id IS NOT NULL
+                            AND (
+                                (a_u_email = ? AND b_feedback IS NOT NULL AND b_feedback <> 0) OR 
+                                (b_u_email = ? AND a_feedback IS NOT NULL AND a_feedback <> 0)
+                            )
+                          ORDER BY d_date DESC
+                          LIMIT 6
+                      ";
+                      $stmt = $conn->prepare($sql);
+                      $stmt->bind_param("ss", $email, $email);
+                      $stmt->execute();
+                      $res = $stmt->get_result();
+                      $stmt->close();
+
+                      while ($row = $res->fetch_assoc()) {
+                      $d_id = (int)$row['demanded_id'];
+
+                      // 避免重複
+                      $exists = false;
+                      foreach ($foundDemands as $d) {
+                          if ($d['d_id'] === $d_id) {
+                              $exists = true;
+                              break;
+                          }
+                      }
+                      if ($exists) continue;
+
+                      // 這裡加入身份條件（社團只能看到企業的，企業只能看到社團的）
+                      $stmt2 = $conn->prepare("
+                          SELECT tag, u_permission, d_date 
+                          FROM demanded 
+                          WHERE d_id = ? 
+                            AND (
+                              (tag = '合作' AND (
+                                  (? = '企業' AND u_permission = '組織團體') OR 
+                                  (? = '組織團體' AND u_permission = '企業')
+                              )) 
+                              OR 
+                              (tag <> '合作' AND u_permission = ?)
+                          )
+                      ");
+                      $stmt2->bind_param("isss", $d_id, $current_perm, $current_perm, $permission);
+                      $stmt2->execute();
+                      $result2 = $stmt2->get_result();
+                      $stmt2->close();
+
+                      if ($result2 && $row2 = $result2->fetch_assoc()) {
+                          $tag = $row2['tag'];
+                          $u_permission = $row2['u_permission'];
+                          $d_date = $row2['d_date'];
+
+                          $titleContent = getDemandTitleContent($conn, $d_id, $tag, $u_permission);
+
+                          if (
+                              str_starts_with($titleContent['title'], '（') &&
+                              str_contains($titleContent['title'], '無法顯示')
+                          ) continue;
+
+                          $foundDemands[] = [
+                              'd_id'      => $d_id,
+                              'd_date'    => $d_date,
+                              'd_title'   => $titleContent['title'],
+                              'd_content' => $titleContent['content']
+                          ];
+                      }
+
+                      if (count($foundDemands) >= 6) break;
+                  }
+
+
+                      if (count($foundDemands) >= 6) break;
+                  }
+
 
                   // Step 2：抓 top user 的需求文章
                   foreach ($topUsers as $email) {
