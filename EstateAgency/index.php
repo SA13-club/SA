@@ -276,12 +276,12 @@
                   SELECT 
               d.d_id, d.d_date, d.tag, d.u_permission,
               COALESCE(m.a_feedback, 0) + COALESCE(m.b_feedback, 0) AS total_feedback
-          FROM demanded d
-          JOIN match_db m ON d.d_id = m.demanded_id
-          WHERE (m.a_feedback IS NOT NULL OR m.b_feedback IS NOT NULL)
-          GROUP BY d.d_id
-          ORDER BY total_feedback DESC
-          LIMIT 6
+              FROM demanded d
+              JOIN match_db m ON d.d_id = m.demanded_id
+              WHERE (m.a_feedback IS NOT NULL OR m.b_feedback IS NOT NULL)
+              GROUP BY d.d_id
+              ORDER BY total_feedback DESC
+              LIMIT 6
 
               ";
               $stmt = $conn->prepare($sql);
@@ -374,16 +374,19 @@
                   // Step 1 後立即加入這段
                   foreach ($topUsers as $email) {
                       $sql = "
-                          SELECT DISTINCT demanded_id
-                          FROM match_db
-                          WHERE status = 'completed'
-                            AND demanded_id IS NOT NULL
-                            AND (
-                                (a_u_email = ? AND b_feedback IS NOT NULL AND b_feedback <> 0) OR 
-                                (b_u_email = ? AND a_feedback IS NOT NULL AND a_feedback <> 0)
-                            )
-                          ORDER BY d_date DESC
-                          LIMIT 6
+                          SELECT d.d_id AS demanded_id, d.d_date, d.tag, d.u_permission,
+           COALESCE(m.a_feedback, 0) + COALESCE(m.b_feedback, 0) AS total_feedback
+    FROM match_db m
+    JOIN demanded d ON m.demanded_id = d.d_id
+    WHERE m.status = 'completed'
+      AND (
+          (a_u_email = ? AND b_feedback IS NOT NULL AND b_feedback <> 0) OR 
+          (b_u_email = ? AND a_feedback IS NOT NULL AND a_feedback <> 0)
+      )
+    GROUP BY d.d_id
+    ORDER BY total_feedback DESC
+    LIMIT 6
+
                       ";
                       $stmt = $conn->prepare($sql);
                       $stmt->bind_param("ss", $email, $email);
