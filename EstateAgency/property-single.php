@@ -417,7 +417,18 @@ session_start();
                       我想合作
                     </button>
                   </li>
+                  <li class="my-2">
+                    <button class="btn" style="background-color:rgb(184, 0, 0); color: white;" onclick="reportProject(<?= htmlspecialchars($d_id) ?>)">
+                      檢舉專案
+                    </button>
+                    <div id="report-message" style="margin-top: 10px; color: green; font-weight: bold;"></div>
+                  </li>
                 </ul>
+                <?php if (isset($_GET['report']) && $_GET['report'] === 'success'): ?>
+                  <div style="color: red; font-weight: bold; margin-top: 10px;">
+                    ✅ 檢舉成功！
+                  </div>
+                <?php endif; ?>
               </div>
             </div>
           <?php endif; ?>
@@ -442,11 +453,10 @@ session_start();
                 </div>
 
                 <div class="my-2">
-                 <a
+                  <a
                     href="deletepost.php?id=<?php echo urlencode($d_id); ?>"
                     class="btn btn-sm btn-danger"
-                    onclick="return confirm('確定要刪除這篇文章嗎？')"
-                  >
+                    onclick="return confirm('確定要刪除這篇文章嗎？')">
                     <i class="bi bi-trash"></i> 刪除文章
                   </a>
 
@@ -537,6 +547,31 @@ session_start();
 
   <!-- Main JS File -->
   <script src="assets/js/main.js"></script>
+  <script>
+    function reportProject(d_id) {
+      if (!confirm('確定要檢舉專案？')) return;
+
+      fetch('reportdbp.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: 'd_id=' + encodeURIComponent(d_id)
+        })
+        .then(response => response.text())
+        .then(result => {
+          if (result.trim() === 'success') {
+            alert('✅ 檢舉成功！');
+          } else {
+            alert('❌ 檢舉失敗，請稍後再試');
+          }
+        })
+        .catch(error => {
+          console.error('檢舉失敗:', error);
+          alert('❌ 檢舉過程發生錯誤');
+        });
+    }
+  </script>
 
 </body>
 

@@ -341,6 +341,12 @@
                       // 企業可以看到：corp_coop（合作）、org_donate
                       $tagParts[] = "EXISTS (SELECT 1 FROM corp_coop cc WHERE cc.d_id = d.d_id)";
                       $tagParts[] = "EXISTS (SELECT 1 FROM org_donate od WHERE od.d_id = d.d_id)";
+                    } else {
+                      $tagParts[] = "EXISTS (SELECT 1 FROM club_coop clc WHERE clc.d_id = d.d_id)";
+                      $tagParts[] = "EXISTS (SELECT 1 FROM cor_intern ci WHERE ci.d_id = d.d_id)";
+                      $tagParts[] = "EXISTS (SELECT 1 FROM cor_spons cs WHERE cs.d_id = d.d_id)";
+                      $tagParts[] = "EXISTS (SELECT 1 FROM corp_coop cc WHERE cc.d_id = d.d_id)";
+                      $tagParts[] = "EXISTS (SELECT 1 FROM org_donate od WHERE od.d_id = d.d_id)";
                     }
 
                     // 組合 SQL
