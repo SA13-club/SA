@@ -252,71 +252,77 @@ if ($email) {
             <h2><span style="color: #2F4F4F;">帳號資訊</span></h2>
 
             <?php if ($account_info): ?>
-            <div class="card p-4 shadow-sm" style="border: 3px solid #6495ED;">
-                <h2 class="mb-4">
-                    <i class="bi bi-building"></i>
-                    <strong>
-                        <?= htmlspecialchars($source === 'organization' ? $account_info['o_name'] : $account_info['c_name']) ?>
-                    </strong>
-                </h2>
+                <div class="card p-4 shadow-sm" style="border: 3px solid #6495ED;">
+                    <h2 class="mb-4">
+                        <i class="bi bi-building"></i>
+                        <strong>
+                            <?= htmlspecialchars($source === 'organization' ? $account_info['o_name'] : $account_info['c_name']) ?>
+                        </strong>
+                    </h2>
 
-                <div class="mb-3">
-                    <i class="bi bi-tags"></i>
-                    <strong><?= $source === 'organization' ? '組織類型：' : '公司類型：' ?></strong>
-                    <?= htmlspecialchars($source === 'organization' ? $account_info['o_type'] : $account_info['c_type']) ?>
-                </div>
+                    <div class="mb-3">
+                        <i class="bi bi-tags"></i>
+                        <strong><?= $source === 'organization' ? '組織類型：' : '公司類型：' ?></strong>
+                        <?= htmlspecialchars($source === 'organization' ? $account_info['o_type'] : $account_info['c_type']) ?>
+                    </div>
 
-                <?php if ($source === 'corporation'): ?>
-                <div class="mb-3">
-                    <i class="bi bi-diagram-3"></i>
-                    <strong>產業類別：</strong>
-                    <?= htmlspecialchars($account_info['c_industry']) ?>
-                </div>
-                <div class="mb-3">
-                    <i class="bi bi-geo-alt"></i>
-                    <strong>公司地址：</strong>
-                    <?= htmlspecialchars($account_info['c_address']) ?>
-                </div>
-                <?php endif; ?>
+                    <?php if ($source === 'corporation'): ?>
+                        <div class="mb-3">
+                            <i class="bi bi-diagram-3"></i>
+                            <strong>產業類別：</strong>
+                            <?= htmlspecialchars($account_info['c_industry']) ?>
+                        </div>
+                        <div class="mb-3">
+                            <i class="bi bi-geo-alt"></i>
+                            <strong>公司地址：</strong>
+                            <?= htmlspecialchars($account_info['c_address']) ?>
+                        </div>
+                    <?php endif; ?>
 
-                <div class="mb-3">
-                    <i class="bi bi-person"></i>
-                    <strong>聯絡人姓名：</strong>
-                    <?= htmlspecialchars($source === 'organization' ? $account_info['s_name'] : $account_info['e_name']) ?>
-                </div>
+                    <div class="mb-3">
+                        <i class="bi bi-person"></i>
+                        <strong>聯絡人姓名：</strong>
+                        <?= htmlspecialchars($source === 'organization' ? $account_info['s_name'] : $account_info['e_name']) ?>
+                    </div>
 
-                <div class="mb-3">
-                    <i class="bi bi-briefcase"></i>
-                    <strong>聯絡人職稱：</strong>
-                    <?= htmlspecialchars($source === 'organization' ? $account_info['s_type'] : $account_info['e_type']) ?>
-                </div>
+                    <div class="mb-3">
+                        <i class="bi bi-briefcase"></i>
+                        <strong>聯絡人職稱：</strong>
+                        <?= htmlspecialchars($source === 'organization' ? $account_info['s_type'] : $account_info['e_type']) ?>
+                    </div>
 
-                <div class="mb-3">
-                    <i class="bi bi-envelope"></i>
-                    <strong>聯絡人 Email：</strong>
-                    <?= htmlspecialchars($source === 'organization' ? $account_info['s_email'] : $account_info['e_email']) ?>
-                </div>
+                    <div class="mb-3">
+                        <i class="bi bi-envelope"></i>
+                        <strong>聯絡人 Email：</strong>
+                        <?= htmlspecialchars($source === 'organization' ? $account_info['s_email'] : $account_info['e_email']) ?>
+                    </div>
 
-                <div class="mb-3">
-                    <i class="bi bi-telephone"></i>
-                    <strong>聯絡人電話：</strong>
-                    <?= htmlspecialchars($source === 'organization' ? $account_info['s_phone'] : $account_info['e_phone']) ?>
-                </div>
+                    <div class="mb-3">
+                        <i class="bi bi-telephone"></i>
+                        <strong>聯絡人電話：</strong>
+                        <?= htmlspecialchars($source === 'organization' ? $account_info['s_phone'] : $account_info['e_phone']) ?>
+                    </div>
 
-                <div class="mb-3">
-                    <i class="bi bi-card-text"></i>
-                    <strong><?= $source === 'organization' ? '組織簡介：' : '公司簡介：' ?></strong><br />
-                    <div style="border: 1px solid #ccc; padding: 10px; margin-top: 5px; border-radius: 5px; background-color: #f9f9f9;">
-                        <?= nl2br(htmlspecialchars($account_info['u_content'] ?? '無簡介資料')) ?>
+                    <div class="mb-3">
+                        <i class="bi bi-card-text"></i>
+                        <strong><?= $source === 'organization' ? '組織簡介：' : '公司簡介：' ?></strong><br />
+                        <div style="border: 1px solid #ccc; padding: 10px; margin-top: 5px; border-radius: 5px; background-color: #f9f9f9;">
+                            <?= nl2br(htmlspecialchars($account_info['u_content'] ?? '無簡介資料')) ?>
+                        </div>
+                    </div>
+                    <div class="text-end mt-3">
+                        <button class="btn" style="background-color:rgb(184, 0, 0); color: white;"
+                            onclick="reportProject('<?= htmlspecialchars($email) ?>')">
+                            檢舉此帳號
+                        </button>
+
                     </div>
                 </div>
-
-            </div>
             <?php else: ?>
-            <div class="alert alert-warning">查無該帳號資料，請確認網址參數。</div>
+                <div class="alert alert-warning">查無該帳號資料，請確認網址參數。</div>
             <?php endif; ?>
         </div>
-        
+
 
         <div class="container my-5">
             <h3><span style="color: #2F4F4F;">合作評價紀錄</span></h3>
@@ -376,6 +382,31 @@ if ($email) {
     <script src="assets/vendor/aos/aos.js"></script>
     <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
     <script src="assets/js/main.js"></script>
+    <script>
+        function reportProject(u_email) {
+            if (!confirm('確定要檢舉此帳號？')) return;
+
+            fetch('reportdba.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: 'u_email=' + encodeURIComponent(u_email)
+                })
+                .then(response => response.text())
+                .then(result => {
+                    if (result.trim() === 'success') {
+                        alert('✅ 檢舉成功！');
+                    } else {
+                        alert('❌ 檢舉失敗，請稍後再試');
+                    }
+                })
+                .catch(error => {
+                    console.error('檢舉失敗:', error);
+                    alert('❌ 檢舉過程發生錯誤');
+                });
+        }
+    </script>
 </body>
 
 </html>
