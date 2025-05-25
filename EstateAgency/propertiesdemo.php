@@ -477,7 +477,7 @@
         od.deadline AS donate_deadline,
         clc.deadline AS coop_club_deadline,
         cc.deadline AS coop_corp_deadline,
-        ci.c_name AS intern_c_name, ci.c_phone AS intern_c_phone, ci.c_email AS intern_c_email, ci.title AS intern_title,
+        ci.c_name AS intern_c_name, ci.c_phone AS intern_c_phone, ci.c_email AS intern_c_email, ci.intern_title AS intern_title,
         cs.c_name AS spons_c_name, cs.c_phone AS spons_c_phone, cs.c_email AS spons_c_email, cs.title AS spons_title,
         od.c_name AS donate_c_name, od.c_phone AS donate_c_phone, od.c_email AS donate_c_email, od.title AS donate_title,
         COALESCE(cc.c_name, clc.c_name) AS coop_c_name,

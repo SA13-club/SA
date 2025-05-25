@@ -11,7 +11,7 @@ if ($conn->connect_error) {
 $u_email = $_POST['u_email'];
 
 
-$stmt = $conn->prepare("UPDATE user_account SET d_ban = IFNULL(d_ban, 0) + 1 WHERE u_email = ?");
+$stmt = $conn->prepare("UPDATE user_account SET banac = IFNULL(banac, 0) + 1 WHERE u_email = ?");
 $stmt->bind_param("s", $u_email);
 
 if ($stmt->execute()) {
