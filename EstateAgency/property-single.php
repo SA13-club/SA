@@ -82,9 +82,9 @@ session_start();
 
           <nav id="navmenu" class="navmenu">
             <ul>
-              <li><a href="index.php" class="active">主頁</a></li>
+              <li><a href="index.php">主頁</a></li>
               <li><a href="about.php">操作指南</a></li>
-              <li><a href="propertiesdemo.php">專案總覽</a></li>
+              <li><a href="propertiesdemo.php" class='active'>專案總覽</a></li>
               <li><a href="contact.php">聯絡我們</a></li>
               <?php
               if ($_SESSION['u_email']) {
