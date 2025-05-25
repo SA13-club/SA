@@ -1,5 +1,4 @@
 <?php
-session_start();
 $me = $_SESSION['u_email'] ?? '';
 if (!$me) {
     echo json_encode(['status'=>false,'msg'=>'未登入']); exit;

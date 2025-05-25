@@ -375,17 +375,17 @@
                   foreach ($topUsers as $email) {
                       $sql = "
                           SELECT d.d_id AS demanded_id, d.d_date, d.tag, d.u_permission,
-           COALESCE(m.a_feedback, 0) + COALESCE(m.b_feedback, 0) AS total_feedback
-    FROM match_db m
-    JOIN demanded d ON m.demanded_id = d.d_id
-    WHERE m.status = 'completed'
-      AND (
-          (a_u_email = ? AND b_feedback IS NOT NULL AND b_feedback <> 0) OR 
-          (b_u_email = ? AND a_feedback IS NOT NULL AND a_feedback <> 0)
-      )
-    GROUP BY d.d_id
-    ORDER BY total_feedback DESC
-    LIMIT 6
+                          COALESCE(m.a_feedback, 0) + COALESCE(m.b_feedback, 0) AS total_feedback
+                          FROM match_db m
+                          JOIN demanded d ON m.demanded_id = d.d_id
+                          WHERE m.status = 'completed'
+                            AND (
+                                (a_u_email = ? AND b_feedback IS NOT NULL AND b_feedback <> 0) OR 
+                                (b_u_email = ? AND a_feedback IS NOT NULL AND a_feedback <> 0)
+                            )
+                          GROUP BY d.d_id
+                          ORDER BY total_feedback DESC
+                          LIMIT 6
 
                       ";
                       $stmt = $conn->prepare($sql);
