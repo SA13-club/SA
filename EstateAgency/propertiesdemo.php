@@ -136,7 +136,7 @@
           <li><a href="index.php">主頁</a></li>
           <li><a href="about.php">關於</a></li>
           <li><a href="services.php">服務</a></li>
-          <li><a href="propertiesdemo.php" class="active">最新專案</a></li>
+          <li><a href="propertiesdemo.php" class="active">專案總覽</a></li>
           <li><a href="agents.php">合作單位</a></li>
           <li><a href="contact.php">聯絡我們</a></li>
           <?php
@@ -181,7 +181,7 @@
         <div class="container" style="padding: 85px 0 0 0;">
           <ol>
             <li><a href="index.php">首頁</a></li>
-            <li class="current">最新專案</li>
+            <li class="current">專案總覽</li>
           </ol>
         </div>
       </nav>
@@ -192,7 +192,7 @@
 
       <!-- Section Title -->
       <div class="container section-title" data-aos="fade-up">
-        <h2>最新專案</h2>
+        <h2>專案總覽</h2>
       </div><!-- End Section Title -->
 
       <div class='container'>
@@ -401,7 +401,7 @@
                 <?php
                 if ($_SESSION['u_email']) {
                   echo " <a href='newdona.php' class='btn btn-success'>
-                    <i class='bi bi-plus-circle me-2'></i>發布需求";
+                    <i class='bi bi-plus-circle me-2'></i>發布專案";
                 }
                 ?>
                 </a>
