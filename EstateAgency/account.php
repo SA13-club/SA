@@ -980,7 +980,7 @@ if ($currentUser) {
                                                 $isWaitingStep2 = false;
                                                 $isNotAcceptedStep2 = false;
                                                 $waitingText2 = '';
-
+                                                //判斷狀態以及是誰接受\未接受
                                                 if ($r['status'] === 'pending') {
                                                     if ($r['agree_a'] == 1 && $r['agree_b'] == 0) {
                                                         if ($me === $r['a_u_email']) {
@@ -1083,7 +1083,7 @@ if ($currentUser) {
                                                             }
                                                 echo "</div>
                                                             <a class='btn chat-button' style='background-color:#28c76f;color:white; margin-left: 10px; border-radius: 100%;'
-                                                            href='./chat/public/index.php?u_email=" . urlencode($me) . "&receiver=" . urlencode($partner) . "' 
+                                                            href='./chat/public/index .php?u_email=" . urlencode($me) . "&receiver=" . urlencode($partner) . "' 
                                                             target='_blank'><i class='bi bi-chat-dots-fill'></i></a>
                                                         </div>
                                                     </div>

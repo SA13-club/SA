@@ -27,15 +27,15 @@ if (!$tag_row) {
 $cop_b=$tag_row['u_email'];
 $tag = $tag_row['tag'];
 
-// 根據 tag 決定查哪張表
+// 根據 tag 決定查哪張表// 先決定初始 table
 switch ($tag) {
     case '合作':
-        $table = 'org_coop';
+        $table = 'club_coop';
         break;
     case 'spon':
         $table = 'org_donate';
         break;
-    case '招募':
+    case '實習':
         $table = 'cor_intern';
         break;
     case '贊助':
@@ -45,15 +45,25 @@ switch ($tag) {
         die('錯誤：未知的標籤類型！');
 }
 
-// 查真正的內容
-$content_sql = "SELECT * FROM $table WHERE d_id='$d_id'";
+// 第一次查 club_coop（或其他 table）
+$content_sql    = "SELECT * FROM {$table} WHERE d_id='$d_id'";
 $content_result = mysqli_query($link, $content_sql);
+
+// 如果是「合作」標籤，且在 club_coop 沒查到任何資料，就再 fallback 去 corp_coop
+if ($tag === '合作' && mysqli_num_rows($content_result) === 0) {
+    $table          = 'corp_coop';
+    $content_sql    = "SELECT * FROM {$table} WHERE d_id='$d_id'";
+    $content_result = mysqli_query($link, $content_sql);
+}
+
+// 最終拿到一列資料或 null
 $content_row = mysqli_fetch_assoc($content_result);
 $receiver_email = $content_row['c_email'] ?? '';
 
 if (!$receiver_email) {
     die('找不到合作對象');
 }
+
 
 // ✅ 使用 PHPMailer 發送 Email
 $mail = new PHPMailer(true);

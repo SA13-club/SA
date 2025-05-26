@@ -88,7 +88,7 @@ if ($u_permission == '組織團體') {
                     // 合作期間
                     $coop_start = $_POST['coop_start'] ?? '';
                     $coop_end   = $_POST['coop_end']   ?? '';
-        
+                    
                     // 組 SQL（請改用 Prepared Statement 會更安全，以下範例簡化版）
                     $sql = "
                         INSERT INTO club_coop

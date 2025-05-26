@@ -386,7 +386,7 @@ session_start();
                 <ul>
                   <?php
                   // 顯示公司資訊
-                  echo "<li><p>🏢 <strong>公司名稱：</strong><a href='profile.php?d_id=" . htmlspecialchars($d_id) . "'> " .
+                  echo "<li><p>🏢 <strong>發布者名稱：</strong><a href='profile.php?d_id=" . htmlspecialchars($d_id) . "'> " .
                     htmlspecialchars($content_row['c_name'] ?? '無資料') . "</a></p></li>
                   <li><p>📧 <strong>聯絡信箱：</strong> " .
                     htmlspecialchars($content_row['c_email'] ?? '無資料') . "</p></li>
@@ -448,7 +448,7 @@ session_start();
                 <ul>
                   <?php
                   // 顯示公司資訊
-                  echo "<li><p>🏢 <strong>公司名稱：</strong><a href='profile.php?d_id=" . htmlspecialchars($d_id) . "'> " .
+                  echo "<li><p>🏢 <strong>發布者名稱：</strong><a href='profile.php?d_id=" . htmlspecialchars($d_id) . "'> " .
                     htmlspecialchars($content_row['c_name'] ?? '無資料') . "</a></p></li>
                   <li><p>📧 <strong>聯絡信箱：</strong> " .
                     htmlspecialchars($content_row['c_email'] ?? '無資料') . "</p></li>

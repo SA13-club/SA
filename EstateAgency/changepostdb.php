@@ -1,6 +1,6 @@
 <meta http-equiv="refresh" content="3; url=newdona.php">
 <?php
-session_start();
+
 $servername = "localhost";
 $username = "root";
 $password = "";

@@ -505,6 +505,9 @@
                                 <input type="date" name="deadline" class="form-control" value="<?php echo htmlspecialchars($row['deadline'] ?? ''); ?>">
                             </div>
                         </div>
+                          <div class="col-md-12 text-center">
+                                <button type="submit">修改</button>
+                            </div>
                 </div>
                 </form>
             </div>
