@@ -932,22 +932,51 @@ if ($currentUser) {
                                                 $tag = htmlspecialchars($t->get_result()->fetch_assoc()['tag'] ?? '');
                                                 $t->close();
 
+                                               // 先準備好每個 tag 對應的一或多張表，以及欄位 key
                                                 switch ($tag) {
-                                                    case '企業合作': $tbl='corp_coop';  $key='coop_name'; break;
-                                                    case '社團合作': $tbl='club_coop';  $key='coop_name'; break;
-                                                    case 'spon':      $tbl='org_donate'; $key='event_name'; $tag='贊助'; break;
-                                                    case '贊助':      $tbl='cor_spons';  $key='title'; break;
-                                                    case '實習':      $tbl='cor_intern'; $key='intern_title'; break;
-                                                    default:          $tbl=''; $key=''; break;
+                                                    case '合作':
+                                                        
+                                                        $tables = ['club_coop', 'corp_coop'];
+                                                        $key    = 'coop_name';
+                                                        break;
+                                                    case 'spon':
+                                                        $tables = ['org_donate'];
+                                                        $key    = 'event_name';
+                                                        $tag    = '贊助';
+                                                        break;
+                                                    case '贊助':
+                                                        $tables = ['cor_spons'];
+                                                        $key    = 'title';
+                                                        break;
+                                                    case '實習':
+                                                        $tables = ['cor_intern'];
+                                                        $key    = 'intern_title';
+                                                        break;
+                                                    default:
+                                                        die('錯誤：未知的標籤類型！');
                                                 }
 
+                                                // 如果有對應到表，開始依序查
                                                 $proj = '';
-                                                if ($tbl) {
-                                                    $u = $conn->prepare("SELECT $key FROM $tbl WHERE d_id=?");
-                                                    $u->bind_param("s", $r['demanded_id']);
-                                                    $u->execute();
-                                                    $proj = htmlspecialchars($u->get_result()->fetch_assoc()[$key] ?? '');
-                                                    $u->close();
+                                                if (!empty($tables)) {
+                                                    foreach ($tables as $tbl) {
+                                                        $stmt = $conn->prepare("SELECT `$key` FROM `$tbl` WHERE d_id = ?");
+                                                        $stmt->bind_param("s", $r['demanded_id']);
+                                                        $stmt->execute();
+                                                        $res = $stmt->get_result()->fetch_assoc();
+                                                        $stmt->close();
+
+                                                        if (!empty($res[$key])) {
+                                                            // 找到第一筆非空值就停
+                                                            $proj = htmlspecialchars($res[$key]);
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+
+                                                // 如果到最後還是空，就報錯
+                                                if ($proj === '') {
+                                                    die('找不到此合作專案的名稱');
                                                 }
 
                                                 $who = ($r['a_u_email'] === $me) ? 'a' : 'b';
