@@ -212,9 +212,8 @@
         <div class="col-lg-3 col-md-6 d-flex">
           <i class="bi bi-geo-alt icon"></i>
           <div class="address">
-            <h4>Address</h4>
-            <p>A108 Adam Street</p>
-            <p>New York, NY 535022</p>
+            <h4>地址</h4>
+            <p>242新北市新莊區中正路510號</p>
             <p></p>
           </div>
 
@@ -223,9 +222,9 @@
         <div class="col-lg-3 col-md-6 d-flex">
           <i class="bi bi-telephone icon"></i>
           <div>
-            <h4>Contact</h4>
+            <h4>聯繫方式</h4>
             <p>
-              <strong>Phone:</strong> <span>+1 5589 55488 55</span><br>
+              <strong>電話:</strong> <span>0912312312</span><br>
               <strong>Email:</strong> <span>info@example.com</span><br>
             </p>
           </div>
@@ -234,16 +233,16 @@
         <div class="col-lg-3 col-md-6 d-flex">
           <i class="bi bi-clock icon"></i>
           <div>
-            <h4>Opening Hours</h4>
+            <h4>客服時間</h4>
             <p>
-              <strong>Mon-Sat:</strong> <span>11AM - 23PM</span><br>
-              <strong>Sunday</strong>: <span>Closed</span>
+              <strong>星期一～星期六</strong>: <span>11AM - 23PM</span><br>
+              <strong>星期日</strong>: <span>未營業</span>
             </p>
           </div>
         </div>
 
         <div class="col-lg-3 col-md-6">
-          <h4>Follow Us</h4>
+          <h4>社群媒體</h4>
           <div class="social-links d-flex">
             <a href="#" class="twitter"><i class="bi bi-twitter-x"></i></a>
             <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
