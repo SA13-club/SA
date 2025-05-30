@@ -111,8 +111,8 @@
         <div class="container">
           <div class="row d-flex justify-content-center text-center">
             <div class="col-lg-8">
-              <h1>Contact</h1>
-              <p class="mb-0">Odio et unde deleniti. Deserunt numquam exercitationem. Officiis quo odio sint voluptas consequatur ut a odio voluptatem. Sit dolorum debitis veritatis natus dolores. Quasi ratione sint. Sit quaerat ipsum dolorem.</p>
+              <h1>聯絡我們</h1>
+              <p class="mb-0">有任何問題、建議或合作邀約，歡迎透過以下方式與我們聯繫。我們將盡快回覆您，謝謝您的支持！</p>
             </div>
           </div>
         </div>
@@ -120,8 +120,8 @@
       <nav class="breadcrumbs">
         <div class="container">
           <ol>
-            <li><a href="index.php">Home</a></li>
-            <li class="current">Contact</li>
+            <li><a href="index.php">首頁</a></li>
+            <li class="current">聯絡我們</li>
           </ol>
         </div>
       </nav>
