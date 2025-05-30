@@ -123,8 +123,8 @@
               </div>
               <div class="modal-body">
                 <a href="BusinessSignIn.php" class="btn-permission">企業</a>
+                <a></a>
                 <a href="OgnizationSignIn.php" class="btn-permission">組織團體</a>
-                <a href="PersonalSignIn.php" class="btn-permission">個人</a>
               </div>
             </div>
           </div>
