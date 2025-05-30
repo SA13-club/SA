@@ -948,10 +948,10 @@ if ($currentUser) {
                                                         $tables = ['cor_spons'];
                                                         $key    = 'title';
                                                         break;
-                                                    case '實習':
+                                                    /*case '實習':
                                                         $tables = ['cor_intern'];
                                                         $key    = 'intern_title';
-                                                        break;
+                                                        break;*/
                                                     default:
                                                         die('錯誤：未知的標籤類型！');
                                                 }
